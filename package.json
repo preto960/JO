@@ -1,0 +1,35 @@
+{
+  "name": "plugin-marketplace-monorepo",
+  "version": "1.0.0",
+  "description": "Plugin Marketplace - Monorepo with 3 separate Vercel projects",
+  "private": true,
+  "scripts": {
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:publisher": "cd publisher && npm run dev",
+    "dev:all": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:publisher\"",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "build:publisher": "cd publisher && npm run build",
+    "build:all": "npm run build:backend && npm run build:frontend && npm run build:publisher",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install && cd ../publisher && npm install",
+    "lint:backend": "cd backend && npm run lint",
+    "lint:frontend": "cd frontend && npm run lint",
+    "lint:publisher": "cd publisher && npm run lint",
+    "lint:all": "npm run lint:backend && npm run lint:frontend && npm run lint:publisher",
+    "db:push": "cd backend && npm run db:push",
+    "db:studio": "cd backend && npm run db:studio"
+  },
+  "workspaces": [
+    "backend",
+    "frontend", 
+    "publisher"
+  ],
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}
