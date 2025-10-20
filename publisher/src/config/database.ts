@@ -19,8 +19,8 @@ if (databaseUrl) {
     type: 'postgres',
     url: databaseUrl,
     entities: [PublisherUser, PublisherPlugin, PublisherSession, PublisherAnalytics],
-    synchronize: process.env.NODE_ENV === 'development',
-    logging: process.env.NODE_ENV === 'development',
+    synchronize: false, // Disable auto-sync to prevent hanging
+    logging: false, // Disable logging to prevent console spam
     ssl: { rejectUnauthorized: false }, // Always use SSL for external databases
     migrations: ['src/migrations/*.ts'],
     subscribers: ['src/subscribers/*.ts'],

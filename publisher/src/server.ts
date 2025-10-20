@@ -9,12 +9,12 @@ import analyticsRoutes from './routes/analytics';
 import { errorHandler } from './middleware/errorHandler';
 
 const app = express();
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3005;
 
 // Security middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3001'],
+  origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3003', 'http://localhost:3004'],
   credentials: true
 }));
 
@@ -49,12 +49,43 @@ app.use(errorHandler);
 // Initialize database and start server
 const startServer = async () => {
   try {
+    console.log('🔄 Starting Publisher API server...');
+    console.log(`📡 Port: ${PORT}`);
+    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    
+    console.log('🔗 Connecting to database...');
     await PublisherDataSource.initialize();
     console.log('✅ Publisher Database connected successfully');
     
-    app.listen(PORT, () => {
-      console.log(`🚀 Publisher API running on port ${PORT}`);
-      console.log(`📊 Dashboard available at: http://localhost:${PORT}`);
+      // Handle port conflicts - try different ports
+    const tryPort = async (port: number): Promise<number> => {
+      return new Promise((resolve, reject) => {
+        const testServer = app.listen(port, () => {
+          testServer.close(() => {
+            resolve(port);
+          });
+        }).on('error', (err: any) => {
+          if (err.code === 'EADDRINUSE') {
+            if (port < 3100) {
+              resolve(tryPort(port + 1));
+            } else if (port < 9000) {
+              resolve(tryPort(port + 1));
+            } else {
+              reject(new Error('No available ports found'));
+            }
+          } else {
+            reject(err);
+          }
+        });
+      });
+    };
+
+    const availablePort = await tryPort(typeof PORT === 'string' ? parseInt(PORT) : PORT);
+    
+    app.listen(availablePort, () => {
+      console.log(`🚀 Publisher API running on port ${availablePort}`);
+      console.log(`📊 Dashboard available at: http://localhost:${availablePort}`);
+      console.log(`🔗 Health check: http://localhost:${availablePort}/api/health`);
     });
   } catch (error) {
     console.error('❌ Failed to start publisher server:', error);
