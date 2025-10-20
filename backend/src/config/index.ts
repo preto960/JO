@@ -7,13 +7,7 @@ interface Config {
   port: number;
   nodeEnv: string;
   database: {
-    url?: string;
-    host: string;
-    port: number;
-    username: string;
-    password: string;
-    database: string;
-    ssl: boolean;
+    url: string;
     synchronize: boolean;
     logging: boolean;
   };
@@ -36,13 +30,7 @@ const config: Config = {
   nodeEnv: process.env.NODE_ENV || 'development',
   
   database: {
-    url: process.env.DATABASE_URL,
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || '5432'),
-    username: process.env.DB_USERNAME || 'postgres',
-    password: process.env.DB_PASSWORD || 'password',
-    database: process.env.DB_NAME || 'plugin_marketplace',
-    ssl: process.env.NODE_ENV === 'production',
+    url: process.env.DATABASE_URL || '',
     synchronize: process.env.NODE_ENV === 'development',
     logging: process.env.NODE_ENV === 'development',
   },
@@ -64,8 +52,8 @@ const config: Config = {
 };
 
 // Validation
-if (!config.database.url && config.nodeEnv === 'production') {
-  throw new Error('DATABASE_URL is required in production');
+if (!config.database.url) {
+  throw new Error('DATABASE_URL is required in all environments');
 }
 
 if (!config.jwt.secret || config.jwt.secret === 'your-super-secret-jwt-key-change-this-in-production') {
@@ -79,7 +67,7 @@ if (!config.jwt.secret || config.jwt.secret === 'your-super-secret-jwt-key-chang
 console.log('🔧 Configuration loaded:', {
   port: config.port,
   nodeEnv: config.nodeEnv,
-  databaseUrl: config.database.url ? 'CONFIGURED' : 'USING LOCALHOST',
+  databaseUrl: 'CONFIGURED',
   jwtSecret: config.jwt.secret ? 'CONFIGURED' : 'MISSING',
   corsOrigin: config.cors.origin,
 });

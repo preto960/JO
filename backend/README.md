@@ -1,12 +1,12 @@
-# Plugin Marketplace - Backend con TypeORM y PostgreSQL
+# Plugin Marketplace - Backend con TypeORM y Neon PostgreSQL
 
-¡Perfecto! He corregido completamente el backend para usar **TypeORM + PostgreSQL** en lugar de Prisma + SQLite. Aquí está la arquitectura correcta:
+¡Perfecto! He configurado el backend para usar **TypeORM + Neon PostgreSQL** con conexión única via DATABASE_URL. Aquí está la arquitectura correcta:
 
 ## 🏗️ Cambios Realizados
 
 ### 1. **Dependencias Actualizadas**
 - ❌ Prisma + SQLite
-- ✅ **TypeORM + PostgreSQL**
+- ✅ **TypeORM + Neon PostgreSQL**
 
 ### 2. **Entidades TypeORM Completas**
 - `User` - Usuarios con roles (USER, DEVELOPER, ADMIN)
@@ -17,14 +17,9 @@
 - `PluginAnalytics` - Analíticas
 - `Transaction` - Transacciones financieras
 
-### 3. **Configuración PostgreSQL**
+### 3. **Configuración Neon PostgreSQL**
 ```env
-DATABASE_URL=postgresql://postgres:password@localhost:5432/plugin_marketplace
-DB_HOST=localhost
-DB_PORT=5432
-DB_USERNAME=postgres
-DB_PASSWORD=password
-DB_NAME=plugin_marketplace
+DATABASE_URL=postgresql://neondb_owner:npg_hnVE2jqZSHx7@ep-patient-pond-adixypv6-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require
 ```
 
 ### 4. **Características de Seguridad**
@@ -45,25 +40,24 @@ GET  /api/users/:id         - Perfil de usuario
 
 ## 🚀 Para Iniciar
 
-1. **Instalar PostgreSQL** y crear base de datos:
-```sql
-CREATE DATABASE plugin_marketplace;
-```
-
-2. **Instalar dependencias**:
+1. **Instalar dependencias**:
 ```bash
 cd backend
 npm install
 ```
 
-3. **Configurar variables de entorno** en `.env`
+2. **Configurar variables de entorno** en `.env`:
+```bash
+cp .env.example .env
+# Editar .env con tu DATABASE_URL de Neon
+```
 
-4. **Iniciar servidor**:
+3. **Iniciar servidor**:
 ```bash
 npm run dev
 ```
 
-## 📊 Ventajas de TypeORM + PostgreSQL
+## 📊 Ventajas de TypeORM + Neon PostgreSQL
 
 - ✅ **Base de datos production-ready**
 - ✅ **Relaciones complejas** soportadas
@@ -71,6 +65,8 @@ npm run dev
 - ✅ **Transacciones ACID**
 - ✅ **Performance superior**
 - ✅ **Escalabilidad horizontal**
+- ✅ **Hosting gratuito** con Neon
+- ✅ **SSL incluido** por defecto
 
 ## 🔗 Estructura del Proyecto
 
@@ -82,11 +78,19 @@ backend/
 │   ├── routes/          # Definición de rutas
 │   ├── middleware/      # Auth, validación, errores
 │   ├── utils/           # Utilidades
-│   ├── config/          # Configuración DB
+│   ├── config/          # Configuración centralizada
 │   └── index.ts         # Punto de entrada
-├── .env                 # Variables de entorno
+├── .env                 # Variables de entorno (DATABASE_URL requerido)
+├── .env.example         # Ejemplo de configuración
 ├── package.json         # Dependencias
 └── tsconfig.json        # Config TypeScript
 ```
 
-Ahora tienes un backend robusto y production-ready con PostgreSQL y TypeORM! 🎉
+## ⚠️ Importante
+
+- **DATABASE_URL es REQUERIDO** en todos los ambientes
+- No se usan variables individuales (DB_HOST, DB_PORT, etc.)
+- Solo se soporta conexión via DATABASE_URL
+- Configuración optimizada para Neon PostgreSQL
+
+Ahora tienes un backend robusto y production-ready con Neon PostgreSQL y TypeORM! 🎉
