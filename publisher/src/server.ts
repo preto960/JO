@@ -53,8 +53,9 @@ const startServer = async () => {
     console.log(`📡 Port: ${PORT}`);
     console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
     
-    // Skip database connection for now - using mock storage
-    console.log('⚠️  Using mock storage (database disabled for development)');
+    console.log('🔗 Connecting to database...');
+    await PublisherDataSource.initialize();
+    console.log('✅ Publisher Database connected successfully');
     
       // Handle port conflicts - try different ports
     const tryPort = async (port: number): Promise<number> => {
@@ -86,6 +87,7 @@ const startServer = async () => {
       console.log(`📊 Dashboard available at: http://localhost:${availablePort}`);
       console.log(`🔗 Health check: http://localhost:${availablePort}/api/health`);
       console.log(`🔐 Auth endpoints: http://localhost:${availablePort}/api/auth/login, /api/auth/register`);
+      console.log(`💾 Database: Neon PostgreSQL connected`);
     });
   } catch (error) {
     console.error('❌ Failed to start publisher server:', error);

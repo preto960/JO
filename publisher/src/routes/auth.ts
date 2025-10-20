@@ -1,11 +1,10 @@
 import { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import { PublisherDataSource } from '../config/database';
+import { PublisherUser } from '../entities';
 
 const router = Router();
-
-// Mock user storage (en producción, usar base de datos)
-const users: any[] = [];
 
 // Login route
 router.post('/login', async (req, res) => {
@@ -14,8 +13,13 @@ router.post('/login', async (req, res) => {
     
     console.log('🔑 Login attempt:', { email, password: '***' });
     
-    // Buscar usuario por email
-    const user = users.find(u => u.email === email);
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+    
+    // Buscar usuario en la base de datos
+    const userRepository = PublisherDataSource.getRepository(PublisherUser);
+    const user = await userRepository.findOne({ where: { email } });
     
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
@@ -34,6 +38,8 @@ router.post('/login', async (req, res) => {
       process.env.JWT_SECRET || 'fallback-secret',
       { expiresIn: '24h' }
     );
+    
+    console.log('✅ Login successful:', { userId: user.id, email: user.email });
     
     res.json({
       user: {
@@ -58,44 +64,59 @@ router.post('/register', async (req, res) => {
     
     console.log('📝 Register attempt:', { email, username, password: '***', role });
     
+    if (!email || !username || !password) {
+      return res.status(400).json({ error: 'Email, username, and password are required' });
+    }
+    
+    // Inicializar repositorio
+    const userRepository = PublisherDataSource.getRepository(PublisherUser);
+    
     // Verificar si el usuario ya existe
-    const existingUser = users.find(u => u.email === email || u.username === username);
+    const existingUser = await userRepository.findOne({ 
+      where: [
+        { email },
+        { username }
+      ]
+    });
     
     if (existingUser) {
-      return res.status(400).json({ error: 'User already exists' });
+      return res.status(400).json({ error: 'User with this email or username already exists' });
     }
     
     // Hashear contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
     
     // Crear nuevo usuario
-    const newUser = {
-      id: Date.now().toString(),
+    const newUser = userRepository.create({
       email,
       username,
       password: hashedPassword,
-      role,
-      createdAt: new Date().toISOString()
-    };
+      role
+    });
     
-    users.push(newUser);
+    // Guardar en la base de datos
+    const savedUser = await userRepository.save(newUser);
     
-    console.log('✅ User created:', { id: newUser.id, email: newUser.email, username: newUser.username });
+    console.log('✅ User created in database:', { 
+      id: savedUser.id, 
+      email: savedUser.email, 
+      username: savedUser.username 
+    });
     
     // Generar token
     const token = jwt.sign(
-      { userId: newUser.id, email: newUser.email, username: newUser.username },
+      { userId: savedUser.id, email: savedUser.email, username: savedUser.username },
       process.env.JWT_SECRET || 'fallback-secret',
       { expiresIn: '24h' }
     );
     
     res.status(201).json({
       user: {
-        id: newUser.id,
-        email: newUser.email,
-        username: newUser.username,
-        role: newUser.role,
-        createdAt: newUser.createdAt
+        id: savedUser.id,
+        email: savedUser.email,
+        username: savedUser.username,
+        role: savedUser.role,
+        createdAt: savedUser.createdAt
       },
       token
     });
