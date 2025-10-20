@@ -1,5 +1,9 @@
+import dotenv from 'dotenv';
 import { DataSource } from 'typeorm';
 import { PublisherUser, PublisherPlugin, PublisherSession, PublisherAnalytics } from '../entities';
+
+// Load environment variables
+dotenv.config();
 
 // Parse DATABASE_URL if provided, otherwise use individual variables
 const databaseUrl = process.env.DATABASE_URL;

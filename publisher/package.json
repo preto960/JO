@@ -9,7 +9,7 @@
     "client": "vite",
     "build": "vite build",
     "start": "node dist/server.js",
-    "db:reset": "ts-node src/scripts/resetDatabase.ts",
+    "db:reset": "ts-node --project tsconfig.script.json src/scripts/resetDatabase.ts",
     "db:sync": "npm run typeorm -- schema:sync",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
@@ -48,6 +48,7 @@
     "postcss": "^8.4.47",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^4.2.0",
     "typeorm": "^0.3.20",
     "typescript": "~5.6.3",
     "vite": "^5.4.9",

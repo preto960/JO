@@ -1,6 +1,10 @@
+import dotenv from 'dotenv';
 import { DataSource } from 'typeorm';
 import { PublisherDataSource } from '../config/database';
 import { PublisherUser, PublisherPlugin, PublisherSession, PublisherAnalytics } from '../entities';
+
+// Load environment variables
+dotenv.config();
 
 const resetPublisherDatabase = async () => {
   try {
