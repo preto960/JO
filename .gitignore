@@ -62,3 +62,4 @@ build/
 *.tgz
 *.tar.gz
 >>>>>>> 4b64638250d20d80f26f52c9db70325df13eaf2d
+package-lock.json
