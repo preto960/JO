@@ -5,6 +5,7 @@ import Plugins from '@/views/Plugins.vue'
 import Analytics from '@/views/Analytics.vue'
 import Settings from '@/views/Settings.vue'
 import Login from '@/views/Login.vue'
+import Register from '@/views/Register.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -37,6 +38,11 @@ const router = createRouter({
       path: '/login',
       name: 'Login',
       component: Login
+    },
+    {
+      path: '/register',
+      name: 'Register',
+      component: Register
     }
   ]
 })
