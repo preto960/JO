@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '@/config/database';
-import { User, Plugin } from '@/entities';
+import { User, Plugin, PluginStatus } from '@/entities';
 import { asyncHandler } from '@/middleware/errorHandler';
 import { AuthenticatedRequest } from '@/middleware/auth';
 
@@ -24,7 +24,7 @@ export const getUserById = asyncHandler(async (req: Request, res: Response) => {
     where: { 
       authorId: id, 
       isActive: true,
-      status: 'APPROVED'
+      status: PluginStatus.APPROVED
     },
     select: ['id', 'title', 'description', 'price', 'category', 'createdAt', 'downloadCount', 'viewCount']
   });

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '@/config/database';
-import { Plugin, User } from '@/entities';
+import { Plugin, User, PluginStatus } from '@/entities';
 import { asyncHandler } from '@/middleware/errorHandler';
 import { pluginValidation, validateRequest } from '@/middleware/validation';
 import { AuthenticatedRequest } from '@/middleware/auth';
@@ -14,8 +14,7 @@ export const getPlugins = asyncHandler(async (req: Request, res: Response) => {
     category,
     search,
     sortBy = 'createdAt',
-    sortOrder = 'DESC',
-    status = 'APPROVED'
+    sortOrder = 'DESC'
   } = req.query;
 
   const skip = (Number(page) - 1) * Number(limit);
@@ -24,7 +23,7 @@ export const getPlugins = asyncHandler(async (req: Request, res: Response) => {
   const queryBuilder = pluginRepository
     .createQueryBuilder('plugin')
     .leftJoinAndSelect('plugin.author', 'author')
-    .where('plugin.status = :status', { status })
+    .where('plugin.status = :status', { status: PluginStatus.APPROVED })
     .andWhere('plugin.isActive = :isActive', { isActive: true });
 
   // Add filters
@@ -139,7 +138,7 @@ export const createPlugin = asyncHandler(async (req: AuthenticatedRequest, res: 
     githubUrl,
     documentationUrl,
     authorId: req.user!.id,
-    status: 'PENDING'
+    status: PluginStatus.PENDING
   });
 
   await pluginRepository.save(plugin);
@@ -194,7 +193,7 @@ export const updatePlugin = asyncHandler(async (req: AuthenticatedRequest, res: 
     demoUrl,
     githubUrl,
     documentationUrl,
-    status: 'PENDING' // Reset to pending when updated
+    status: PluginStatus.PENDING // Reset to pending when updated
   });
 
   // Get updated plugin
