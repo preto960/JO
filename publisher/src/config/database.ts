@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import { User, Plugin, Session, Purchase, Review, PluginAnalytics, Transaction } from '../entities';
+import { PublisherUser, PublisherPlugin, PublisherSession, PublisherAnalytics } from '../entities';
 
 // Parse DATABASE_URL if provided, otherwise use individual variables
 const databaseUrl = process.env.DATABASE_URL;
@@ -10,7 +10,7 @@ if (databaseUrl) {
   dataSourceConfig = {
     type: 'postgres',
     url: databaseUrl,
-    entities: [User, Plugin, Session, Purchase, Review, PluginAnalytics, Transaction],
+    entities: [PublisherUser, PublisherPlugin, PublisherSession, PublisherAnalytics],
     synchronize: process.env.NODE_ENV === 'development',
     logging: process.env.NODE_ENV === 'development',
     ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
@@ -25,8 +25,8 @@ if (databaseUrl) {
     port: parseInt(process.env.DB_PORT || '5432'),
     username: process.env.DB_USERNAME || 'postgres',
     password: process.env.DB_PASSWORD || 'password',
-    database: process.env.DB_NAME || 'plugin_marketplace',
-    entities: [User, Plugin, Session, Purchase, Review, PluginAnalytics, Transaction],
+    database: process.env.DB_NAME || 'publisher_db',
+    entities: [PublisherUser, PublisherPlugin, PublisherSession, PublisherAnalytics],
     synchronize: process.env.NODE_ENV === 'development',
     logging: process.env.NODE_ENV === 'development',
     ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
@@ -35,5 +35,5 @@ if (databaseUrl) {
   };
 }
 
-export const AppDataSource = new DataSource(dataSourceConfig);
-export default AppDataSource;
+export const PublisherDataSource = new DataSource(dataSourceConfig);
+export default PublisherDataSource;
