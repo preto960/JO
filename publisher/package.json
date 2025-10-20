@@ -9,7 +9,8 @@
     "client": "vite",
     "build": "vite build",
     "start": "node dist/server.js",
-    "db:push": "typeorm migration:run -d src/config/database.ts",
+    "db:reset": "ts-node src/scripts/resetDatabase.ts",
+    "db:sync": "npm run typeorm -- schema:sync",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {

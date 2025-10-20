@@ -14,11 +14,14 @@
     "build:publisher": "cd publisher && npm run build",
     "build:all": "npm run build:backend && npm run build:frontend && npm run build:publisher",
     "install:projects": "cd backend && npm install && cd ../frontend && npm install && cd ../publisher && npm install",
+    "db:reset:backend": "cd backend && npm run db:reset",
+    "db:reset:publisher": "cd publisher && npm run db:reset",
+    "db:reset:all": "npm run db:reset:backend && npm run db:reset:publisher",
     "lint:backend": "cd backend && npm run lint",
     "lint:frontend": "cd frontend && npm run lint",
     "lint:publisher": "cd publisher && npm run lint",
     "lint:all": "npm run lint:backend && npm run lint:frontend && npm run lint:publisher",
-    "db:push": "cd backend && npm run db:push",
+    "db:push": "cd backend && npm run db:sync",
     "db:studio": "cd backend && npm run db:studio"
   },
   "devDependencies": {
