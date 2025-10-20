@@ -25,7 +25,7 @@
     "db:studio": "cd backend && npm run db:studio"
   },
   "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.10",
+    "@types/jsonwebtoken": "^8.5.9",
     "concurrently": "^9.0.1"
   },
   "engines": {

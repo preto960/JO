@@ -14,7 +14,7 @@ if (!databaseUrl) {
 // Always use DATABASE_URL configuration
 console.log('🌐 Using DATABASE_URL configuration');
 const dataSourceConfig = {
-  type: 'postgres',
+  type: 'postgres' as const,
   url: databaseUrl,
   entities: [User, Plugin, Session, Purchase, Review, PluginAnalytics, Transaction],
   synchronize: config.database.synchronize,
