@@ -9,7 +9,7 @@ import analyticsRoutes from './routes/analytics';
 import { errorHandler } from './middleware/errorHandler';
 
 const app = express();
-const PORT = process.env.PORT || 3005;
+const PORT = process.env.PORT || 3002;
 
 // Security middleware
 app.use(helmet());
@@ -53,9 +53,8 @@ const startServer = async () => {
     console.log(`📡 Port: ${PORT}`);
     console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
     
-    console.log('🔗 Connecting to database...');
-    await PublisherDataSource.initialize();
-    console.log('✅ Publisher Database connected successfully');
+    // Skip database connection for now - using mock storage
+    console.log('⚠️  Using mock storage (database disabled for development)');
     
       // Handle port conflicts - try different ports
     const tryPort = async (port: number): Promise<number> => {
@@ -86,6 +85,7 @@ const startServer = async () => {
       console.log(`🚀 Publisher API running on port ${availablePort}`);
       console.log(`📊 Dashboard available at: http://localhost:${availablePort}`);
       console.log(`🔗 Health check: http://localhost:${availablePort}/api/health`);
+      console.log(`🔐 Auth endpoints: http://localhost:${availablePort}/api/auth/login, /api/auth/register`);
     });
   } catch (error) {
     console.error('❌ Failed to start publisher server:', error);

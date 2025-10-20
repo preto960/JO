@@ -5,11 +5,11 @@
   "main": "server.js",
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "server": "nodemon --exec 'ts-node --project tsconfig.script.json' src/server.ts",
+    "server": "nodemon --exec \"npx ts-node --project tsconfig.script.json\" src/server.ts",
     "client": "vite",
     "build": "vite build",
     "start": "node dist/server.js",
-    "db:reset": "ts-node --project tsconfig.script.json src/scripts/resetDatabase.ts",
+    "db:reset": "npx ts-node --project tsconfig.script.json src/scripts/resetDatabase.ts",
     "db:sync": "npm run typeorm -- schema:sync",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
