@@ -1,0 +1,87 @@
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
+interface Config {
+  port: number;
+  nodeEnv: string;
+  database: {
+    url?: string;
+    host: string;
+    port: number;
+    username: string;
+    password: string;
+    database: string;
+    ssl: boolean;
+    synchronize: boolean;
+    logging: boolean;
+  };
+  jwt: {
+    secret: string;
+    expiresIn: string;
+  };
+  cors: {
+    origin: string;
+    credentials: boolean;
+  };
+  rateLimit: {
+    windowMs: number;
+    max: number;
+  };
+}
+
+const config: Config = {
+  port: parseInt(process.env.PORT || '3000'),
+  nodeEnv: process.env.NODE_ENV || 'development',
+  
+  database: {
+    url: process.env.DATABASE_URL,
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT || '5432'),
+    username: process.env.DB_USERNAME || 'postgres',
+    password: process.env.DB_PASSWORD || 'password',
+    database: process.env.DB_NAME || 'plugin_marketplace',
+    ssl: process.env.NODE_ENV === 'production',
+    synchronize: process.env.NODE_ENV === 'development',
+    logging: process.env.NODE_ENV === 'development',
+  },
+  
+  jwt: {
+    secret: process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production',
+    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+  },
+  
+  cors: {
+    origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+    credentials: true,
+  },
+  
+  rateLimit: {
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+  },
+};
+
+// Validation
+if (!config.database.url && config.nodeEnv === 'production') {
+  throw new Error('DATABASE_URL is required in production');
+}
+
+if (!config.jwt.secret || config.jwt.secret === 'your-super-secret-jwt-key-change-this-in-production') {
+  if (config.nodeEnv === 'production') {
+    throw new Error('JWT_SECRET is required in production');
+  } else {
+    console.warn('⚠️  Using default JWT secret. Please set JWT_SECRET in production.');
+  }
+}
+
+console.log('🔧 Configuration loaded:', {
+  port: config.port,
+  nodeEnv: config.nodeEnv,
+  databaseUrl: config.database.url ? 'CONFIGURED' : 'USING LOCALHOST',
+  jwtSecret: config.jwt.secret ? 'CONFIGURED' : 'MISSING',
+  corsOrigin: config.cors.origin,
+});
+
+export default config;

@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import config from '@/config';
 
 export interface ValidationError {
   field: string;
@@ -29,7 +30,7 @@ export const errorHandler = (
   if (error instanceof AppError) {
     return res.status(error.statusCode).json({
       error: error.message,
-      ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
+      ...(config.nodeEnv === 'development' && { stack: error.stack })
     });
   }
 
@@ -37,7 +38,7 @@ export const errorHandler = (
   if (error.name === 'QueryFailedError') {
     return res.status(400).json({
       error: 'Database operation failed',
-      ...(process.env.NODE_ENV === 'development' && { details: error.message })
+      ...(config.nodeEnv === 'development' && { details: error.message })
     });
   }
 
@@ -53,7 +54,7 @@ export const errorHandler = (
   // Default error
   res.status(500).json({
     error: 'Internal server error',
-    ...(process.env.NODE_ENV === 'development' && { message: error.message })
+    ...(config.nodeEnv === 'development' && { message: error.message })
   });
 };
 
