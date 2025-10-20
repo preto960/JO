@@ -4,6 +4,7 @@
   "description": "Plugin Marketplace - Monorepo with 3 separate Vercel projects",
   "private": true,
   "scripts": {
+    "setup": "npm install && cd backend && npm install && cd ../frontend && npm install && cd ../publisher && npm install",
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:publisher": "cd publisher && npm run dev",
@@ -12,7 +13,7 @@
     "build:frontend": "cd frontend && npm run build",
     "build:publisher": "cd publisher && npm run build",
     "build:all": "npm run build:backend && npm run build:frontend && npm run build:publisher",
-    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install && cd ../publisher && npm install",
+    "install:projects": "cd backend && npm install && cd ../frontend && npm install && cd ../publisher && npm install",
     "lint:backend": "cd backend && npm run lint",
     "lint:frontend": "cd frontend && npm run lint",
     "lint:publisher": "cd publisher && npm run lint",
@@ -20,11 +21,6 @@
     "db:push": "cd backend && npm run db:push",
     "db:studio": "cd backend && npm run db:studio"
   },
-  "workspaces": [
-    "backend",
-    "frontend", 
-    "publisher"
-  ],
   "devDependencies": {
     "concurrently": "^9.0.1"
   },
