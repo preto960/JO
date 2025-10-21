@@ -27,40 +27,44 @@ app.get('/api/health', (req, res) => {
 app.post('/api/auth/login', (req, res) => {
   const { email, password } = req.body;
   
-  // Simulación de autenticación
+  // Simulación de autenticación - acepta cualquier credencial
   if (email && password) {
+    const mockUser = {
+      id: '1',
+      email,
+      username: email.split('@')[0] || 'developer',
+      role: 'DEVELOPER'
+    };
+    
     res.json({
-      user: {
-        id: '1',
-        email,
-        username: email.split('@')[0],
-        role: 'DEVELOPER'
-      },
-      token: 'mock-jwt-token',
-      refreshToken: 'mock-refresh-token'
+      user: mockUser,
+      token: 'mock-jwt-token-' + Date.now(),
+      refreshToken: 'mock-refresh-token-' + Date.now()
     });
   } else {
-    res.status(400).json({ error: 'Credenciales inválidas' });
+    res.status(400).json({ error: 'Se requieren email y password' });
   }
 });
 
 app.post('/api/auth/register', (req, res) => {
   const { email, username, password, role } = req.body;
   
-  // Simulación de registro
+  // Simulación de registro - acepta cualquier dato
   if (email && username && password) {
+    const mockUser = {
+      id: '1',
+      email,
+      username,
+      role: role || 'DEVELOPER'
+    };
+    
     res.json({
-      user: {
-        id: '1',
-        email,
-        username,
-        role: role || 'DEVELOPER'
-      },
-      token: 'mock-jwt-token',
-      refreshToken: 'mock-refresh-token'
+      user: mockUser,
+      token: 'mock-jwt-token-' + Date.now(),
+      refreshToken: 'mock-refresh-token-' + Date.now()
     });
   } else {
-    res.status(400).json({ error: 'Datos incompletos' });
+    res.status(400).json({ error: 'Se requieren email, username y password' });
   }
 });
 

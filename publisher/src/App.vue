@@ -90,5 +90,11 @@ const logout = async () => {
 
 onMounted(() => {
   authStore.loadUserFromStorage()
+  
+  // Si no está autenticado y no está en la página de login/register
+  // redirigir a login automáticamente
+  if (!authStore.isAuthenticated && !window.location.pathname.includes('/login') && !window.location.pathname.includes('/register')) {
+    router.push('/login')
+  }
 })
 </script>

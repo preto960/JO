@@ -55,6 +55,19 @@
           </button>
         </div>
 
+        <!-- Quick Login for Development -->
+        <div class="text-center">
+          <button
+            type="button"
+            @click="quickLogin"
+            :disabled="loading"
+            class="w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span v-if="loading">Signing in...</span>
+            <span v-else>🚀 Quick Login (Development)</span>
+          </button>
+        </div>
+
         <div class="text-center">
           <p class="text-sm text-gray-600">
             Don't have an account?
@@ -101,5 +114,11 @@ const handleLogin = async () => {
   } catch (err) {
     toastStore.error('An unexpected error occurred')
   }
+}
+
+const quickLogin = async () => {
+  email.value = 'developer@test.com'
+  password.value = 'password123'
+  await handleLogin()
 }
 </script>
