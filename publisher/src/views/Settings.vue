@@ -446,6 +446,11 @@ const clearCache = () => {
   toastStore.success('Cache cleared successfully')
 }
 
+const formatDate = (date: string | undefined) => {
+  if (!date) return 'N/A'
+  return new Date(date).toLocaleDateString()
+}
+
 onMounted(() => {
   // Load settings from store
   settingsStore.loadSettings()
