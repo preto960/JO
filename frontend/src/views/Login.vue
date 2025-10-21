@@ -1,82 +1,53 @@
 <template>
-  <div class="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8">
-      <div>
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Admin Panel Login
-        </h2>
-        <p class="mt-2 text-center text-sm text-gray-600">
-          Sign in to access your admin dashboard
-        </p>
+  <div class="min-h-screen bg-white flex items-center justify-center">
+    <div class="w-full max-w-sm p-6">
+      <div class="text-center mb-8">
+        <h1 class="text-2xl font-light text-gray-900">Admin Panel</h1>
+        <p class="text-sm text-gray-500 mt-2">Sign in to continue</p>
       </div>
       
-      <form class="mt-8 space-y-6" @submit.prevent="handleLogin">
-        <div class="rounded-md shadow-sm -space-y-px">
-          <div>
-            <label for="email" class="sr-only">Email address</label>
-            <input
-              id="email"
-              v-model="email"
-              name="email"
-              type="email"
-              autocomplete="email"
-              required
-              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-              placeholder="Email address"
-            />
-          </div>
-          <div>
-            <label for="password" class="sr-only">Password</label>
-            <input
-              id="password"
-              v-model="password"
-              name="password"
-              type="password"
-              autocomplete="current-password"
-              required
-              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-              placeholder="Password"
-            />
-          </div>
+      <form @submit.prevent="handleLogin" class="space-y-4">
+        <div>
+          <input
+            v-model="email"
+            type="email"
+            placeholder="Email"
+            required
+            class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 text-sm"
+          />
+        </div>
+        
+        <div>
+          <input
+            v-model="password"
+            type="password"
+            placeholder="Password"
+            required
+            class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 text-sm"
+          />
         </div>
 
-        <div v-if="error" class="text-red-600 text-sm text-center">
+        <div v-if="error" class="text-red-500 text-xs text-center">
           {{ error }}
         </div>
 
-        <div>
-          <button
-            type="submit"
-            :disabled="loading"
-            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <span v-if="loading">Signing in...</span>
-            <span v-else>Sign in</span>
-          </button>
-        </div>
-
-        <!-- Quick Login for Development -->
-        <div class="text-center">
-          <button
-            type="button"
-            @click="quickLogin"
-            :disabled="loading"
-            class="w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <span v-if="loading">Signing in...</span>
-            <span v-else>🚀 Quick Login (Development)</span>
-          </button>
-        </div>
-
-        <div class="text-center">
-          <p class="text-sm text-gray-600">
-            Don't have an account?
-            <router-link to="/register" class="font-medium text-blue-600 hover:text-blue-500">
-              Register here
-            </router-link>
-          </p>
-        </div>
+        <button
+          type="submit"
+          :disabled="loading"
+          class="w-full py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 text-sm"
+        >
+          {{ loading ? 'Signing in...' : 'Sign In' }}
+        </button>
       </form>
+
+      <div class="text-center mt-6">
+        <p class="text-xs text-gray-500">
+          Don't have an account? 
+          <router-link to="/register" class="text-gray-900 hover:underline">
+            Register
+          </router-link>
+        </p>
+      </div>
     </div>
   </div>
 </template>
@@ -100,11 +71,5 @@ const handleLogin = async () => {
   if (success) {
     router.push('/dashboard')
   }
-}
-
-const quickLogin = async () => {
-  email.value = 'admin@example.com'
-  password.value = 'admin123'
-  await handleLogin()
 }
 </script>

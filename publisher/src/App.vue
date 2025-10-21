@@ -12,7 +12,7 @@
     />
 
     <!-- Navigation -->
-    <nav class="bg-white shadow-lg">
+    <nav v-if="!isAuthPage" class="bg-white shadow-lg">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
           <div class="flex items-center">
@@ -73,6 +73,10 @@ const showUserMenu = ref(false)
 
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 const user = computed(() => authStore.user)
+const isAuthPage = computed(() => {
+  const currentRoute = router.currentRoute.value.path
+  return currentRoute === '/login' || currentRoute === '/register'
+})
 
 const toggleUserMenu = () => {
   showUserMenu.value = !showUserMenu.value
