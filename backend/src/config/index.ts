@@ -16,7 +16,7 @@ interface Config {
     expiresIn: string;
   };
   cors: {
-    origin: string;
+    origin: string | string[];
     credentials: boolean;
   };
   rateLimit: {
