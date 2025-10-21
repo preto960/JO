@@ -3,7 +3,17 @@ export interface User {
   email: string
   username: string
   role: 'USER' | 'DEVELOPER' | 'ADMIN'
+  firstName?: string
+  lastName?: string
+  bio?: string
+  website?: string
+  location?: string
+  githubUrl?: string
+  twitterUrl?: string
+  linkedinUrl?: string
+  avatar?: string
   createdAt: string
+  updatedAt?: string
 }
 
 export interface Plugin {

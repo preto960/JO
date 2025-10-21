@@ -70,6 +70,26 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  const updateProfile = async (profileData: Partial<User>): Promise<boolean> => {
+    loading.value = true
+    error.value = null
+    
+    try {
+      const updatedUser: User = await authApi.updateProfile(profileData)
+      user.value = updatedUser
+      
+      // Update localStorage with new user data
+      localStorage.setItem('user', JSON.stringify(updatedUser))
+      
+      return true
+    } catch (err: any) {
+      error.value = err.response?.data?.error || 'Profile update failed'
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     user,
     token,
@@ -79,6 +99,7 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     register,
     logout,
-    loadUserFromStorage
+    loadUserFromStorage,
+    updateProfile
   }
 })

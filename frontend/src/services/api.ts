@@ -34,6 +34,11 @@ export const authApi = {
       headers: { Authorization: `Bearer ${token}` }
     })
     return response.data
+  },
+
+  async updateProfile(profileData: Partial<User>): Promise<User> {
+    const response = await api.put('/auth/profile', profileData)
+    return response.data
   }
 }
 
