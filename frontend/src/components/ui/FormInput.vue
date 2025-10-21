@@ -3,7 +3,8 @@
     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ label }}</label>
     <div class="relative">
       <input
-        v-model="modelValue"
+        :value="modelValue"
+        @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
         :type="type"
         :required="required"
         :placeholder="placeholder"
@@ -31,7 +32,7 @@ interface Props {
   helpText?: string
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   type: 'text',
   required: false
 })

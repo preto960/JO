@@ -17,6 +17,8 @@
 </template>
 
 <script setup lang="ts">
+import { computed }
+
 interface Props {
   text: string
   loading?: boolean
@@ -52,8 +54,4 @@ const buttonClass = computed(() => {
       return `${baseClass} bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700`
   }
 })
-</script>
-
-<script setup lang="ts">
-import { computed }
 </script>
