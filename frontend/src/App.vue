@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" class="bg-white dark:bg-gray-900">
     <!-- Toast Container -->
     <Teleport to="body">
       <div
@@ -20,7 +20,7 @@
       </div>
     </Teleport>
 
-    <main class="min-h-screen bg-gray-50">
+    <main class="min-h-screen">
       <router-view />
     </main>
   </div>
@@ -30,12 +30,15 @@
 import { onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
+import { useThemeStore } from '@/stores/theme'
 import Toast from '@/components/Toast.vue'
 
 const authStore = useAuthStore()
 const toastStore = useToastStore()
+const themeStore = useThemeStore()
 
 onMounted(() => {
   authStore.loadUserFromStorage()
+  themeStore.loadTheme()
 })
 </script>

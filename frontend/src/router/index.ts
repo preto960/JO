@@ -6,6 +6,8 @@ import Dashboard from '@/views/Dashboard.vue'
 import Settings from '@/views/Settings.vue'
 import Marketplace from '@/views/Marketplace.vue'
 import Profile from '@/views/Profile.vue'
+import MyPlugins from '@/views/MyPlugins.vue'
+import SidebarLayout from '@/layouts/SidebarLayout.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -27,26 +29,62 @@ const router = createRouter({
     {
       path: '/dashboard',
       name: 'Dashboard',
-      component: Dashboard,
-      meta: { requiresAuth: true }
+      component: SidebarLayout,
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: '',
+          component: Dashboard
+        }
+      ]
     },
     {
       path: '/settings',
       name: 'Settings',
-      component: Settings,
-      meta: { requiresAuth: true }
+      component: SidebarLayout,
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: '',
+          component: Settings
+        }
+      ]
     },
     {
       path: '/marketplace',
       name: 'Marketplace',
-      component: Marketplace,
-      meta: { requiresAuth: true }
+      component: SidebarLayout,
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: '',
+          component: Marketplace
+        }
+      ]
     },
     {
       path: '/profile',
       name: 'Profile',
-      component: Profile,
-      meta: { requiresAuth: true }
+      component: SidebarLayout,
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: '',
+          component: Profile
+        }
+      ]
+    },
+    {
+      path: '/my-plugins',
+      name: 'MyPlugins',
+      component: SidebarLayout,
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: '',
+          component: MyPlugins
+        }
+      ]
     }
   ]
 })
