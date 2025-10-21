@@ -18,6 +18,16 @@ api.interceptors.request.use((config) => {
   return config
 })
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.code === 'ECONNREFUSED' || error.code === 'ECONNRESET') {
+      console.error('Error de conexión con el servidor backend. Asegúrate de que el servidor esté corriendo en el puerto 3002.')
+    }
+    return Promise.reject(error)
+  }
+)
+
 export const authApi = {
   async login(email: string, password: string): Promise<AuthResponse> {
     const response = await api.post('/auth/login', { email, password })
