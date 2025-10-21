@@ -6,11 +6,11 @@
     >
       <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
         <span class="text-white text-sm font-medium">
-          {{ user?.username?.charAt(0).toUpperCase() || 'U' }}
+          {{ getInitials() }}
         </span>
       </div>
       <span class="text-sm font-medium text-gray-700 dark:text-gray-200">
-        {{ user?.username || 'User' }}
+        {{ getDisplayName() }}
       </span>
       <svg 
         class="w-4 h-4 text-gray-500 dark:text-gray-400 transition-transform duration-200"
@@ -32,7 +32,7 @@
       <div class="py-1">
         <div class="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
           <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
-            {{ user?.username || 'User' }}
+            {{ getDisplayName() }}
           </p>
           <p class="text-xs text-gray-500 dark:text-gray-400">
             {{ user?.email || 'user@example.com' }}
@@ -76,6 +76,20 @@ const toastStore = useToastStore()
 
 const isOpen = ref(false)
 const user = computed(() => authStore.user)
+
+const getDisplayName = () => {
+  if (user.value?.profile?.firstName && user.value?.profile?.lastName) {
+    return `${user.value.profile.firstName} ${user.value.profile.lastName}`
+  }
+  return user.value?.username || 'User'
+}
+
+const getInitials = () => {
+  if (user.value?.profile?.firstName && user.value?.profile?.lastName) {
+    return `${user.value.profile.firstName.charAt(0).toUpperCase()}${user.value.profile.lastName.charAt(0).toUpperCase()}`
+  }
+  return user.value?.username?.charAt(0).toUpperCase() || 'U'
+}
 
 const toggleDropdown = () => {
   isOpen.value = !isOpen.value

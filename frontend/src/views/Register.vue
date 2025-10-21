@@ -20,6 +20,30 @@
         
         <form @submit.prevent="handleRegister" class="space-y-6">
           <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">First Name</label>
+                <input
+                  v-model="firstName"
+                  type="text"
+                  placeholder="Enter your first name"
+                  required
+                  class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
+                />
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Last Name</label>
+                <input
+                  v-model="lastName"
+                  type="text"
+                  placeholder="Enter your last name"
+                  required
+                  class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
+                />
+              </div>
+            </div>
+            
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
               <input
@@ -101,13 +125,15 @@ const toastStore = useToastStore()
 const email = ref('')
 const username = ref('')
 const password = ref('')
+const firstName = ref('')
+const lastName = ref('')
 
 const loading = computed(() => authStore.loading)
 const error = computed(() => authStore.error)
 
 const handleRegister = async () => {
   try {
-    const success = await authStore.register(email.value, username.value, password.value)
+    const success = await authStore.register(email.value, username.value, password.value, firstName.value, lastName.value)
     if (success) {
       toastStore.success('Registration successful! Welcome to the plugin marketplace.')
       router.push('/dashboard')

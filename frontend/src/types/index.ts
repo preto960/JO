@@ -1,17 +1,31 @@
+export interface Profile {
+  id: string
+  firstName: string
+  lastName: string
+  bio?: string
+  avatar?: string
+  website?: string
+  github?: string
+  paypalEmail?: string
+  phone?: string
+  location?: string
+  birthDate?: string
+  isPublic: boolean
+  createdAt: string
+  updatedAt: string
+  fullName?: string
+}
+
 export interface User {
   id: string
   email: string
   username: string
   role: 'USER' | 'DEVELOPER' | 'ADMIN' | 'PUBLISHER'
-  avatar?: string
-  bio?: string
-  website?: string
-  github?: string
-  paypalEmail?: string
   isActive: boolean
   lastLoginAt?: string
   createdAt: string
   updatedAt: string
+  profile?: Profile
 }
 
 export interface Plugin {

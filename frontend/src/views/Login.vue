@@ -21,11 +21,11 @@
         <form @submit.prevent="handleLogin" class="space-y-6">
           <div class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email or Username</label>
               <input
-                v-model="email"
-                type="email"
-                placeholder="Enter your email"
+                v-model="login"
+                type="text"
+                placeholder="Enter your email or username"
                 required
                 class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
               />
@@ -87,7 +87,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 const toastStore = useToastStore()
 
-const email = ref('')
+const login = ref('')
 const password = ref('')
 
 const loading = computed(() => authStore.loading)
@@ -95,7 +95,7 @@ const error = computed(() => authStore.error)
 
 const handleLogin = async () => {
   try {
-    const success = await authStore.login(email.value, password.value)
+    const success = await authStore.login(login.value, password.value)
     if (success) {
       toastStore.success('Login successful! Welcome back.')
       router.push('/dashboard')

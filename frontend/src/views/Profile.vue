@@ -25,11 +25,11 @@
             <div class="flex items-center space-x-4">
               <div class="w-20 h-20 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
                 <span class="text-white text-2xl font-bold">
-                  {{ user?.username?.charAt(0).toUpperCase() || 'U' }}
+                  {{ getInitials() }}
                 </span>
               </div>
               <div>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ user?.username || 'User' }}</h2>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ getDisplayName() }}</h2>
                 <p class="text-gray-600 dark:text-gray-400">{{ user?.email || 'user@example.com' }}</p>
                 <div class="flex items-center space-x-2 mt-2">
                   <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-sm font-medium rounded-full">
@@ -45,6 +45,14 @@
           <div class="p-6">
             <div class="grid md:grid-cols-2 gap-6">
               <div>
+                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">First Name</h3>
+                <p class="text-gray-900 dark:text-white font-medium">{{ user?.profile?.firstName || 'Not set' }}</p>
+              </div>
+              <div>
+                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Last Name</h3>
+                <p class="text-gray-900 dark:text-white font-medium">{{ user?.profile?.lastName || 'Not set' }}</p>
+              </div>
+              <div>
                 <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Username</h3>
                 <p class="text-gray-900 dark:text-white font-medium">{{ user?.username || 'Not set' }}</p>
               </div>
@@ -54,7 +62,7 @@
               </div>
               <div>
                 <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Bio</h3>
-                <p class="text-gray-900 dark:text-white">{{ user?.bio || 'No bio provided' }}</p>
+                <p class="text-gray-900 dark:text-white">{{ user?.profile?.bio || 'No bio provided' }}</p>
               </div>
               <div>
                 <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Account Status</h3>
@@ -173,11 +181,11 @@
                   </div>
                   <div>
                     <h3 class="font-medium text-gray-900 dark:text-white">GitHub</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ user?.github ? `@${user.github}` : 'Not connected' }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ user?.profile?.github ? `@${user.profile.github}` : 'Not connected' }}</p>
                   </div>
                 </div>
                 <button class="px-4 py-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors">
-                  {{ user?.github ? 'Disconnect' : 'Connect' }}
+                  {{ user?.profile?.github ? 'Disconnect' : 'Connect' }}
                 </button>
               </div>
             </div>
@@ -520,6 +528,20 @@ const showPasswordModal = ref(false)
 const show2FAModal = ref(false)
 const showSessionsModal = ref(false)
 const savingPassword = ref(false)
+
+const getDisplayName = () => {
+  if (user.value?.profile?.firstName && user.value?.profile?.lastName) {
+    return `${user.value.profile.firstName} ${user.value.profile.lastName}`
+  }
+  return user.value?.username || 'User'
+}
+
+const getInitials = () => {
+  if (user.value?.profile?.firstName && user.value?.profile?.lastName) {
+    return `${user.value.profile.firstName.charAt(0).toUpperCase()}${user.value.profile.lastName.charAt(0).toUpperCase()}`
+  }
+  return user.value?.username?.charAt(0).toUpperCase() || 'U'
+}
 
 const passwordForm = ref({
   currentPassword: '',

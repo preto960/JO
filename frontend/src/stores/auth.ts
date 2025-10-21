@@ -11,12 +11,12 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAuthenticated = computed(() => !!token.value && !!user.value)
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (login: string, password: string): Promise<boolean> => {
     loading.value = true
     error.value = null
     
     try {
-      const response: AuthResponse = await authApi.login(email, password)
+      const response: AuthResponse = await authApi.login(login, password)
       user.value = response.user
       token.value = response.token
       
@@ -32,12 +32,12 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  const register = async (email: string, username: string, password: string, role: string = 'USER'): Promise<boolean> => {
+  const register = async (email: string, username: string, password: string, firstName: string, lastName: string, role: string = 'USER'): Promise<boolean> => {
     loading.value = true
     error.value = null
     
     try {
-      const response: AuthResponse = await authApi.register(email, username, password, role)
+      const response: AuthResponse = await authApi.register(email, username, password, firstName, lastName, role)
       user.value = response.user
       token.value = response.token
       

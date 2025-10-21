@@ -19,13 +19,13 @@ api.interceptors.request.use((config) => {
 })
 
 export const authApi = {
-  async login(email: string, password: string): Promise<AuthResponse> {
-    const response = await api.post('/auth/login', { email, password })
+  async login(login: string, password: string): Promise<AuthResponse> {
+    const response = await api.post('/auth/login', { login, password })
     return response.data
   },
 
-  async register(email: string, username: string, password: string, role: string = 'USER'): Promise<AuthResponse> {
-    const response = await api.post('/auth/register', { email, username, password, role })
+  async register(email: string, username: string, password: string, firstName: string, lastName: string, role: string = 'USER'): Promise<AuthResponse> {
+    const response = await api.post('/auth/register', { email, username, password, firstName, lastName, role })
     return response.data
   },
 
