@@ -36,27 +36,10 @@
                 type="email"
                 id="email"
                 v-model="form.email"
-                required
-                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                disabled
+                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-500 sm:text-sm"
               />
-            </div>
-            <div>
-              <label for="firstName" class="block text-sm font-medium text-gray-700">First Name</label>
-              <input
-                type="text"
-                id="firstName"
-                v-model="form.firstName"
-                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              />
-            </div>
-            <div>
-              <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name</label>
-              <input
-                type="text"
-                id="lastName"
-                v-model="form.lastName"
-                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              />
+              <p class="text-xs text-gray-500 mt-1">Email cannot be changed</p>
             </div>
           </div>
         </div>
@@ -76,16 +59,6 @@
               ></textarea>
             </div>
             <div>
-              <label for="location" class="block text-sm font-medium text-gray-700">Location</label>
-              <input
-                type="text"
-                id="location"
-                v-model="form.location"
-                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="City, Country"
-              />
-            </div>
-            <div>
               <label for="website" class="block text-sm font-medium text-gray-700">Website</label>
               <input
                 type="url"
@@ -93,6 +66,16 @@
                 v-model="form.website"
                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="https://yourwebsite.com"
+              />
+            </div>
+            <div>
+              <label for="paypalEmail" class="block text-sm font-medium text-gray-700">PayPal Email</label>
+              <input
+                type="email"
+                id="paypalEmail"
+                v-model="form.paypalEmail"
+                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="paypal@example.com"
               />
             </div>
           </div>
@@ -103,33 +86,13 @@
           <h4 class="text-md font-medium text-gray-900 mb-4">Social Links</h4>
           <div class="space-y-4">
             <div>
-              <label for="githubUrl" class="block text-sm font-medium text-gray-700">GitHub</label>
+              <label for="github" class="block text-sm font-medium text-gray-700">GitHub</label>
               <input
-                type="url"
-                id="githubUrl"
-                v-model="form.githubUrl"
+                type="text"
+                id="github"
+                v-model="form.github"
                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="https://github.com/username"
-              />
-            </div>
-            <div>
-              <label for="twitterUrl" class="block text-sm font-medium text-gray-700">Twitter</label>
-              <input
-                type="url"
-                id="twitterUrl"
-                v-model="form.twitterUrl"
-                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="https://twitter.com/username"
-              />
-            </div>
-            <div>
-              <label for="linkedinUrl" class="block text-sm font-medium text-gray-700">LinkedIn</label>
-              <input
-                type="url"
-                id="linkedinUrl"
-                v-model="form.linkedinUrl"
-                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="https://linkedin.com/in/username"
+                placeholder="username"
               />
             </div>
           </div>
@@ -181,14 +144,10 @@ const loading = ref(false)
 const form = reactive({
   username: '',
   email: '',
-  firstName: '',
-  lastName: '',
   bio: '',
   website: '',
-  location: '',
-  githubUrl: '',
-  twitterUrl: '',
-  linkedinUrl: ''
+  github: '',
+  paypalEmail: ''
 })
 
 onMounted(() => {

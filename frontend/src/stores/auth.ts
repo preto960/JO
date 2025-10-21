@@ -75,11 +75,11 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
     
     try {
-      const updatedUser: User = await authApi.updateProfile(profileData)
-      user.value = updatedUser
+      const response: {message: string, user: User} = await authApi.updateProfile(profileData)
+      user.value = response.user
       
       // Update localStorage with new user data
-      localStorage.setItem('user', JSON.stringify(updatedUser))
+      localStorage.setItem('user', JSON.stringify(response.user))
       
       return true
     } catch (err: any) {

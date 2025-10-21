@@ -30,13 +30,13 @@ export const authApi = {
   },
 
   async getCurrentUser(token: string): Promise<User> {
-    const response = await api.get('/auth/me', {
+    const response = await api.get('/auth/profile', {
       headers: { Authorization: `Bearer ${token}` }
     })
-    return response.data
+    return response.data.user
   },
 
-  async updateProfile(profileData: Partial<User>): Promise<User> {
+  async updateProfile(profileData: Partial<User>): Promise<{message: string, user: User}> {
     const response = await api.put('/auth/profile', profileData)
     return response.data
   }
