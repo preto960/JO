@@ -407,7 +407,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useToastStore } from '@/stores/toast'
-import ThemeToggle from '@/components/ThemeToggle.vue'
 
 const toastStore = useToastStore()
 
