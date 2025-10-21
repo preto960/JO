@@ -9,67 +9,64 @@
   >
     <div
       v-if="show"
-      class="max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden"
+      class="w-full sm:max-w-md bg-white shadow-xl rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden border border-gray-200"
     >
       <div class="p-4">
         <div class="flex items-start">
           <div class="flex-shrink-0">
             <!-- Success Icon -->
-            <svg
+            <div
               v-if="type === 'success'"
-              class="h-6 w-6 text-green-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+              class="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
+              <svg class="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
             <!-- Error Icon -->
-            <svg
+            <div
               v-else-if="type === 'error'"
-              class="h-6 w-6 text-red-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+              class="h-6 w-6 rounded-full bg-red-100 flex items-center justify-center"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
+              <svg class="h-4 w-4 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </div>
             <!-- Info Icon -->
-            <svg
+            <div
               v-else
-              class="h-6 w-6 text-blue-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+              class="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
+              <svg class="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
           </div>
-          <div class="ml-3 w-0 flex-1 pt-0.5">
+          <div class="ml-3 w-0 flex-1">
             <p
               v-if="title"
-              class="text-sm font-medium text-gray-900"
+              class="text-sm font-semibold text-gray-900"
             >
               {{ title }}
             </p>
             <p
               v-if="message"
-              class="mt-1 text-sm text-gray-500"
+              class="mt-1 text-sm text-gray-600"
             >
               {{ message }}
             </p>
@@ -77,9 +74,9 @@
           <div class="ml-4 flex-shrink-0 flex">
             <button
               @click="close"
-              class="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              class="inline-flex text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-md p-1"
             >
-              <span class="sr-only">Close</span>
+              <span class="sr-only">Dismiss</span>
               <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path
                   fill-rule="evenodd"
