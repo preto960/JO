@@ -294,9 +294,6 @@
                     </div>
                     <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Total Plugins</span>
                   </div>
-<<<<<<< HEAD
-                  <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ user?.plugins?.length || 0 }}</span>
-=======
                   <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ siteStats.totalPlugins }}</span>
                 </div>
                 
@@ -310,15 +307,10 @@
                     <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Total Revenue</span>
                   </div>
                   <span class="text-sm font-semibold text-gray-900 dark:text-white">${{ siteStats.totalRevenue }}</span>
->>>>>>> f0e09af1bceb11f4155c223dfbecef0e5c46821a
                 </div>
               </div>
             </div>
           </div>
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> f0e09af1bceb11f4155c223dfbecef0e5c46821a
 
           <!-- Quick Actions Card -->
           <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -332,19 +324,6 @@
                   <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                   </svg>
-<<<<<<< HEAD
-                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Export Data</span>
-                </button>
-                
-                <button
-                  @click="deleteAccount"
-                  class="w-full text-left px-4 py-3 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors flex items-center space-x-3"
-                >
-                  <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                  </svg>
-                  <span class="text-sm font-medium text-red-600 dark:text-red-400">Delete Account</span>
-=======
                   <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Export Site Data</span>
                 </button>
                 
@@ -356,16 +335,10 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                   </svg>
                   <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Clear Cache</span>
->>>>>>> f0e09af1bceb11f4155c223dfbecef0e5c46821a
                 </button>
               </div>
             </div>
           </div>
-<<<<<<< HEAD
-=======
->>>>>>> e1e5a2d753b6ecde04aa69dea9993ab03e436096
-=======
->>>>>>> f0e09af1bceb11f4155c223dfbecef0e5c46821a
         </div>
       </div>
   </div>
@@ -400,23 +373,6 @@ const paymentForm = ref({
   stripeConnected: false
 })
 
-<<<<<<< HEAD
-const user = computed(() => authStore.user)
-
-const updateProfile = async () => {
-  saving.value = true
-  try {
-    // TODO: Implement profile update API call
-    console.log('Updating profile:', profileForm.value)
-    await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate API call
-    toastStore.success('Profile updated successfully!')
-  } catch (error) {
-    toastStore.error('Failed to update profile')
-  } finally {
-    saving.value = false
-  }
-}
-=======
 // Site Settings Form
 const siteForm = ref({
   siteName: 'Plugin Marketplace',
@@ -437,7 +393,6 @@ const siteStats = computed(() => {
     totalRevenue: totalRevenue.toFixed(2)
   }
 })
->>>>>>> f0e09af1bceb11f4155c223dfbecef0e5c46821a
 
 const updatePaymentSettings = async () => {
   savingPayment.value = true
