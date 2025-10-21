@@ -1,5 +1,6 @@
 <template>
-  <div class="p-6">
+  <SidebarLayout>
+    <div class="p-6">
       <!-- Header -->
       <div class="mb-8">
         <div class="flex items-center justify-between">
