@@ -171,10 +171,12 @@
 import { ref, computed, onMounted } from 'vue'
 import { usePluginStore } from '@/stores/plugins'
 import { useAuthStore } from '@/stores/auth'
+import { useToastStore } from '@/stores/toast'
 import type { Plugin } from '@/types'
 
 const pluginStore = usePluginStore()
 const authStore = useAuthStore()
+const toastStore = useToastStore()
 
 const plugins = ref<Plugin[]>([])
 
@@ -216,7 +218,12 @@ const getStatusClass = (status: string) => {
 }
 
 onMounted(async () => {
-  await pluginStore.fetchPlugins()
-  plugins.value = pluginStore.plugins
+  try {
+    await pluginStore.fetchPlugins()
+    plugins.value = pluginStore.plugins
+    toastStore.success('Dashboard loaded successfully')
+  } catch (error) {
+    toastStore.error('Failed to load dashboard data')
+  }
 })
 </script>

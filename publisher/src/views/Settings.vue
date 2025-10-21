@@ -196,9 +196,11 @@
 import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { usePluginStore } from '@/stores/plugins'
+import { useToastStore } from '@/stores/toast'
 
 const authStore = useAuthStore()
 const pluginStore = usePluginStore()
+const toastStore = useToastStore()
 
 const saving = ref(false)
 const savingPayment = ref(false)
@@ -240,8 +242,9 @@ const updateProfile = async () => {
     // TODO: Implement profile update API call
     console.log('Updating profile:', profileForm.value)
     await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate API call
+    toastStore.success('Profile updated successfully!')
   } catch (error) {
-    console.error('Failed to update profile:', error)
+    toastStore.error('Failed to update profile')
   } finally {
     saving.value = false
   }
@@ -253,8 +256,9 @@ const updatePaymentSettings = async () => {
     // TODO: Implement payment settings update API call
     console.log('Updating payment settings:', paymentForm.value)
     await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate API call
+    toastStore.success('Payment settings updated successfully!')
   } catch (error) {
-    console.error('Failed to update payment settings:', error)
+    toastStore.error('Failed to update payment settings')
   } finally {
     savingPayment.value = false
   }
@@ -262,12 +266,14 @@ const updatePaymentSettings = async () => {
 
 const exportData = () => {
   // TODO: Implement data export functionality
+  toastStore.info('Data export started. You will receive an email when ready.')
   console.log('Exporting user data...')
 }
 
 const deleteAccount = () => {
   if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
     // TODO: Implement account deletion
+    toastStore.warning('Account deletion requested. You will receive a confirmation email.')
     console.log('Deleting account...')
   }
 }

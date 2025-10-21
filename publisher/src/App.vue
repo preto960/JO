@@ -1,5 +1,16 @@
 <template>
   <div id="app" class="min-h-screen bg-gray-50">
+    <!-- Toast Notifications -->
+    <Toast
+      v-for="toast in toastStore.toasts"
+      :key="toast.id"
+      :show="true"
+      :type="toast.type"
+      :title="toast.title"
+      :message="toast.message"
+      @close="toastStore.removeToast(toast.id)"
+    />
+
     <!-- Navigation -->
     <nav class="bg-white shadow-lg">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -51,9 +62,12 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useToastStore } from '@/stores/toast'
+import Toast from '@/components/Toast.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const toastStore = useToastStore()
 
 const showUserMenu = ref(false)
 
@@ -65,8 +79,13 @@ const toggleUserMenu = () => {
 }
 
 const logout = async () => {
-  await authStore.logout()
-  router.push('/login')
+  try {
+    await authStore.logout()
+    toastStore.success('Logged out successfully')
+    router.push('/login')
+  } catch (error) {
+    toastStore.error('Failed to logout')
+  }
 }
 
 onMounted(() => {

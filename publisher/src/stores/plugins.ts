@@ -1,13 +1,14 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { pluginsApi } from '@/services/api'
 import type { Plugin } from '@/types'
+import { useToastStore } from './toast'
 
-export const usePluginStore = defineStore('plugin', () => {
+export const usePluginStore = defineStore('plugins', () => {
   const plugins = ref<Plugin[]>([])
-  const currentPlugin = ref<Plugin | null>(null)
   const loading = ref(false)
   const error = ref<string | null>(null)
+  const toastStore = useToastStore()
 
   const fetchPlugins = async () => {
     loading.value = true
@@ -15,23 +16,26 @@ export const usePluginStore = defineStore('plugin', () => {
     
     try {
       const response = await pluginsApi.getPlugins()
-      plugins.value = response.plugins || response
+      plugins.value = response.data || response
     } catch (err: any) {
       error.value = err.response?.data?.error || 'Failed to fetch plugins'
+      toastStore.error('Failed to load plugins')
     } finally {
       loading.value = false
     }
   }
 
-  const fetchPluginById = async (id: string) => {
+  const getPlugin = async (id: string) => {
     loading.value = true
     error.value = null
     
     try {
       const response = await pluginsApi.getPlugin(id)
-      currentPlugin.value = response.plugin || response
+      return response.data || response
     } catch (err: any) {
       error.value = err.response?.data?.error || 'Failed to fetch plugin'
+      toastStore.error('Failed to load plugin details')
+      return null
     } finally {
       loading.value = false
     }
@@ -43,10 +47,14 @@ export const usePluginStore = defineStore('plugin', () => {
     
     try {
       const response = await pluginsApi.createPlugin(pluginData)
-      plugins.value.unshift(response)
-      return response
+      const newPlugin = response.data || response
+      
+      plugins.value.push(newPlugin)
+      toastStore.success('Plugin created successfully!')
+      return newPlugin
     } catch (err: any) {
       error.value = err.response?.data?.error || 'Failed to create plugin'
+      toastStore.error(error.value || 'Failed to create plugin')
       throw err
     } finally {
       loading.value = false
@@ -59,16 +67,18 @@ export const usePluginStore = defineStore('plugin', () => {
     
     try {
       const response = await pluginsApi.updatePlugin(id, pluginData)
+      const updatedPlugin = response.data || response
+      
       const index = plugins.value.findIndex(p => p.id === id)
-      if (index !== -1) {
-        plugins.value[index] = response
+      if (index > -1) {
+        plugins.value[index] = updatedPlugin
       }
-      if (currentPlugin.value?.id === id) {
-        currentPlugin.value = response
-      }
-      return response
+      
+      toastStore.success('Plugin updated successfully!')
+      return updatedPlugin
     } catch (err: any) {
       error.value = err.response?.data?.error || 'Failed to update plugin'
+      toastStore.error(error.value || 'Failed to update plugin')
       throw err
     } finally {
       loading.value = false
@@ -81,27 +91,44 @@ export const usePluginStore = defineStore('plugin', () => {
     
     try {
       await pluginsApi.deletePlugin(id)
-      plugins.value = plugins.value.filter(p => p.id !== id)
-      if (currentPlugin.value?.id === id) {
-        currentPlugin.value = null
+      
+      const index = plugins.value.findIndex(p => p.id === id)
+      if (index > -1) {
+        plugins.value.splice(index, 1)
       }
+      
+      toastStore.success('Plugin deleted successfully!')
     } catch (err: any) {
       error.value = err.response?.data?.error || 'Failed to delete plugin'
+      toastStore.error(error.value || 'Failed to delete plugin')
       throw err
     } finally {
       loading.value = false
     }
   }
 
+  const getMyPlugins = (userId: string) => {
+    return computed(() => {
+      return plugins.value.filter(plugin => plugin.author.id === userId)
+    })
+  }
+
+  const getPluginById = (id: string) => {
+    return computed(() => {
+      return plugins.value.find(plugin => plugin.id === id)
+    })
+  }
+
   return {
     plugins,
-    currentPlugin,
     loading,
     error,
     fetchPlugins,
-    fetchPluginById,
+    getPlugin,
     createPlugin,
     updatePlugin,
-    deletePlugin
+    deletePlugin,
+    getMyPlugins,
+    getPluginById
   }
 })

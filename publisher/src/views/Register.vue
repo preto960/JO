@@ -87,9 +87,11 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useToastStore } from '@/stores/toast'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const toastStore = useToastStore()
 
 const email = ref('')
 const username = ref('')
@@ -99,9 +101,26 @@ const loading = computed(() => authStore.loading)
 const error = computed(() => authStore.error)
 
 const handleRegister = async () => {
-  const success = await authStore.register(email.value, username.value, password.value)
-  if (success) {
-    router.push('/')
+  if (!email.value || !username.value || !password.value) {
+    toastStore.error('Please fill in all fields')
+    return
+  }
+
+  if (password.value.length < 6) {
+    toastStore.error('Password must be at least 6 characters long')
+    return
+  }
+
+  try {
+    const success = await authStore.register(email.value, username.value, password.value)
+    if (success) {
+      toastStore.success('Registration successful! Welcome to Publisher Dashboard.')
+      router.push('/')
+    } else {
+      toastStore.error(error.value || 'Registration failed')
+    }
+  } catch (err) {
+    toastStore.error('An unexpected error occurred during registration')
   }
 }
 </script>

@@ -72,9 +72,11 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useToastStore } from '@/stores/toast'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const toastStore = useToastStore()
 
 const email = ref('')
 const password = ref('')
@@ -83,9 +85,21 @@ const loading = computed(() => authStore.loading)
 const error = computed(() => authStore.error)
 
 const handleLogin = async () => {
-  const success = await authStore.login(email.value, password.value)
-  if (success) {
-    router.push('/')
+  if (!email.value || !password.value) {
+    toastStore.error('Please fill in all fields')
+    return
+  }
+
+  try {
+    const success = await authStore.login(email.value, password.value)
+    if (success) {
+      toastStore.success('Login successful! Welcome back.')
+      router.push('/')
+    } else {
+      toastStore.error(error.value || 'Login failed')
+    }
+  } catch (err) {
+    toastStore.error('An unexpected error occurred')
   }
 }
 </script>
