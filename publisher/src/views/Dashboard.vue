@@ -292,7 +292,11 @@ onMounted(async () => {
   try {
     await pluginStore.fetchPlugins()
     plugins.value = pluginStore.plugins
-    toastStore.success('Dashboard loaded successfully')
+    // Only show success toast on first load, not on navigation back
+    if (!sessionStorage.getItem('dashboardVisited')) {
+      toastStore.success('Dashboard loaded successfully')
+      sessionStorage.setItem('dashboardVisited', 'true')
+    }
   } catch (error) {
     toastStore.error('Failed to load dashboard data')
   }
