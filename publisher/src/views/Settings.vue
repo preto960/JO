@@ -356,11 +356,19 @@ const paymentForm = ref({
   stripeConnected: false
 })
 
-// Site Settings Form
-const siteForm = ref({
-  siteName: 'Plugin Marketplace',
-  commissionRate: 10,
-  minPrice: 1.00
+// Site Settings Form - using computed for reactive binding
+const siteForm = computed({
+  get: () => ({
+    siteName: settingsStore.siteName || 'Plugin Marketplace',
+    commissionRate: settingsStore.commissionRate || 10,
+    minPrice: settingsStore.minPrice || 1.00
+  }),
+  set: (value) => {
+    // This will be called when v-model updates the form
+    settingsStore.siteName = value.siteName
+    settingsStore.commissionRate = value.commissionRate
+    settingsStore.minPrice = value.minPrice
+  }
 })
 
 // Site Statistics
@@ -394,11 +402,14 @@ const updatePaymentSettings = async () => {
 const updateSiteSettings = async () => {
   savingSite.value = true
   try {
+    // Get current values from computed
+    const currentValues = siteForm.value
+    
     // Update settings store
     settingsStore.updateSiteSettings({
-      siteName: siteForm.value.siteName,
-      commissionRate: siteForm.value.commissionRate,
-      minPrice: siteForm.value.minPrice
+      siteName: currentValues.siteName,
+      commissionRate: currentValues.commissionRate,
+      minPrice: currentValues.minPrice
     })
     
     toastStore.success('Site settings updated successfully')

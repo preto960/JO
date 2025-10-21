@@ -12,6 +12,8 @@ export const useSettingsStore = defineStore('settings', () => {
   const siteUrl = ref('https://plugins.example.com')
   const siteDescription = ref('A marketplace for discovering and sharing amazing plugins')
   const defaultLanguage = ref('en')
+  const commissionRate = ref(10)
+  const minPrice = ref(1.00)
   
   // Loading state
   const loading = ref(false)
@@ -39,6 +41,12 @@ export const useSettingsStore = defineStore('settings', () => {
     minPrice?: number
   }) => {
     siteName.value = settings.siteName
+    if (settings.commissionRate !== undefined) {
+      commissionRate.value = settings.commissionRate
+    }
+    if (settings.minPrice !== undefined) {
+      minPrice.value = settings.minPrice
+    }
     
     // Save to localStorage for persistence
     localStorage.setItem('siteSettings', JSON.stringify(settings))
@@ -75,6 +83,8 @@ export const useSettingsStore = defineStore('settings', () => {
       if (savedSiteSettings) {
         const site = JSON.parse(savedSiteSettings)
         siteName.value = site.siteName ?? 'Plugin Marketplace'
+        commissionRate.value = site.commissionRate ?? 10
+        minPrice.value = site.minPrice ?? 1.00
       }
       
       // Load general settings
@@ -100,6 +110,8 @@ export const useSettingsStore = defineStore('settings', () => {
     siteUrl,
     siteDescription,
     defaultLanguage,
+    commissionRate,
+    minPrice,
     loading,
     
     // Computed
