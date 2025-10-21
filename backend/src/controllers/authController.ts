@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '@/config/database';
-import { User } from '@/entities';
+import { User, Profile } from '@/entities';
 import { AuthUtils } from '@/utils/auth';
 import { asyncHandler } from '@/middleware/errorHandler';
 import { registerValidation, loginValidation, validateRequest } from '@/middleware/validation';
@@ -8,8 +8,9 @@ import { AuthenticatedRequest } from '@/middleware/auth';
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const userRepository = AppDataSource.getRepository(User);
+  const profileRepository = AppDataSource.getRepository(Profile);
 
-  const { email, username, password, role = 'USER' } = req.body;
+  const { email, username, password, firstName, lastName, role = 'USER' } = req.body;
 
   // Check if user already exists
   const existingUser = await userRepository.findOne({
@@ -35,6 +36,21 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 
   await userRepository.save(user);
 
+  // Create profile for the user
+  const profile = profileRepository.create({
+    firstName,
+    lastName,
+    user
+  });
+
+  await profileRepository.save(profile);
+
+  // Load user with profile
+  const userWithProfile = await userRepository.findOne({
+    where: { id: user.id },
+    relations: ['profile']
+  });
+
   // Generate token
   const token = AuthUtils.generateToken({
     userId: user.id,
@@ -43,7 +59,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   });
 
   // Remove password from response
-  const { password: _, ...userResponse } = user;
+  const { password: _, ...userResponse } = userWithProfile!;
 
   res.status(201).json({
     message: 'User registered successfully',
@@ -55,11 +71,15 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const userRepository = AppDataSource.getRepository(User);
 
-  const { email, password } = req.body;
+  const { login: loginField, password } = req.body;
 
-  // Find user
+  // Find user by email or username
   const user = await userRepository.findOne({
-    where: { email, isActive: true }
+    where: [
+      { email: loginField, isActive: true },
+      { username: loginField, isActive: true }
+    ],
+    relations: ['profile']
   });
 
   if (!user) {
@@ -94,15 +114,27 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const getProfile = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-  const { password: _, ...userResponse } = req.user!;
+  const userRepository = AppDataSource.getRepository(User);
+  
+  const user = await userRepository.findOne({
+    where: { id: req.user!.id },
+    relations: ['profile']
+  });
+
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
+  const { password: _, ...userResponse } = user;
   res.json({ user: userResponse });
 });
 
 export const updateProfile = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
   const userRepository = AppDataSource.getRepository(User);
+  const profileRepository = AppDataSource.getRepository(Profile);
   const userId = req.user!.id;
 
-  const { username, bio, website, github, paypalEmail } = req.body;
+  const { username, firstName, lastName, bio, website, github, paypalEmail, phone, location, birthDate, isPublic } = req.body;
 
   // Check if username is being changed and if it's already taken
   if (username && username !== req.user!.username) {
@@ -117,14 +149,40 @@ export const updateProfile = asyncHandler(async (req: AuthenticatedRequest, res:
 
   // Update user
   await userRepository.update(userId, {
-    username: username || req.user!.username,
-    bio,
-    website,
-    github,
-    paypalEmail
+    username: username || req.user!.username
   });
 
-  const updatedUser = await userRepository.findOne({ where: { id: userId } });
+  // Update or create profile
+  let profile = await profileRepository.findOne({
+    where: { user: { id: userId } }
+  });
+
+  if (!profile) {
+    profile = profileRepository.create({
+      firstName: firstName || req.user!.email.split('@')[0],
+      lastName: lastName || 'User',
+      user: { id: userId } as User
+    });
+  } else {
+    if (firstName) profile.firstName = firstName;
+    if (lastName) profile.lastName = lastName;
+    if (bio !== undefined) profile.bio = bio;
+    if (website !== undefined) profile.website = website;
+    if (github !== undefined) profile.github = github;
+    if (paypalEmail !== undefined) profile.paypalEmail = paypalEmail;
+    if (phone !== undefined) profile.phone = phone;
+    if (location !== undefined) profile.location = location;
+    if (birthDate !== undefined) profile.birthDate = birthDate ? new Date(birthDate) : null;
+    if (isPublic !== undefined) profile.isPublic = isPublic;
+  }
+
+  await profileRepository.save(profile);
+
+  const updatedUser = await userRepository.findOne({ 
+    where: { id: userId },
+    relations: ['profile']
+  });
+  
   const { password: _, ...userResponse } = updatedUser!;
 
   res.json({

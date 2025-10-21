@@ -1,8 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, Index } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, OneToOne, Index } from 'typeorm';
 import { Plugin } from './Plugin';
 import { Purchase } from './Purchase';
 import { Review } from './Review';
 import { Session } from './Session';
+import { Profile } from './Profile';
 
 export enum UserRole {
   USER = 'USER',
@@ -33,21 +34,6 @@ export class User {
   })
   role: UserRole;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  avatar?: string;
-
-  @Column({ type: 'text', nullable: true })
-  bio?: string;
-
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  website?: string;
-
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  github?: string;
-
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  paypalEmail?: string;
-
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
 
@@ -61,6 +47,9 @@ export class User {
   updatedAt: Date;
 
   // Relations
+  @OneToOne(() => Profile, profile => profile.user, { cascade: true })
+  profile: Profile;
+
   @OneToMany(() => Plugin, plugin => plugin.author)
   plugins: Plugin[];
 

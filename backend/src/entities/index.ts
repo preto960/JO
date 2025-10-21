@@ -1,4 +1,5 @@
 export { User, UserRole } from './User';
+export { Profile } from './Profile';
 export { Plugin, PluginStatus } from './Plugin';
 export { Session } from './Session';
 export { Purchase, PurchaseStatus } from './Purchase';
