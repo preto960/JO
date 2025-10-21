@@ -283,7 +283,6 @@
               </form>
             </div>
           </div>
-        </div>
 
         <!-- Sidebar -->
         <div class="xl:col-span-1 space-y-6">
@@ -325,27 +324,43 @@
                     </div>
                     <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Total Plugins</span>
                   </div>
-                  <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ stats.totalPlugins }}</span>
-                </div>
-                
-                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center">
-                      <svg class="w-4 h-4 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
-                    </div>
-                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Total Revenue</span>
-                  </div>
-                  <span class="text-sm font-semibold text-gray-900 dark:text-white">${{ stats.totalRevenue }}</span>
+                  <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ user?.plugins?.length || 0 }}</span>
                 </div>
               </div>
             </div>
           </div>
 
+          <!-- Quick Actions Card -->
+          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div class="p-6">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Quick Actions</h3>
+              <div class="space-y-3">
+                <button
+                  @click="exportData"
+                  class="w-full text-left px-4 py-3 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors flex items-center space-x-3"
+                >
+                  <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Export Data</span>
+                </button>
+                
+                <button
+                  @click="deleteAccount"
+                  class="w-full text-left px-4 py-3 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors flex items-center space-x-3"
+                >
+                  <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                  <span class="text-sm font-medium text-red-600 dark:text-red-400">Delete Account</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -385,22 +400,6 @@ const paymentForm = ref({
 })
 
 const user = computed(() => authStore.user)
-const stats = computed(() => {
-  const userPlugins = pluginStore.plugins.filter(plugin => plugin.author.id === authStore.user?.id)
-  const totalRevenue = userPlugins.reduce((sum, plugin) => {
-    return sum + (plugin.price * plugin._count.purchases)
-  }, 0)
-
-  return {
-    totalPlugins: userPlugins.length,
-    totalRevenue: totalRevenue.toFixed(2)
-  }
-})
-
-const formatDate = (dateString?: string) => {
-  if (!dateString) return 'N/A'
-  return new Date(dateString).toLocaleDateString()
-}
 
 const updateProfile = async () => {
   saving.value = true
@@ -462,6 +461,11 @@ const deleteAccount = () => {
     toastStore.warning('Account deletion requested. You will receive a confirmation email.')
     console.log('Deleting account...')
   }
+}
+
+const formatDate = (date: string | undefined) => {
+  if (!date) return 'N/A'
+  return new Date(date).toLocaleDateString()
 }
 
 onMounted(() => {
