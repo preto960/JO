@@ -6,7 +6,7 @@
       class="absolute top-4 right-4 p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 z-10"
       :title="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
     >
-      <Sun v-if="isDark" class="w-5 h-5 text-yellow-500" />
+      <Sun v-if="!isDark" class="w-5 h-5 text-yellow-500" />
       <Moon v-else class="w-5 h-5 text-indigo-600" />
     </button>
 
