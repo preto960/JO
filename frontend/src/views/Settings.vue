@@ -7,7 +7,6 @@
           <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Site Settings</h1>
           <p class="text-gray-600 dark:text-gray-400 mt-2">Manage global site configuration and preferences</p>
         </div>
-        <ThemeToggle />
       </div>
     </div>
 
@@ -407,7 +406,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useToastStore } from '@/stores/toast'
-import ThemeToggle from '@/components/ThemeToggle.vue'
 
 const toastStore = useToastStore()
 
