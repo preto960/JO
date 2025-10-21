@@ -152,11 +152,12 @@ const form = reactive({
 
 onMounted(() => {
   // Initialize form with current user data
-  Object.keys(form).forEach(key => {
-    const formKey = key as keyof typeof form
-    const userKey = formKey as keyof User
-    form[formKey] = props.user[userKey] || ''
-  })
+  form.username = props.user.username || ''
+  form.email = props.user.email || ''
+  form.bio = props.user.bio || ''
+  form.website = props.user.website || ''
+  form.github = props.user.github || ''
+  form.paypalEmail = props.user.paypalEmail || ''
 })
 
 const handleSubmit = async () => {
