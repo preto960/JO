@@ -1,23 +1,35 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen animated-bg">
+    <!-- Background decoration -->
+    <div class="absolute inset-0 overflow-hidden">
+      <div class="absolute -top-40 -right-40 w-80 h-80 bg-green-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+      <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+      <div class="absolute top-40 left-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+    </div>
+
     <!-- Header -->
-    <header class="bg-white shadow-sm border-b">
+    <header class="glass fixed top-0 left-0 right-0 z-40 fade-in">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
+        <div class="flex justify-between h-16 items-center">
           <div class="flex items-center">
-            <h1 class="text-xl font-semibold text-gray-900">Settings</h1>
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg"></div>
+              <h1 class="text-xl font-bold text-glow">Settings</h1>
+            </div>
           </div>
           <div class="flex items-center space-x-4">
             <router-link 
               to="/dashboard" 
-              class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+              class="glass-button text-sm hover:bg-white/20 transition-all duration-300"
             >
               Back to Dashboard
             </router-link>
-            <span class="text-sm text-gray-600">Welcome, {{ user?.username }}</span>
+            <div class="glass px-4 py-2 rounded-lg">
+              <span class="text-sm opacity-90">Welcome, {{ user?.username }}</span>
+            </div>
             <button 
               @click="logout"
-              class="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition"
+              class="glass-button bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white border-0 transition-all duration-300"
             >
               Logout
             </button>
@@ -27,54 +39,63 @@
     </header>
 
     <!-- Navigation -->
-    <nav class="bg-white shadow-sm">
+    <nav class="glass fixed top-16 left-0 right-0 z-30 fade-in">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex space-x-8">
+        <div class="flex space-x-1">
           <router-link 
             to="/dashboard" 
-            class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
+            class="glass-button px-4 py-2 text-sm font-medium hover:bg-white/20 transition-all duration-300"
           >
             Dashboard
           </router-link>
           <router-link 
             to="/marketplace" 
-            class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
+            class="glass-button px-4 py-2 text-sm font-medium hover:bg-white/20 transition-all duration-300"
           >
             Marketplace
           </router-link>
           <router-link 
-            to="/settings" 
-            class="inline-flex items-center px-1 pt-1 border-b-2 border-blue-500 text-sm font-medium text-gray-900"
+            to="/my-plugins" 
+            class="glass-button px-4 py-2 text-sm font-medium hover:bg-white/20 transition-all duration-300"
           >
-            Settings
+            My Plugins
           </router-link>
           <router-link 
             to="/profile" 
-            class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
+            class="glass-button px-4 py-2 text-sm font-medium hover:bg-white/20 transition-all duration-300"
           >
             Profile
+          </router-link>
+          <router-link 
+            to="/settings" 
+            class="glass-button px-4 py-2 text-sm font-medium bg-white/20 border-white/30"
+          >
+            Settings
           </router-link>
         </div>
       </div>
     </nav>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-      <div class="px-4 py-6 sm:px-0">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <!-- Settings Sidebar -->
-          <div class="lg:col-span-1">
-            <div class="bg-white shadow rounded-lg">
-              <div class="p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Settings Categories</h3>
-                <nav class="space-y-1">
+    <main class="pt-32 pb-8 px-4 relative z-10">
+      <div class="max-w-7xl mx-auto">
+        <div class="glass-card p-8 slide-up">
+          <h2 class="text-3xl font-bold text-glow mb-2">Settings</h2>
+          <p class="text-lg opacity-80 mb-8">Manage your application preferences and configurations</p>
+          
+          <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Settings Sidebar -->
+            <div class="lg:col-span-1">
+              <div class="glass-card p-6">
+                <h3 class="text-lg font-bold text-glow mb-6">Categories</h3>
+                <nav class="space-y-2">
                   <button
                     @click="activeTab = 'general'"
                     :class="[
-                      'w-full text-left px-3 py-2 rounded-md text-sm font-medium',
+                      'w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300',
                       activeTab === 'general'
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                        ? 'glass bg-white/30 border-white/50'
+                        : 'glass-button hover:bg-white/20'
                     ]"
                   >
                     General
@@ -82,10 +103,10 @@
                   <button
                     @click="activeTab = 'security'"
                     :class="[
-                      'w-full text-left px-3 py-2 rounded-md text-sm font-medium',
+                      'w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300',
                       activeTab === 'security'
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                        ? 'glass bg-white/30 border-white/50'
+                        : 'glass-button hover:bg-white/20'
                     ]"
                   >
                     Security
@@ -93,82 +114,55 @@
                   <button
                     @click="activeTab = 'notifications'"
                     :class="[
-                      'w-full text-left px-3 py-2 rounded-md text-sm font-medium',
+                      'w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300',
                       activeTab === 'notifications'
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                        ? 'glass bg-white/30 border-white/50'
+                        : 'glass-button hover:bg-white/20'
                     ]"
                   >
                     Notifications
                   </button>
-                  <button
-                    @click="activeTab = 'integrations'"
-                    :class="[
-                      'w-full text-left px-3 py-2 rounded-md text-sm font-medium',
-                      activeTab === 'integrations'
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                    ]"
-                  >
-                    Integrations
-                  </button>
-                  <button
-                    @click="activeTab = 'advanced'"
-                    :class="[
-                      'w-full text-left px-3 py-2 rounded-md text-sm font-medium',
-                      activeTab === 'advanced'
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                    ]"
-                  >
-                    Advanced
-                  </button>
                 </nav>
               </div>
             </div>
-          </div>
 
-          <!-- Settings Content -->
-          <div class="lg:col-span-2">
-            <div class="bg-white shadow rounded-lg">
-              <div class="p-6">
+            <!-- Settings Content -->
+            <div class="lg:col-span-3">
+              <div class="glass-card p-8">
                 <!-- General Settings -->
                 <div v-if="activeTab === 'general'">
-                  <h3 class="text-lg font-medium text-gray-900 mb-4">General Settings</h3>
+                  <h3 class="text-2xl font-bold text-glow mb-6">General Settings</h3>
                   
                   <div class="space-y-6">
                     <div>
-                      <label class="block text-sm font-medium text-gray-700">Application Name</label>
+                      <label class="block text-sm font-medium mb-2 opacity-90">Application Name</label>
                       <input
                         v-model="settings.appName"
                         type="text"
-                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        class="glass-input w-full"
                       />
                     </div>
 
                     <div>
-                      <label class="block text-sm font-medium text-gray-700">Default Language</label>
+                      <label class="block text-sm font-medium mb-2 opacity-90">Language</label>
                       <select
                         v-model="settings.language"
-                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        class="glass-input w-full"
                       >
                         <option value="en">English</option>
                         <option value="es">Español</option>
                         <option value="fr">Français</option>
-                        <option value="de">Deutsch</option>
                       </select>
                     </div>
 
                     <div>
-                      <label class="block text-sm font-medium text-gray-700">Timezone</label>
+                      <label class="block text-sm font-medium mb-2 opacity-90">Timezone</label>
                       <select
                         v-model="settings.timezone"
-                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        class="glass-input w-full"
                       >
                         <option value="UTC">UTC</option>
                         <option value="America/New_York">Eastern Time</option>
-                        <option value="America/Chicago">Central Time</option>
-                        <option value="America/Denver">Mountain Time</option>
                         <option value="America/Los_Angeles">Pacific Time</option>
                       </select>
                     </div>
@@ -177,49 +171,29 @@
                       <input
                         v-model="settings.darkMode"
                         type="checkbox"
-                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        class="w-4 h-4 text-blue-600 rounded"
                       />
-                      <label class="ml-2 block text-sm text-gray-900">Enable Dark Mode</label>
+                      <label class="ml-3 text-sm opacity-90">Enable Dark Mode</label>
                     </div>
                   </div>
                 </div>
 
                 <!-- Security Settings -->
                 <div v-if="activeTab === 'security'">
-                  <h3 class="text-lg font-medium text-gray-900 mb-4">Security Settings</h3>
+                  <h3 class="text-2xl font-bold text-glow mb-6">Security Settings</h3>
                   
                   <div class="space-y-6">
                     <div class="flex items-center">
                       <input
                         v-model="settings.twoFactorAuth"
                         type="checkbox"
-                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        class="w-4 h-4 text-blue-600 rounded"
                       />
-                      <label class="ml-2 block text-sm text-gray-900">Enable Two-Factor Authentication</label>
-                    </div>
-
-                    <div class="flex items-center">
-                      <input
-                        v-model="settings.sessionTimeout"
-                        type="checkbox"
-                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                      />
-                      <label class="ml-2 block text-sm text-gray-900">Enable Session Timeout</label>
+                      <label class="ml-3 text-sm opacity-90">Enable Two-Factor Authentication</label>
                     </div>
 
                     <div>
-                      <label class="block text-sm font-medium text-gray-700">Session Duration (minutes)</label>
-                      <input
-                        v-model="settings.sessionDuration"
-                        type="number"
-                        min="5"
-                        max="480"
-                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                      />
-                    </div>
-
-                    <div class="pt-4">
-                      <button class="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition">
+                      <button class="glass-button bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white border-0 transition-all duration-300">
                         Change Password
                       </button>
                     </div>
@@ -228,142 +202,43 @@
 
                 <!-- Notification Settings -->
                 <div v-if="activeTab === 'notifications'">
-                  <h3 class="text-lg font-medium text-gray-900 mb-4">Notification Settings</h3>
+                  <h3 class="text-2xl font-bold text-glow mb-6">Notification Settings</h3>
                   
                   <div class="space-y-6">
                     <div class="flex items-center">
                       <input
                         v-model="settings.emailNotifications"
                         type="checkbox"
-                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        class="w-4 h-4 text-blue-600 rounded"
                       />
-                      <label class="ml-2 block text-sm text-gray-900">Email Notifications</label>
+                      <label class="ml-3 text-sm opacity-90">Email Notifications</label>
                     </div>
 
                     <div class="flex items-center">
                       <input
                         v-model="settings.pushNotifications"
                         type="checkbox"
-                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        class="w-4 h-4 text-blue-600 rounded"
                       />
-                      <label class="ml-2 block text-sm text-gray-900">Push Notifications</label>
+                      <label class="ml-3 text-sm opacity-90">Push Notifications</label>
                     </div>
 
                     <div class="flex items-center">
                       <input
                         v-model="settings.pluginUpdates"
                         type="checkbox"
-                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        class="w-4 h-4 text-blue-600 rounded"
                       />
-                      <label class="ml-2 block text-sm text-gray-900">Plugin Update Notifications</label>
-                    </div>
-
-                    <div class="flex items-center">
-                      <input
-                        v-model="settings.securityAlerts"
-                        type="checkbox"
-                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                      />
-                      <label class="ml-2 block text-sm text-gray-900">Security Alerts</label>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Integration Settings -->
-                <div v-if="activeTab === 'integrations'">
-                  <h3 class="text-lg font-medium text-gray-900 mb-4">Integration Settings</h3>
-                  
-                  <div class="space-y-6">
-                    <div class="border border-gray-200 rounded-lg p-4">
-                      <div class="flex items-center justify-between">
-                        <div>
-                          <h4 class="text-sm font-medium text-gray-900">GitHub Integration</h4>
-                          <p class="text-sm text-gray-500">Connect your GitHub account</p>
-                        </div>
-                        <button class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition">
-                          Connect
-                        </button>
-                      </div>
-                    </div>
-
-                    <div class="border border-gray-200 rounded-lg p-4">
-                      <div class="flex items-center justify-between">
-                        <div>
-                          <h4 class="text-sm font-medium text-gray-900">Slack Integration</h4>
-                          <p class="text-sm text-gray-500">Send notifications to Slack</p>
-                        </div>
-                        <button class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition">
-                          Connect
-                        </button>
-                      </div>
-                    </div>
-
-                    <div class="border border-gray-200 rounded-lg p-4">
-                      <div class="flex items-center justify-between">
-                        <div>
-                          <h4 class="text-sm font-medium text-gray-900">API Access</h4>
-                          <p class="text-sm text-gray-500">Manage API keys and access</p>
-                        </div>
-                        <button class="bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-700 transition">
-                          Manage
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Advanced Settings -->
-                <div v-if="activeTab === 'advanced'">
-                  <h3 class="text-lg font-medium text-gray-900 mb-4">Advanced Settings</h3>
-                  
-                  <div class="space-y-6">
-                    <div class="flex items-center">
-                      <input
-                        v-model="settings.debugMode"
-                        type="checkbox"
-                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                      />
-                      <label class="ml-2 block text-sm text-gray-900">Enable Debug Mode</label>
-                    </div>
-
-                    <div class="flex items-center">
-                      <input
-                        v-model="settings.betaFeatures"
-                        type="checkbox"
-                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                      />
-                      <label class="ml-2 block text-sm text-gray-900">Enable Beta Features</label>
-                    </div>
-
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700">Cache Duration (hours)</label>
-                      <input
-                        v-model="settings.cacheDuration"
-                        type="number"
-                        min="1"
-                        max="168"
-                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                      />
-                    </div>
-
-                    <div class="pt-4 border-t border-gray-200">
-                      <button class="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition">
-                        Clear Cache
-                      </button>
+                      <label class="ml-3 text-sm opacity-90">Plugin Update Notifications</label>
                     </div>
                   </div>
                 </div>
 
                 <!-- Save Button -->
-                <div class="mt-8 pt-6 border-t border-gray-200">
-                  <div class="flex justify-end">
-                    <button
-                      @click="saveSettings"
-                      class="bg-blue-600 text-white px-6 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition"
-                    >
-                      Save Settings
-                    </button>
-                  </div>
+                <div class="mt-8 pt-6 border-t border-white/20">
+                  <button class="glass-button bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white border-0 transition-all duration-300">
+                    Save Changes
+                  </button>
                 </div>
               </div>
             </div>
@@ -382,34 +257,48 @@ import { useAuthStore } from '@/stores/auth'
 const router = useRouter()
 const authStore = useAuthStore()
 
+const user = computed(() => authStore.user)
 const activeTab = ref('general')
 
-const user = computed(() => authStore.user)
-
 const settings = ref({
-  appName: 'Plugin Admin Panel',
+  appName: 'Plugin Marketplace',
   language: 'en',
   timezone: 'UTC',
   darkMode: false,
   twoFactorAuth: false,
-  sessionTimeout: true,
-  sessionDuration: 60,
   emailNotifications: true,
-  pushNotifications: false,
-  pluginUpdates: true,
-  securityAlerts: true,
-  debugMode: false,
-  betaFeatures: false,
-  cacheDuration: 24
+  pushNotifications: true,
+  pluginUpdates: true
 })
 
 const logout = () => {
   authStore.logout()
   router.push('/login')
 }
-
-const saveSettings = () => {
-  console.log('Saving settings:', settings.value)
-  // TODO: Implement settings save logic
-}
 </script>
+
+<style scoped>
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+.animate-blob {
+  animation: blob 7s infinite;
+}
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+</style>
