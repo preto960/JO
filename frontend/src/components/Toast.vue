@@ -9,7 +9,8 @@
   >
     <div
       v-if="show"
-      class="w-full sm:max-w-md bg-white shadow-xl rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden border border-gray-200"
+      class="w-full bg-white shadow-xl rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden border border-gray-200"
+      style="min-width: 320px; max-width: 448px;"
     >
       <div class="p-4">
         <div class="flex items-start">
@@ -17,7 +18,7 @@
             <!-- Success Icon -->
             <div
               v-if="type === 'success'"
-              class="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center"
+              class="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0"
             >
               <svg class="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -31,7 +32,7 @@
             <!-- Error Icon -->
             <div
               v-else-if="type === 'error'"
-              class="h-6 w-6 rounded-full bg-red-100 flex items-center justify-center"
+              class="h-6 w-6 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0"
             >
               <svg class="h-4 w-4 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -45,7 +46,7 @@
             <!-- Info Icon -->
             <div
               v-else
-              class="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center"
+              class="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0"
             >
               <svg class="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -57,16 +58,16 @@
               </svg>
             </div>
           </div>
-          <div class="ml-3 w-0 flex-1">
+          <div class="ml-3 min-w-0 flex-1">
             <p
               v-if="title"
-              class="text-sm font-semibold text-gray-900"
+              class="text-sm font-semibold text-gray-900 break-words"
             >
               {{ title }}
             </p>
             <p
               v-if="message"
-              class="mt-1 text-sm text-gray-600"
+              class="mt-1 text-sm text-gray-600 break-words"
             >
               {{ message }}
             </p>
@@ -74,7 +75,7 @@
           <div class="ml-4 flex-shrink-0 flex">
             <button
               @click="close"
-              class="inline-flex text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-md p-1"
+              class="inline-flex text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-md p-1 transition-colors duration-200"
             >
               <span class="sr-only">Dismiss</span>
               <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">

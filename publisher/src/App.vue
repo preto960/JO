@@ -4,7 +4,8 @@
     <Teleport to="body">
       <div
         v-if="toastStore.toasts.length > 0"
-        class="fixed z-50 top-4 right-4 sm:top-6 sm:right-6 space-y-2 pointer-events-none"
+        class="fixed z-[9999] top-4 right-4 sm:top-6 sm:right-6 space-y-2"
+        style="min-width: 320px; max-width: 448px;"
       >
         <Toast
           v-for="toast in toastStore.toasts"
