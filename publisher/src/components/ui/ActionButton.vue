@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed }
+import { computed } from 'vue'
 
 interface Props {
   text: string
