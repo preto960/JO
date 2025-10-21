@@ -31,7 +31,7 @@
           :to="item.to"
           class="flex items-center space-x-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200"
           :class="[
-            $route.path === item.to 
+            isActiveRoute(item.to) 
               ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-r-2 border-indigo-600 dark:border-indigo-400' 
               : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
           ]"
@@ -118,4 +118,9 @@ const menuItems = computed(() => {
 
   return items
 })
+
+// Helper function to check if route is active
+const isActiveRoute = (to: string) => {
+  return route.path.startsWith(to)
+}
 </script>
