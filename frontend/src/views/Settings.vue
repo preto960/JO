@@ -349,7 +349,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useToastStore } from '@/stores/toast'
 import { useSettingsStore } from '@/stores/settings'
 import SettingsCard from '@/components/ui/SettingsCard.vue'
@@ -367,8 +367,8 @@ const editingCategory = ref(null)
 
 // General Settings Form - using reactive from settings store
 const generalForm = ref({
-  siteName: settingsStore.siteName,
-  defaultLanguage: settingsStore.defaultLanguage
+  siteName: '',
+  defaultLanguage: ''
 })
 
 // Security Settings Form - using reactive from settings store
@@ -536,5 +536,14 @@ onMounted(() => {
     requireEmailVerification: settingsStore.requireEmailVerification,
     requirePluginApproval: settingsStore.requirePluginApproval
   }
+})
+
+// Watch for changes in settings store to update the form
+watch(() => settingsStore.siteName, (newSiteName) => {
+  generalForm.value.siteName = newSiteName
+})
+
+watch(() => settingsStore.defaultLanguage, (newLanguage) => {
+  generalForm.value.defaultLanguage = newLanguage
 })
 </script>

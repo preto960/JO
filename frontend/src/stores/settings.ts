@@ -64,19 +64,19 @@ export const useSettingsStore = defineStore('settings', () => {
         requirePluginApproval.value = security.requirePluginApproval ?? true
       }
       
-      // Load site settings
-      const savedSiteSettings = localStorage.getItem('siteSettings')
-      if (savedSiteSettings) {
-        const site = JSON.parse(savedSiteSettings)
-        siteName.value = site.siteName ?? 'Plugin Marketplace'
-      }
-      
-      // Load general settings
+      // Load general settings first (includes siteName)
       const savedGeneralSettings = localStorage.getItem('generalSettings')
       if (savedGeneralSettings) {
         const general = JSON.parse(savedGeneralSettings)
         siteName.value = general.siteName ?? 'Plugin Marketplace'
         defaultLanguage.value = general.defaultLanguage ?? 'en'
+      } else {
+        // Fallback to siteSettings if generalSettings doesn't exist
+        const savedSiteSettings = localStorage.getItem('siteSettings')
+        if (savedSiteSettings) {
+          const site = JSON.parse(savedSiteSettings)
+          siteName.value = site.siteName ?? 'Plugin Marketplace'
+        }
       }
     } catch (error) {
       console.error('Error loading settings:', error)
