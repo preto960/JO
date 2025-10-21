@@ -220,14 +220,17 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useToastStore } from '@/stores/toast'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const toastStore = useToastStore()
 
 const user = computed(() => authStore.user)
 
 const logout = () => {
   authStore.logout()
+  toastStore.success('Logged out successfully')
   router.push('/login')
 }
 </script>

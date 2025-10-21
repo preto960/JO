@@ -66,9 +66,11 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useToastStore } from '@/stores/toast'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const toastStore = useToastStore()
 
 const email = ref('')
 const username = ref('')
@@ -78,9 +80,16 @@ const loading = computed(() => authStore.loading)
 const error = computed(() => authStore.error)
 
 const handleRegister = async () => {
-  const success = await authStore.register(email.value, username.value, password.value)
-  if (success) {
-    router.push('/dashboard')
+  try {
+    const success = await authStore.register(email.value, username.value, password.value)
+    if (success) {
+      toastStore.success('Registration successful! Welcome to the admin panel.')
+      router.push('/dashboard')
+    } else {
+      toastStore.error(error.value || 'Registration failed')
+    }
+  } catch (err) {
+    toastStore.error('An unexpected error occurred during registration')
   }
 }
 </script>

@@ -1,15 +1,21 @@
 <template>
   <div id="app" class="min-h-screen bg-gray-50">
     <!-- Toast Notifications -->
-    <Toast
-      v-for="toast in toastStore.toasts"
-      :key="toast.id"
-      :show="true"
-      :type="toast.type"
-      :title="toast.title"
-      :message="toast.message"
-      @close="toastStore.removeToast(toast.id)"
-    />
+    <div
+      v-if="toastStore.toasts.length > 0"
+      class="fixed z-50 top-4 right-4 space-y-2"
+    >
+      <Toast
+        v-for="toast in toastStore.toasts"
+        :key="toast.id"
+        :show="true"
+        :type="toast.type"
+        :title="toast.title"
+        :message="toast.message"
+        :duration="toast.duration"
+        @close="toastStore.removeToast(toast.id)"
+      />
+    </div>
 
     <!-- Navigation -->
     <nav v-if="!isAuthPage" class="bg-white shadow-lg">
