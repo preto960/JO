@@ -1,338 +1,233 @@
 <template>
-  <div class="min-h-screen bg-gray-50 py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">Developer Dashboard</h1>
-        <button
-          @click="showCreateModal = true"
-          class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-        >
-          Create New Plugin
-        </button>
-      </div>
-
-      <!-- Stats Overview -->
-      <div class="grid md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white rounded-lg shadow-sm p-6">
-          <div class="text-2xl font-bold text-blue-600">{{ stats.totalPlugins }}</div>
-          <div class="text-sm text-gray-600">Total Plugins</div>
-        </div>
-        <div class="bg-white rounded-lg shadow-sm p-6">
-          <div class="text-2xl font-bold text-green-600">${{ stats.totalRevenue }}</div>
-          <div class="text-sm text-gray-600">Total Revenue</div>
-        </div>
-        <div class="bg-white rounded-lg shadow-sm p-6">
-          <div class="text-2xl font-bold text-purple-600">{{ stats.totalSales }}</div>
-          <div class="text-sm text-gray-600">Total Sales</div>
-        </div>
-        <div class="bg-white rounded-lg shadow-sm p-6">
-          <div class="text-2xl font-bold text-orange-600">{{ stats.avgRating }}</div>
-          <div class="text-sm text-gray-600">Average Rating</div>
+  <div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <div class="flex items-center">
+            <h1 class="text-xl font-semibold text-gray-900">Admin Dashboard</h1>
+          </div>
+          <div class="flex items-center space-x-4">
+            <span class="text-sm text-gray-600">Welcome, {{ user?.username }}</span>
+            <button 
+              @click="logout"
+              class="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </div>
+    </header>
 
-      <!-- My Plugins -->
-      <div class="bg-white rounded-lg shadow-sm">
-        <div class="p-6 border-b border-gray-200">
-          <h2 class="text-xl font-semibold">My Plugins</h2>
-        </div>
-        
-        <div v-if="loading" class="text-center py-12">
-          <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        </div>
-
-        <div v-else-if="error" class="text-center py-12 text-red-600">
-          {{ error }}
-        </div>
-
-        <div v-else-if="myPlugins.length === 0" class="text-center py-12 text-gray-500">
-          You haven't created any plugins yet.
-        </div>
-
-        <div v-else class="divide-y divide-gray-200">
-          <div 
-            v-for="plugin in myPlugins" 
-            :key="plugin.id"
-            class="p-6 hover:bg-gray-50"
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex space-x-8">
+          <router-link 
+            to="/dashboard" 
+            class="inline-flex items-center px-1 pt-1 border-b-2 border-blue-500 text-sm font-medium text-gray-900"
           >
-            <div class="flex justify-between items-start">
-              <div class="flex-1">
-                <div class="flex items-center space-x-3">
-                  <h3 class="text-lg font-medium">{{ plugin.title }}</h3>
-                  <span class="inline-block px-2 py-1 text-xs rounded-full"
-                        :class="getStatusClass(plugin.status)">
-                    {{ plugin.status }}
-                  </span>
+            Dashboard
+          </router-link>
+          <router-link 
+            to="/marketplace" 
+            class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
+          >
+            Marketplace
+          </router-link>
+          <router-link 
+            to="/settings" 
+            class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
+          >
+            Settings
+          </router-link>
+          <router-link 
+            to="/profile" 
+            class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
+          >
+            Profile
+          </router-link>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <div class="px-4 py-6 sm:px-0">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                    </svg>
+                  </div>
                 </div>
-                <p class="text-gray-600 mt-1">{{ plugin.description }}</p>
-                <div class="flex items-center space-x-4 mt-2 text-sm text-gray-500">
-                  <span>${{ plugin.price }}</span>
-                  <span>•</span>
-                  <span>{{ plugin._count.purchases }} sold</span>
-                  <span>•</span>
-                  <span>★ {{ plugin.avgRating.toFixed(1) }}</span>
+                <div class="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt class="text-sm font-medium text-gray-500 truncate">Total Users</dt>
+                    <dd class="text-lg font-semibold text-gray-900">1,234</dd>
+                  </dl>
                 </div>
               </div>
-              <div class="flex space-x-2 ml-4">
-                <button
-                  @click="editPlugin(plugin)"
-                  class="text-blue-600 hover:text-blue-800"
-                >
-                  Edit
-                </button>
-                <button
-                  @click="deletePlugin(plugin.id)"
-                  class="text-red-600 hover:text-red-800"
-                >
-                  Delete
-                </button>
+            </div>
+          </div>
+
+          <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                  </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt class="text-sm font-medium text-gray-500 truncate">Active Plugins</dt>
+                    <dd class="text-lg font-semibold text-gray-900">42</dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <div class="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                    </svg>
+                  </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt class="text-sm font-medium text-gray-500 truncate">Revenue</dt>
+                    <dd class="text-lg font-semibold text-gray-900">$8,420</dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <div class="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                  </div>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt class="text-sm font-medium text-gray-500 truncate">Growth Rate</dt>
+                    <dd class="text-lg font-semibold text-gray-900">+12%</dd>
+                  </dl>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Create/Edit Plugin Modal -->
-    <div v-if="showCreateModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-lg p-6 w-full max-w-2xl max-h-screen overflow-y-auto">
-        <h2 class="text-xl font-semibold mb-4">
-          {{ editingPlugin ? 'Edit Plugin' : 'Create New Plugin' }}
-        </h2>
-        
-        <form @submit.prevent="savePlugin" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Title</label>
-            <input
-              v-model="pluginForm.title"
-              type="text"
-              required
-              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Description</label>
-            <textarea
-              v-model="pluginForm.description"
-              rows="4"
-              required
-              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            ></textarea>
-          </div>
-          
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Price</label>
-              <input
-                v-model="pluginForm.price"
-                type="number"
-                step="0.01"
-                required
-                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Category</label>
-              <select
-                v-model="pluginForm.category"
-                required
-                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">Select a category</option>
-                <option value="productivity">Productivity</option>
-                <option value="development">Development</option>
-                <option value="design">Design</option>
-                <option value="marketing">Marketing</option>
-                <option value="analytics">Analytics</option>
-              </select>
-            </div>
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Tags (comma-separated)</label>
-            <input
-              v-model="pluginForm.tagsString"
-              type="text"
-              placeholder="tag1, tag2, tag3"
-              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Demo URL</label>
-              <input
-                v-model="pluginForm.demoUrl"
-                type="url"
-                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            
-            <div>
-              <label class="block text-sm font-medium text-gray-700">GitHub URL</label>
-              <input
-                v-model="pluginForm.githubUrl"
-                type="url"
-                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              />
+        <!-- Recent Activity -->
+        <div class="bg-white shadow rounded-lg">
+          <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Recent Activity</h3>
+            <div class="flow-root">
+              <ul class="-mb-8">
+                <li>
+                  <div class="relative pb-8">
+                    <div class="relative flex space-x-3">
+                      <div>
+                        <span class="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center ring-8 ring-white">
+                          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                          </svg>
+                        </span>
+                      </div>
+                      <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                        <div>
+                          <p class="text-sm text-gray-500">New user registration</p>
+                        </div>
+                        <div class="text-right text-sm whitespace-nowrap text-gray-500">
+                          2 hours ago
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div class="relative pb-8">
+                    <div class="relative flex space-x-3">
+                      <div>
+                        <span class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center ring-8 ring-white">
+                          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                          </svg>
+                        </span>
+                      </div>
+                      <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                        <div>
+                          <p class="text-sm text-gray-500">Plugin updated successfully</p>
+                        </div>
+                        <div class="text-right text-sm whitespace-nowrap text-gray-500">
+                          4 hours ago
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div class="relative">
+                    <div class="relative flex space-x-3">
+                      <div>
+                        <span class="h-8 w-8 rounded-full bg-yellow-500 flex items-center justify-center ring-8 ring-white">
+                          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                          </svg>
+                        </span>
+                      </div>
+                      <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                        <div>
+                          <p class="text-sm text-gray-500">System maintenance completed</p>
+                        </div>
+                        <div class="text-right text-sm whitespace-nowrap text-gray-500">
+                          6 hours ago
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              </ul>
             </div>
           </div>
-          
-          <div class="flex justify-end space-x-3">
-            <button
-              type="button"
-              @click="closeModal"
-              class="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              :disabled="saving"
-              class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-            >
-              <span v-if="saving">Saving...</span>
-              <span v-else>{{ editingPlugin ? 'Update' : 'Create' }} Plugin</span>
-            </button>
-          </div>
-        </form>
+        </div>
       </div>
-    </div>
+    </main>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { usePluginStore } from '@/stores/plugins'
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import type { Plugin } from '@/types'
 
-const pluginStore = usePluginStore()
+const router = useRouter()
 const authStore = useAuthStore()
 
-const showCreateModal = ref(false)
-const editingPlugin = ref<Plugin | null>(null)
-const saving = ref(false)
+const user = computed(() => authStore.user)
 
-const pluginForm = ref({
-  title: '',
-  description: '',
-  price: '',
-  category: '',
-  tagsString: '',
-  demoUrl: '',
-  githubUrl: ''
-})
-
-const loading = computed(() => pluginStore.loading)
-const error = computed(() => pluginStore.error)
-const plugins = computed(() => pluginStore.plugins)
-
-const myPlugins = computed(() => {
-  return plugins.value.filter(plugin => plugin.author.id === authStore.user?.id)
-})
-
-const stats = computed(() => {
-  const userPlugins = myPlugins.value
-  const totalRevenue = userPlugins.reduce((sum, plugin) => {
-    return sum + (plugin.price * plugin._count.purchases)
-  }, 0)
-  const totalSales = userPlugins.reduce((sum, plugin) => sum + plugin._count.purchases, 0)
-  const avgRating = userPlugins.length > 0 
-    ? userPlugins.reduce((sum, plugin) => sum + plugin.avgRating, 0) / userPlugins.length 
-    : 0
-
-  return {
-    totalPlugins: userPlugins.length,
-    totalRevenue: totalRevenue.toFixed(2),
-    totalSales,
-    avgRating: avgRating.toFixed(1)
-  }
-})
-
-const getStatusClass = (status: string) => {
-  switch (status) {
-    case 'APPROVED':
-      return 'bg-green-100 text-green-800'
-    case 'PENDING':
-      return 'bg-yellow-100 text-yellow-800'
-    case 'REJECTED':
-      return 'bg-red-100 text-red-800'
-    default:
-      return 'bg-gray-100 text-gray-800'
-  }
+const logout = () => {
+  authStore.logout()
+  router.push('/login')
 }
-
-const editPlugin = (plugin: Plugin) => {
-  editingPlugin.value = plugin
-  pluginForm.value = {
-    title: plugin.title,
-    description: plugin.description,
-    price: plugin.price.toString(),
-    category: plugin.category,
-    tagsString: plugin.tags.join(', '),
-    demoUrl: plugin.demoUrl || '',
-    githubUrl: plugin.githubUrl || ''
-  }
-  showCreateModal.value = true
-}
-
-const deletePlugin = async (pluginId: string) => {
-  if (confirm('Are you sure you want to delete this plugin?')) {
-    try {
-      await pluginStore.deletePlugin(pluginId)
-    } catch (error) {
-      console.error('Failed to delete plugin:', error)
-    }
-  }
-}
-
-const savePlugin = async () => {
-  saving.value = true
-  
-  try {
-    const pluginData = {
-      title: pluginForm.value.title,
-      description: pluginForm.value.description,
-      price: parseFloat(pluginForm.value.price),
-      category: pluginForm.value.category,
-      tags: pluginForm.value.tagsString.split(',').map(tag => tag.trim()).filter(Boolean),
-      demoUrl: pluginForm.value.demoUrl || undefined,
-      githubUrl: pluginForm.value.githubUrl || undefined,
-      authorId: authStore.user!.id
-    }
-
-    if (editingPlugin.value) {
-      await pluginStore.updatePlugin(editingPlugin.value.id, pluginData)
-    } else {
-      await pluginStore.createPlugin(pluginData)
-    }
-    
-    closeModal()
-  } catch (error) {
-    console.error('Failed to save plugin:', error)
-  } finally {
-    saving.value = false
-  }
-}
-
-const closeModal = () => {
-  showCreateModal.value = false
-  editingPlugin.value = null
-  pluginForm.value = {
-    title: '',
-    description: '',
-    price: '',
-    category: '',
-    tagsString: '',
-    demoUrl: '',
-    githubUrl: ''
-  }
-}
-
-onMounted(async () => {
-  await pluginStore.fetchPlugins()
-})
 </script>

@@ -1,30 +1,18 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import Home from '@/views/Home.vue'
-import Plugins from '@/views/Plugins.vue'
-import PluginDetail from '@/views/PluginDetail.vue'
 import Login from '@/views/Login.vue'
 import Register from '@/views/Register.vue'
-import Profile from '@/views/Profile.vue'
 import Dashboard from '@/views/Dashboard.vue'
+import Settings from '@/views/Settings.vue'
+import Marketplace from '@/views/Marketplace.vue'
+import Profile from '@/views/Profile.vue'
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
       path: '/',
-      name: 'Home',
-      component: Home
-    },
-    {
-      path: '/plugins',
-      name: 'Plugins',
-      component: Plugins
-    },
-    {
-      path: '/plugins/:id',
-      name: 'PluginDetail',
-      component: PluginDetail
+      redirect: '/login'
     },
     {
       path: '/login',
@@ -37,16 +25,28 @@ const router = createRouter({
       component: Register
     },
     {
+      path: '/dashboard',
+      name: 'Dashboard',
+      component: Dashboard,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/settings',
+      name: 'Settings',
+      component: Settings,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/marketplace',
+      name: 'Marketplace',
+      component: Marketplace,
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/profile',
       name: 'Profile',
       component: Profile,
       meta: { requiresAuth: true }
-    },
-    {
-      path: '/dashboard',
-      name: 'Dashboard',
-      component: Dashboard,
-      meta: { requiresAuth: true, requiresDeveloper: true }
     }
   ]
 })
@@ -56,8 +56,6 @@ router.beforeEach((to, from, next) => {
   
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next('/login')
-  } else if (to.meta.requiresDeveloper && authStore.user?.role !== 'DEVELOPER') {
-    next('/')
   } else {
     next()
   }
