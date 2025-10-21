@@ -7,7 +7,7 @@ export function useDocumentTitle() {
   // Update document title when site name changes
   const updateDocumentTitle = (siteName: string) => {
     const title = siteName || 'Plugin Publisher'
-    document.title = `${title} - Publisher Dashboard`
+    document.title = title
   }
   
   // Watch for changes in site name
