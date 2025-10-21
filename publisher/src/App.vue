@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="min-h-screen bg-gray-50">
+  <div id="app" class="bg-white dark:bg-gray-900">
     <!-- Toast Notifications -->
     <Teleport to="body">
       <div
@@ -21,7 +21,7 @@
     </Teleport>
 
     <!-- Main Content -->
-    <main>
+    <main class="min-h-screen">
       <router-view />
     </main>
   </div>
@@ -32,14 +32,17 @@ import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
+import { useThemeStore } from '@/stores/theme'
 import Toast from '@/components/Toast.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const toastStore = useToastStore()
+const themeStore = useThemeStore()
 
 onMounted(() => {
   authStore.loadUserFromStorage()
+  themeStore.loadTheme()
   
   // Si no está autenticado y no está en la página de login/register
   // redirigir a login automáticamente

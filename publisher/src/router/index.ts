@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import SidebarLayout from '@/layouts/SidebarLayout.vue'
 import Dashboard from '@/views/Dashboard.vue'
 import Plugins from '@/views/Plugins.vue'
 import Analytics from '@/views/Analytics.vue'
@@ -12,27 +13,55 @@ const router = createRouter({
   routes: [
     {
       path: '/',
+      redirect: '/dashboard'
+    },
+    {
+      path: '/dashboard',
       name: 'Dashboard',
-      component: Dashboard,
-      meta: { requiresAuth: true }
+      component: SidebarLayout,
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: '',
+          component: Dashboard
+        }
+      ]
     },
     {
       path: '/plugins',
       name: 'Plugins',
-      component: Plugins,
-      meta: { requiresAuth: true }
+      component: SidebarLayout,
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: '',
+          component: Plugins
+        }
+      ]
     },
     {
       path: '/analytics',
       name: 'Analytics',
-      component: Analytics,
-      meta: { requiresAuth: true }
+      component: SidebarLayout,
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: '',
+          component: Analytics
+        }
+      ]
     },
     {
       path: '/settings',
       name: 'Settings',
-      component: Settings,
-      meta: { requiresAuth: true }
+      component: SidebarLayout,
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: '',
+          component: Settings
+        }
+      ]
     },
     {
       path: '/login',
