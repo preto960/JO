@@ -2,11 +2,11 @@
   <button
     @click="toggleTheme"
     class="p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
-    :title="theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'"
+    :title="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
   >
-    <!-- Sun icon for light mode -->
+    <!-- Sun icon for dark mode -->
     <svg 
-      v-if="theme === 'light'"
+      v-if="theme === 'dark'"
       class="w-5 h-5 text-yellow-500" 
       fill="none" 
       stroke="currentColor" 
@@ -15,10 +15,10 @@
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
     </svg>
     
-    <!-- Moon icon for dark mode -->
+    <!-- Moon icon for light mode -->
     <svg 
       v-else
-      class="w-5 h-5 text-blue-500" 
+      class="w-5 h-5 text-indigo-600" 
       fill="none" 
       stroke="currentColor" 
       viewBox="0 0 24 24"

@@ -1,14 +1,9 @@
 <template>
   <div class="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center p-4 relative">
     <!-- Theme Toggle Button -->
-    <button
-      @click="toggleTheme"
-      class="absolute top-4 right-4 p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 z-10"
-      :title="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
-    >
-      <Sun v-if="isDark" class="w-5 h-5 text-yellow-500" />
-      <Moon v-else class="w-5 h-5 text-indigo-600" />
-    </button>
+    <div class="absolute top-4 right-4 z-10">
+      <ThemeToggle />
+    </div>
 
     <!-- Register Card -->
     <div class="w-full max-w-md p-8">
@@ -93,11 +88,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
-import { Sun, Moon } from 'lucide-vue-next'
+import ThemeToggle from '@/components/ThemeToggle.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -106,29 +101,9 @@ const toastStore = useToastStore()
 const email = ref('')
 const username = ref('')
 const password = ref('')
-const isDark = ref(false)
 
 const loading = computed(() => authStore.loading)
 const error = computed(() => authStore.error)
-
-const toggleTheme = () => {
-  isDark.value = !isDark.value
-  if (isDark.value) {
-    document.documentElement.classList.add('dark')
-    localStorage.setItem('theme', 'dark')
-  } else {
-    document.documentElement.classList.remove('dark')
-    localStorage.setItem('theme', 'light')
-  }
-}
-
-onMounted(() => {
-  const theme = localStorage.getItem('theme')
-  if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-    isDark.value = true
-    document.documentElement.classList.add('dark')
-  }
-})
 
 const handleRegister = async () => {
   try {
