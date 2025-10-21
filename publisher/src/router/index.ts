@@ -5,6 +5,7 @@ import Dashboard from '@/views/Dashboard.vue'
 import Plugins from '@/views/Plugins.vue'
 import Analytics from '@/views/Analytics.vue'
 import Settings from '@/views/Settings.vue'
+import Profile from '@/views/Profile.vue'
 import Login from '@/views/Login.vue'
 import Register from '@/views/Register.vue'
 
@@ -54,8 +55,26 @@ const router = createRouter({
     {
       path: '/settings',
       name: 'Settings',
-      component: Settings,
-      meta: { requiresAuth: true }
+      component: SidebarLayout,
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: '',
+          component: Settings
+        }
+      ]
+    },
+    {
+      path: '/profile',
+      name: 'Profile',
+      component: SidebarLayout,
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: '',
+          component: Profile
+        }
+      ]
     },
     {
       path: '/login',
