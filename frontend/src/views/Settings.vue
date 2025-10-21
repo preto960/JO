@@ -349,7 +349,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useToastStore } from '@/stores/toast'
 import { useSettingsStore } from '@/stores/settings'
 import SettingsCard from '@/components/ui/SettingsCard.vue'
@@ -365,10 +365,17 @@ const savingSecurity = ref(false)
 const showAddCategoryModal = ref(false)
 const editingCategory = ref(null)
 
-// General Settings Form - using reactive from settings store
-const generalForm = ref({
-  siteName: '',
-  defaultLanguage: ''
+// General Settings Form - using computed for reactive binding
+const generalForm = computed({
+  get: () => ({
+    siteName: settingsStore.siteName || 'Plugin Marketplace',
+    defaultLanguage: settingsStore.defaultLanguage || 'en'
+  }),
+  set: (value) => {
+    // This will be called when v-model updates the form
+    settingsStore.siteName = value.siteName
+    settingsStore.defaultLanguage = value.defaultLanguage
+  }
 })
 
 // Security Settings Form - using reactive from settings store
@@ -420,10 +427,13 @@ const siteStats = ref({
 const updateGeneralSettings = async () => {
   saving.value = true
   try {
+    // Get current values from computed
+    const currentValues = generalForm.value
+    
     // Update settings store
     settingsStore.updateGeneralSettings({
-      siteName: generalForm.siteName,
-      defaultLanguage: generalForm.defaultLanguage
+      siteName: currentValues.siteName,
+      defaultLanguage: currentValues.defaultLanguage
     })
     
     toastStore.success('General settings updated successfully')
@@ -525,25 +535,11 @@ onMounted(() => {
   // Load settings from store
   settingsStore.loadSettings()
   
-  // Update form values with loaded settings
-  generalForm.value = {
-    siteName: settingsStore.siteName,
-    defaultLanguage: settingsStore.defaultLanguage
-  }
-  
+  // Update security form values (general form is handled by computed)
   securityForm.value = {
     allowRegistration: settingsStore.allowRegistration,
     requireEmailVerification: settingsStore.requireEmailVerification,
     requirePluginApproval: settingsStore.requirePluginApproval
   }
-})
-
-// Watch for changes in settings store to update the form
-watch(() => settingsStore.siteName, (newSiteName) => {
-  generalForm.value.siteName = newSiteName
-})
-
-watch(() => settingsStore.defaultLanguage, (newLanguage) => {
-  generalForm.value.defaultLanguage = newLanguage
 })
 </script>
