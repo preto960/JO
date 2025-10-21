@@ -54,14 +54,8 @@ const router = createRouter({
     {
       path: '/settings',
       name: 'Settings',
-      component: SidebarLayout,
-      meta: { requiresAuth: true },
-      children: [
-        {
-          path: '',
-          component: Settings
-        }
-      ]
+      component: Settings,
+      meta: { requiresAuth: true }
     },
     {
       path: '/login',
