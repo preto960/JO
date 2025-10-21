@@ -12,7 +12,8 @@ export const getUserById = asyncHandler(async (req: Request, res: Response) => {
 
   const user = await userRepository.findOne({
     where: { id, isActive: true },
-    select: ['id', 'email', 'username', 'role', 'bio', 'website', 'github', 'createdAt', 'updatedAt']
+    relations: ['profile'],
+    select: ['id', 'email', 'username', 'role', 'createdAt', 'updatedAt']
   });
 
   if (!user) {
