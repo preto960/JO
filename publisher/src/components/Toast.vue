@@ -61,13 +61,15 @@
           <div class="ml-3 min-w-0 flex-1">
             <p
               v-if="title"
-              class="text-sm font-bold text-glow break-words"
+              :class="['text-sm font-bold break-words', textClass]"
+              :style="textGlowClass"
             >
               {{ title }}
             </p>
             <p
               v-if="message"
-              class="mt-1 text-sm opacity-90 break-words"
+              :class="['mt-1 text-sm break-words', textClass]"
+              style="opacity: 0.9;"
             >
               {{ message }}
             </p>
@@ -76,6 +78,7 @@
             <button
               @click="close"
               class="glass-button hover:bg-white/20 p-1 transition-all duration-300"
+              :class="textClass"
             >
               <span class="sr-only">Dismiss</span>
               <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -94,7 +97,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useThemeStore } from '@/stores/theme'
 
 interface Props {
   show: boolean
@@ -112,6 +116,18 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   close: []
 }>()
+
+const themeStore = useThemeStore()
+
+const textClass = computed(() => {
+  return themeStore.theme === 'dark' ? 'text-white' : 'text-black'
+})
+
+const textGlowClass = computed(() => {
+  return themeStore.theme === 'dark' 
+    ? 'text-shadow: 0 0 20px rgba(255, 255, 255, 0.5)'
+    : 'text-shadow: 0 0 20px rgba(0, 0, 0, 0.3)'
+})
 
 let timeoutId: number | null = null
 
