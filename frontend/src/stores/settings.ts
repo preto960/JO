@@ -33,15 +33,20 @@ export const useSettingsStore = defineStore('settings', () => {
     localStorage.setItem('securitySettings', JSON.stringify(settings))
   }
   
+  const updateSiteSettings = (settings: {
+    siteName: string
+  }) => {
+    siteName.value = settings.siteName
+    
+    // Save to localStorage for persistence
+    localStorage.setItem('siteSettings', JSON.stringify(settings))
+  }
+
   const updateGeneralSettings = (settings: {
     siteName: string
-    siteUrl: string
-    siteDescription: string
     defaultLanguage: string
   }) => {
     siteName.value = settings.siteName
-    siteUrl.value = settings.siteUrl
-    siteDescription.value = settings.siteDescription
     defaultLanguage.value = settings.defaultLanguage
     
     // Save to localStorage for persistence
@@ -59,13 +64,18 @@ export const useSettingsStore = defineStore('settings', () => {
         requirePluginApproval.value = security.requirePluginApproval ?? true
       }
       
+      // Load site settings
+      const savedSiteSettings = localStorage.getItem('siteSettings')
+      if (savedSiteSettings) {
+        const site = JSON.parse(savedSiteSettings)
+        siteName.value = site.siteName ?? 'Plugin Marketplace'
+      }
+      
       // Load general settings
       const savedGeneralSettings = localStorage.getItem('generalSettings')
       if (savedGeneralSettings) {
         const general = JSON.parse(savedGeneralSettings)
         siteName.value = general.siteName ?? 'Plugin Marketplace'
-        siteUrl.value = general.siteUrl ?? 'https://plugins.example.com'
-        siteDescription.value = general.siteDescription ?? 'A marketplace for discovering and sharing amazing plugins'
         defaultLanguage.value = general.defaultLanguage ?? 'en'
       }
     } catch (error) {
@@ -79,8 +89,6 @@ export const useSettingsStore = defineStore('settings', () => {
     requireEmailVerification,
     requirePluginApproval,
     siteName,
-    siteUrl,
-    siteDescription,
     defaultLanguage,
     loading,
     
@@ -89,6 +97,7 @@ export const useSettingsStore = defineStore('settings', () => {
     
     // Actions
     updateSecuritySettings,
+    updateSiteSettings,
     updateGeneralSettings,
     loadSettings
   }

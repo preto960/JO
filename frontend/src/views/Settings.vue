@@ -14,99 +14,44 @@
       <!-- Main Settings Content -->
       <div class="xl:col-span-2 space-y-8">
         <!-- General Settings Card -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-          <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-            <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-              </div>
-              <div>
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">General Settings</h2>
-                <p class="text-sm text-gray-600 dark:text-gray-400">Basic site configuration</p>
-              </div>
-            </div>
-          </div>
-          <div class="p-6">
-            <form @submit.prevent="updateGeneralSettings" class="space-y-6">
-              <div class="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Site Name</label>
-                  <div class="relative">
-                    <input
-                      v-model="generalForm.siteName"
-                      type="text"
-                      required
-                      class="w-full px-4 py-3 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
-                    />
-                    <svg class="absolute left-3 top-3.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
-                    </svg>
-                  </div>
-                </div>
-                
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Site URL</label>
-                  <div class="relative">
-                    <input
-                      v-model="generalForm.siteUrl"
-                      type="url"
-                      required
-                      class="w-full px-4 py-3 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
-                      placeholder="https://example.com"
-                    />
-                    <svg class="absolute left-3 top-3.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
-                    </svg>
-                  </div>
-                </div>
-              </div>
-              
-              <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Site Description</label>
-                <textarea
-                  v-model="generalForm.siteDescription"
-                  rows="3"
-                  class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all resize-none"
-                  placeholder="Brief description of your site..."
-                ></textarea>
-              </div>
+        <SettingsCard
+          title="General Settings"
+          description="Basic site configuration"
+          :icon="SettingsIcon"
+          icon-container-class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center"
+          icon-class="w-6 h-6 text-blue-600 dark:text-blue-400"
+        >
+          <form @submit.prevent="updateGeneralSettings" class="space-y-6">
+            <FormInput
+              label="Site Name"
+              v-model="generalForm.siteName"
+              required
+            />
 
-              <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Default Language</label>
-                <select
-                  v-model="generalForm.defaultLanguage"
-                  class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
-                >
-                  <option value="en">English</option>
-                  <option value="es">Español</option>
-                  <option value="fr">Français</option>
-                  <option value="de">Deutsch</option>
-                  <option value="pt">Português</option>
-                </select>
-              </div>
-              
-              <div class="flex justify-end pt-4">
-                <button
-                  type="submit"
-                  :disabled="saving"
-                  class="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105"
-                >
-                  <span v-if="saving" class="flex items-center">
-                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Saving...
-                  </span>
-                  <span v-else>Save Changes</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Default Language</label>
+              <select
+                v-model="generalForm.defaultLanguage"
+                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
+              >
+                <option value="en">English</option>
+                <option value="es">Español</option>
+                <option value="fr">Français</option>
+                <option value="de">Deutsch</option>
+                <option value="pt">Português</option>
+              </select>
+            </div>
+            
+            <div class="flex justify-end pt-4">
+              <ActionButton
+                type="submit"
+                :loading="saving"
+                loading-text="Saving..."
+                text="Save Changes"
+              />
+            </div>
+          </form>
+        </SettingsCard>
 
         <!-- Categories Settings Card -->
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -407,6 +352,10 @@
 import { ref, onMounted } from 'vue'
 import { useToastStore } from '@/stores/toast'
 import { useSettingsStore } from '@/stores/settings'
+import SettingsCard from '@/components/ui/SettingsCard.vue'
+import FormInput from '@/components/ui/FormInput.vue'
+import ActionButton from '@/components/ui/ActionButton.vue'
+import SettingsIcon from '@/components/icons/SettingsIcon.vue'
 
 const toastStore = useToastStore()
 const settingsStore = useSettingsStore()
@@ -419,8 +368,6 @@ const editingCategory = ref(null)
 // General Settings Form - using reactive from settings store
 const generalForm = ref({
   siteName: settingsStore.siteName,
-  siteUrl: settingsStore.siteUrl,
-  siteDescription: settingsStore.siteDescription,
   defaultLanguage: settingsStore.defaultLanguage
 })
 
@@ -473,8 +420,12 @@ const siteStats = ref({
 const updateGeneralSettings = async () => {
   saving.value = true
   try {
-    // TODO: Implement actual API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    // Update settings store
+    settingsStore.updateGeneralSettings({
+      siteName: generalForm.siteName,
+      defaultLanguage: generalForm.defaultLanguage
+    })
+    
     toastStore.success('General settings updated successfully')
   } catch (error) {
     toastStore.error('Failed to update general settings')
@@ -577,8 +528,6 @@ onMounted(() => {
   // Update form values with loaded settings
   generalForm.value = {
     siteName: settingsStore.siteName,
-    siteUrl: settingsStore.siteUrl,
-    siteDescription: settingsStore.siteDescription,
     defaultLanguage: settingsStore.defaultLanguage
   }
   

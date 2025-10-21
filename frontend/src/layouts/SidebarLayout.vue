@@ -7,7 +7,7 @@
           <div class="flex items-center">
             <div class="flex items-center space-x-3">
               <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg"></div>
-              <h1 class="text-xl font-bold text-gray-900 dark:text-white">Plugin Marketplace</h1>
+              <h1 class="text-xl font-bold text-gray-900 dark:text-white">{{ settingsStore.siteName }}</h1>
             </div>
           </div>
           
@@ -87,11 +87,13 @@
 import { h } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useSettingsStore } from '@/stores/settings'
 import ThemeToggle from '@/components/ThemeToggle.vue'
 import UserDropdown from '@/components/UserDropdown.vue'
 
 const route = useRoute()
 const authStore = useAuthStore()
+const settingsStore = useSettingsStore()
 
 // Icons
 const HomeIcon = () => h('svg', { class: 'w-5 h-5', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [

@@ -15,80 +15,59 @@
         <!-- Main Settings Content -->
         <div class="xl:col-span-2 space-y-8">
           <!-- Payment Settings Card -->
-          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-              <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
-                  <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <SettingsCard
+            title="Payment Settings"
+            description="Configure your payment methods"
+            :icon="PaymentIcon"
+            icon-container-class="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center"
+            icon-class="w-6 h-6 text-green-600 dark:text-green-400"
+          >
+            <form @submit.prevent="updatePaymentSettings" class="space-y-6">
+              <FormInput
+                label="PayPal Email"
+                v-model="paymentForm.paypalEmail"
+                type="email"
+                placeholder="paypal@example.com"
+                help-text="This email will be used for receiving payments"
+              >
+                <template #icon>
+                  <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
                   </svg>
-                </div>
-                <div>
-                  <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Payment Settings</h2>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">Configure your payment methods</p>
-                </div>
-              </div>
-            </div>
-            <div class="p-6">
-              <form @submit.prevent="updatePaymentSettings" class="space-y-6">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">PayPal Email</label>
-                  <div class="relative">
-                    <input
-                      v-model="paymentForm.paypalEmail"
-                      type="email"
-                      class="w-full px-4 py-3 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
-                      placeholder="paypal@example.com"
-                    />
-                    <svg class="absolute left-3 top-3.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-                    </svg>
-                  </div>
-                  <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    This email will be used for receiving payments
-                  </p>
-                </div>
-                
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Stripe Connect</label>
-                  <div class="flex items-center space-x-4">
-                    <button
-                      type="button"
-                      class="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-105"
-                    >
-                      Connect with Stripe
-                    </button>
-                    <div v-if="paymentForm.stripeConnected" class="flex items-center text-green-600 dark:text-green-400">
-                      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
-                      Connected
-                    </div>
-                  </div>
-                  <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    Connect your Stripe account to receive payments
-                  </p>
-                </div>
-                
-                <div class="flex justify-end pt-4">
+                </template>
+              </FormInput>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Stripe Connect</label>
+                <div class="flex items-center space-x-4">
                   <button
-                    type="submit"
-                    :disabled="savingPayment"
-                    class="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105"
+                    type="button"
+                    class="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-105"
                   >
-                    <span v-if="savingPayment" class="flex items-center">
-                      <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Saving...
-                    </span>
-                    <span v-else>Save Payment Settings</span>
+                    Connect with Stripe
                   </button>
+                  <div v-if="paymentForm.stripeConnected" class="flex items-center text-green-600 dark:text-green-400">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Connected
+                  </div>
                 </div>
-              </form>
-            </div>
-          </div>
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                  Connect your Stripe account to receive payments
+                </p>
+              </div>
+              
+              <div class="flex justify-end pt-4">
+                <ActionButton
+                  type="submit"
+                  :loading="savingPayment"
+                  loading-text="Saving..."
+                  text="Save Payment Settings"
+                />
+              </div>
+            </form>
+          </SettingsCard>
 
           <!-- Site Settings Card -->
           <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -350,6 +329,10 @@ import { useAuthStore } from '@/stores/auth'
 import { usePluginStore } from '@/stores/plugins'
 import { useToastStore } from '@/stores/toast'
 import { useSettingsStore } from '@/stores/settings'
+import SettingsCard from '@/components/ui/SettingsCard.vue'
+import FormInput from '@/components/ui/FormInput.vue'
+import ActionButton from '@/components/ui/ActionButton.vue'
+import PaymentIcon from '@/components/icons/PaymentIcon.vue'
 
 const authStore = useAuthStore()
 const pluginStore = usePluginStore()
@@ -411,8 +394,12 @@ const updatePaymentSettings = async () => {
 const updateSiteSettings = async () => {
   savingSite.value = true
   try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    // Update settings store
+    settingsStore.updateSiteSettings({
+      siteName: siteForm.value.siteName,
+      commissionRate: siteForm.value.commissionRate,
+      minPrice: siteForm.value.minPrice
+    })
     
     toastStore.success('Site settings updated successfully')
   } catch (error) {

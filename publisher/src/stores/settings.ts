@@ -33,6 +33,17 @@ export const useSettingsStore = defineStore('settings', () => {
     localStorage.setItem('securitySettings', JSON.stringify(settings))
   }
   
+  const updateSiteSettings = (settings: {
+    siteName: string
+    commissionRate?: number
+    minPrice?: number
+  }) => {
+    siteName.value = settings.siteName
+    
+    // Save to localStorage for persistence
+    localStorage.setItem('siteSettings', JSON.stringify(settings))
+  }
+
   const updateGeneralSettings = (settings: {
     siteName: string
     siteUrl: string
@@ -57,6 +68,13 @@ export const useSettingsStore = defineStore('settings', () => {
         allowRegistration.value = security.allowRegistration ?? true
         requireEmailVerification.value = security.requireEmailVerification ?? false
         requirePluginApproval.value = security.requirePluginApproval ?? true
+      }
+      
+      // Load site settings
+      const savedSiteSettings = localStorage.getItem('siteSettings')
+      if (savedSiteSettings) {
+        const site = JSON.parse(savedSiteSettings)
+        siteName.value = site.siteName ?? 'Plugin Marketplace'
       }
       
       // Load general settings
@@ -89,6 +107,7 @@ export const useSettingsStore = defineStore('settings', () => {
     
     // Actions
     updateSecuritySettings,
+    updateSiteSettings,
     updateGeneralSettings,
     loadSettings
   }

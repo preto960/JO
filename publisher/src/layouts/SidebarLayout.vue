@@ -7,7 +7,7 @@
           <div class="flex items-center">
             <div class="flex items-center space-x-3">
               <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg"></div>
-              <h1 class="text-xl font-bold text-gray-900 dark:text-white">Publisher Portal</h1>
+              <h1 class="text-xl font-bold text-gray-900 dark:text-white">{{ settingsStore.siteName }}</h1>
             </div>
           </div>
           
@@ -113,12 +113,14 @@
 import { h } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useSettingsStore } from '@/stores/settings'
 import { useToastStore } from '@/stores/toast'
 import ThemeToggle from '@/components/ThemeToggle.vue'
 import UserDropdown from '@/components/UserDropdown.vue'
 
 const route = useRoute()
 const authStore = useAuthStore()
+const settingsStore = useSettingsStore()
 const toastStore = useToastStore()
 
 // Icons
