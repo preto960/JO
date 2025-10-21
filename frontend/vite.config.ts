@@ -4,6 +4,11 @@ import { resolve } from 'path'
 
 export default defineConfig({
   plugins: [vue()],
+  root: '.',
+  publicDir: 'public',
+  build: {
+    outDir: 'dist'
+  },
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src')
@@ -11,11 +16,7 @@ export default defineConfig({
   },
   server: {
     port: 3001,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3000',
-        changeOrigin: true
-      }
-    }
+    host: '0.0.0.0',
+    open: false
   }
 })
