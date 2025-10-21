@@ -556,9 +556,7 @@ const hasPurchases = computed(() => {
 const handleProfileUpdate = async (formData: any) => {
   const success = await authStore.updateProfile(formData)
   
-  if (success) {
-    toastStore.success('Profile updated successfully!')
-  } else {
+  if (!success) {
     toastStore.error(authStore.error || 'Failed to update profile')
   }
 }
