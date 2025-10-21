@@ -406,27 +406,29 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useToastStore } from '@/stores/toast'
+import { useSettingsStore } from '@/stores/settings'
 
 const toastStore = useToastStore()
+const settingsStore = useSettingsStore()
 
 const saving = ref(false)
 const savingSecurity = ref(false)
 const showAddCategoryModal = ref(false)
 const editingCategory = ref(null)
 
-// General Settings Form
+// General Settings Form - using reactive from settings store
 const generalForm = ref({
-  siteName: 'Plugin Marketplace',
-  siteUrl: 'https://plugins.example.com',
-  siteDescription: 'A marketplace for discovering and sharing amazing plugins',
-  defaultLanguage: 'en'
+  siteName: settingsStore.siteName,
+  siteUrl: settingsStore.siteUrl,
+  siteDescription: settingsStore.siteDescription,
+  defaultLanguage: settingsStore.defaultLanguage
 })
 
-// Security Settings Form
+// Security Settings Form - using reactive from settings store
 const securityForm = ref({
-  allowRegistration: true,
-  requireEmailVerification: false,
-  requirePluginApproval: true
+  allowRegistration: settingsStore.allowRegistration,
+  requireEmailVerification: settingsStore.requireEmailVerification,
+  requirePluginApproval: settingsStore.requirePluginApproval
 })
 
 // Category Form
@@ -484,7 +486,14 @@ const updateGeneralSettings = async () => {
 const updateSecuritySettings = async () => {
   savingSecurity.value = true
   try {
-    // TODO: Implement actual API call
+    // Update settings store
+    settingsStore.updateSecuritySettings({
+      allowRegistration: securityForm.value.allowRegistration,
+      requireEmailVerification: securityForm.value.requireEmailVerification,
+      requirePluginApproval: securityForm.value.requirePluginApproval
+    })
+    
+    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000))
     toastStore.success('Security settings updated successfully')
   } catch (error) {
@@ -562,6 +571,21 @@ const exportData = () => {
 }
 
 onMounted(() => {
-  // Load settings from API
+  // Load settings from store
+  settingsStore.loadSettings()
+  
+  // Update form values with loaded settings
+  generalForm.value = {
+    siteName: settingsStore.siteName,
+    siteUrl: settingsStore.siteUrl,
+    siteDescription: settingsStore.siteDescription,
+    defaultLanguage: settingsStore.defaultLanguage
+  }
+  
+  securityForm.value = {
+    allowRegistration: settingsStore.allowRegistration,
+    requireEmailVerification: settingsStore.requireEmailVerification,
+    requirePluginApproval: settingsStore.requirePluginApproval
+  }
 })
 </script>
