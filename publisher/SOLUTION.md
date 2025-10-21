@@ -36,12 +36,26 @@ cd /home/z/my-project/publisher
 npm run dev
 ```
 
-### Opción 2: Por Separado
+### Opción 2: Scripts por Sistema Operativo
+
+**Windows:**
+```bash
+# Doble clic en el archivo o ejecutar en cmd:
+start-windows.bat
+```
+
+**Linux/Mac:**
+```bash
+chmod +x start-linux.sh
+./start-linux.sh
+```
+
+### Opción 3: Por Separado
 ```bash
 # Terminal 1 - Backend
 npm run server-mock
 
-# Terminal 2 - Frontend
+# Terminal 2 - Frontend (después de 5 segundos)
 npm run client
 ```
 

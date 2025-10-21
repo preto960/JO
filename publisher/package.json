@@ -4,12 +4,11 @@
   "description": "Publisher Dashboard for Plugin Marketplace",
   "main": "server.js",
   "scripts": {
-    "dev": "concurrently \"npm run server-mock\" \"npm run client-delayed\"",
+    "dev": "concurrently \"npm run server-mock\" \"node scripts/start-frontend.js\"",
     "server": "nodemon --exec \"npx ts-node --project tsconfig.script.json\" src/server.ts",
     "server-simple": "nodemon --exec \"npx ts-node --project tsconfig.script.json\" src/server-simple.ts",
     "server-mock": "nodemon --exec \"npx ts-node --project tsconfig.script.json\" src/server-mock.ts",
     "client": "vite",
-    "client-delayed": "wait-on tcp:3002 && vite",
     "build": "vite build",
     "start": "node dist/server.js",
     "db:reset": "npx ts-node --project tsconfig.script.json src/scripts/resetDatabase.ts",
