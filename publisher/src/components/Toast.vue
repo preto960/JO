@@ -9,7 +9,7 @@
   >
     <div
       v-if="show"
-      class="bg-white dark:bg-gray-800 shadow-xl rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden border border-gray-200 dark:border-gray-700"
+      class="glass-card pointer-events-auto overflow-hidden scale-in"
       style="min-width: 320px; max-width: 448px;"
     >
       <div class="p-4">
@@ -18,9 +18,9 @@
             <!-- Success Icon -->
             <div
               v-if="type === 'success'"
-              class="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0"
+              class="w-8 h-8 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 flex items-center justify-center flex-shrink-0"
             >
-              <svg class="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -32,9 +32,9 @@
             <!-- Error Icon -->
             <div
               v-else-if="type === 'error'"
-              class="h-6 w-6 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0"
+              class="w-8 h-8 rounded-full bg-gradient-to-r from-red-500 to-pink-600 flex items-center justify-center flex-shrink-0"
             >
-              <svg class="h-4 w-4 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -46,9 +46,9 @@
             <!-- Info Icon -->
             <div
               v-else
-              class="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0"
+              class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-cyan-600 flex items-center justify-center flex-shrink-0"
             >
-              <svg class="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -61,13 +61,13 @@
           <div class="ml-3 min-w-0 flex-1">
             <p
               v-if="title"
-              class="text-sm font-semibold text-gray-900 dark:text-white break-words"
+              class="text-sm font-bold text-glow break-words"
             >
               {{ title }}
             </p>
             <p
               v-if="message"
-              class="mt-1 text-sm text-gray-600 dark:text-gray-300 break-words"
+              class="mt-1 text-sm opacity-90 break-words"
             >
               {{ message }}
             </p>
@@ -75,7 +75,7 @@
           <div class="ml-4 flex-shrink-0 flex">
             <button
               @click="close"
-              class="inline-flex text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-md p-1 transition-colors duration-200"
+              class="glass-button hover:bg-white/20 p-1 transition-all duration-300"
             >
               <span class="sr-only">Dismiss</span>
               <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
