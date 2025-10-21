@@ -73,25 +73,136 @@ app.get('/api/plugins', (req, res) => {
   res.json([
     {
       id: '1',
-      name: 'Plugin Ejemplo',
-      description: 'Este es un plugin de ejemplo',
+      title: 'Plugin Ejemplo',
+      description: 'Este es un plugin de ejemplo para demostrar la funcionalidad del Publisher Dashboard',
       version: '1.0.0',
-      status: 'PUBLISHED',
-      downloads: 150,
-      revenue: 45.99,
-      createdAt: new Date().toISOString()
+      price: 29.99,
+      category: 'productivity',
+      tags: ['productivity', 'automation', 'tools'],
+      status: 'APPROVED',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      author: {
+        id: '1',
+        username: 'developer'
+      },
+      avgRating: 4.5,
+      _count: {
+        reviews: 12,
+        purchases: 150
+      }
+    },
+    {
+      id: '2',
+      title: 'Analytics Dashboard',
+      description: 'Un plugin completo para analizar métricas y estadísticas en tiempo real',
+      version: '2.1.0',
+      price: 49.99,
+      category: 'analytics',
+      tags: ['analytics', 'dashboard', 'metrics'],
+      status: 'APPROVED',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      author: {
+        id: '1',
+        username: 'developer'
+      },
+      avgRating: 4.8,
+      _count: {
+        reviews: 25,
+        purchases: 89
+      }
+    },
+    {
+      id: '3',
+      title: 'Code Formatter',
+      description: 'Herramienta automática para formatear y organizar código fuente',
+      version: '1.5.2',
+      price: 19.99,
+      category: 'development',
+      tags: ['development', 'code', 'formatter'],
+      status: 'DRAFT',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      author: {
+        id: '1',
+        username: 'developer'
+      },
+      avgRating: 4.2,
+      _count: {
+        reviews: 8,
+        purchases: 45
+      }
     }
   ]);
 });
 
 app.post('/api/plugins', (req, res) => {
-  const plugin = { ...req.body, id: Date.now().toString() };
+  const plugin = { 
+    id: Date.now().toString(),
+    title: req.body.title || 'New Plugin',
+    description: req.body.description || 'Plugin description',
+    version: '1.0.0',
+    price: req.body.price || 0,
+    category: req.body.category || 'productivity',
+    tags: req.body.tags || [],
+    status: 'DRAFT',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    author: {
+      id: '1',
+      username: 'developer'
+    },
+    avgRating: 0,
+    _count: {
+      reviews: 0,
+      purchases: 0
+    }
+  };
   res.json(plugin);
+});
+
+app.get('/api/plugins/:id', (req, res) => {
+  const { id } = req.params;
+  res.json({
+    id,
+    title: `Plugin ${id}`,
+    description: 'Plugin description',
+    version: '1.0.0',
+    price: 29.99,
+    category: 'productivity',
+    tags: ['productivity', 'tools'],
+    status: 'APPROVED',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    author: {
+      id: '1',
+      username: 'developer'
+    },
+    avgRating: 4.5,
+    _count: {
+      reviews: 10,
+      purchases: 100
+    }
+  });
 });
 
 app.put('/api/plugins/:id', (req, res) => {
   const { id } = req.params;
-  res.json({ id, ...req.body, updatedAt: new Date().toISOString() });
+  res.json({ 
+    id, 
+    ...req.body, 
+    updatedAt: new Date().toISOString(),
+    author: {
+      id: '1',
+      username: 'developer'
+    },
+    avgRating: 4.5,
+    _count: {
+      reviews: 10,
+      purchases: 100
+    }
+  });
 });
 
 app.delete('/api/plugins/:id', (req, res) => {
@@ -101,18 +212,60 @@ app.delete('/api/plugins/:id', (req, res) => {
 // Analytics routes (simuladas)
 app.get('/api/analytics/overview', (req, res) => {
   res.json({
-    totalDownloads: 1250,
     totalRevenue: 375.50,
-    activePlugins: 3,
-    monthlyGrowth: 15.5
+    totalSales: 1250,
+    totalPlugins: 3,
+    avgRating: 4.5
   });
 });
 
 app.get('/api/analytics/performance', (req, res) => {
   res.json({
     daily: [
-      { date: '2024-01-01', downloads: 45, revenue: 13.50 },
-      { date: '2024-01-02', downloads: 52, revenue: 15.60 },
+      { date: '2024-01-01', downloads: 45, revenue: 13.50, views: 230 },
+      { date: '2024-01-02', downloads: 52, revenue: 15.60, views: 285 },
+      { date: '2024-01-03', downloads: 38, revenue: 11.40, views: 198 },
+      { date: '2024-01-04', downloads: 61, revenue: 18.30, views: 342 },
+      { date: '2024-01-05', downloads: 43, revenue: 12.90, views: 267 }
+    ]
+  });
+});
+
+app.get('/api/analytics', (req, res) => {
+  res.json({
+    totalRevenue: 375.50,
+    totalSales: 1250,
+    totalPlugins: 3,
+    avgRating: 4.5,
+    dailyStats: [
+      { date: '2024-01-01', downloads: 45, revenue: 13.50, views: 230 },
+      { date: '2024-01-02', downloads: 52, revenue: 15.60, views: 285 },
+      { date: '2024-01-03', downloads: 38, revenue: 11.40, views: 198 },
+      { date: '2024-01-04', downloads: 61, revenue: 18.30, views: 342 },
+      { date: '2024-01-05', downloads: 43, revenue: 12.90, views: 267 }
+    ],
+    pluginStats: [
+      {
+        pluginId: '1',
+        pluginTitle: 'Plugin Ejemplo',
+        downloads: 150,
+        revenue: 45.99,
+        rating: 4.5
+      },
+      {
+        pluginId: '2',
+        pluginTitle: 'Analytics Dashboard',
+        downloads: 89,
+        revenue: 89.01,
+        rating: 4.8
+      },
+      {
+        pluginId: '3',
+        pluginTitle: 'Code Formatter',
+        downloads: 45,
+        revenue: 8.99,
+        rating: 4.2
+      }
     ]
   });
 });
