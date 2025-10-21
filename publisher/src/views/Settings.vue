@@ -283,7 +283,6 @@
               </form>
             </div>
           </div>
-        </div>
 
         <!-- Sidebar -->
         <div class="xl:col-span-1 space-y-6">
