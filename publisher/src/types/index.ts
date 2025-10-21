@@ -2,7 +2,8 @@ export interface User {
   id: string
   email: string
   username: string
-  role: 'USER' | 'DEVELOPER' | 'ADMIN'
+  role: 'USER' | 'DEVELOPER' | 'ADMIN' | 'PUBLISHER'
+  bio?: string
   createdAt: string
 }
 

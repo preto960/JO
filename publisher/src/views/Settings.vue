@@ -1,6 +1,5 @@
 <template>
-  <SidebarLayout>
-    <div class="p-6">
+  <div class="p-6">
       <!-- Header -->
       <div class="mb-8">
         <div class="flex items-center justify-between">
@@ -264,7 +263,6 @@
         </div>
       </div>
     </div>
-  </SidebarLayout>
 </template>
 
 <script setup lang="ts">
@@ -272,7 +270,6 @@ import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { usePluginStore } from '@/stores/plugins'
 import { useToastStore } from '@/stores/toast'
-import SidebarLayout from '@/layouts/SidebarLayout.vue'
 import ThemeToggle from '@/components/ThemeToggle.vue'
 
 const authStore = useAuthStore()

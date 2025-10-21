@@ -66,8 +66,32 @@ export const useAuthStore = defineStore('auth', () => {
     
     if (storedToken && storedUser) {
       token.value = storedToken
-      user.value = JSON.parse(storedUser)
+      const parsedUser = JSON.parse(storedUser)
+      
+      // Ensure user has a valid role, default to 'PUBLISHER' if not set
+      if (!parsedUser.role || !['PUBLISHER', 'ADMIN', 'DEVELOPER'].includes(parsedUser.role)) {
+        parsedUser.role = 'PUBLISHER'
+        localStorage.setItem('user', JSON.stringify(parsedUser))
+      }
+      
+      user.value = parsedUser
     }
+  }
+
+  // Debug function to create test user
+  const createTestUser = () => {
+    const testUser = {
+      id: 1,
+      username: 'admin',
+      email: 'admin@example.com',
+      role: 'PUBLISHER',
+      createdAt: new Date().toISOString()
+    }
+    
+    user.value = testUser
+    token.value = 'test-token'
+    localStorage.setItem('token', 'test-token')
+    localStorage.setItem('user', JSON.stringify(testUser))
   }
 
   return {
@@ -79,6 +103,7 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     register,
     logout,
-    loadUserFromStorage
+    loadUserFromStorage,
+    createTestUser
   }
 })

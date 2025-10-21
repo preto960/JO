@@ -39,9 +39,9 @@
           <span>Dashboard</span>
         </router-link>
 
-        <!-- My Plugins (only for publishers) -->
+        <!-- My Plugins (only for publishers and admins) -->
         <router-link 
-          v-if="authStore.user?.role === 'PUBLISHER'"
+          v-if="authStore.user?.role === 'PUBLISHER' || authStore.user?.role === 'ADMIN'"
           to="/plugins"
           class="flex items-center space-x-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200"
           :class="[
@@ -54,9 +54,9 @@
           <span>My Plugins</span>
         </router-link>
 
-        <!-- Create New Plugin (only for publishers) -->
+        <!-- Create New Plugin (only for publishers and admins) -->
         <router-link 
-          v-if="authStore.user?.role === 'PUBLISHER'"
+          v-if="authStore.user?.role === 'PUBLISHER' || authStore.user?.role === 'ADMIN'"
           to="/plugins?action=create"
           class="flex items-center space-x-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 shadow-md hover:shadow-lg"
         >
@@ -64,9 +64,9 @@
           <span>Create New Plugin</span>
         </router-link>
 
-        <!-- Analytics (only for publishers) -->
+        <!-- Analytics (only for publishers and admins) -->
         <router-link 
-          v-if="authStore.user?.role === 'PUBLISHER'"
+          v-if="authStore.user?.role === 'PUBLISHER' || authStore.user?.role === 'ADMIN'"
           to="/analytics"
           class="flex items-center space-x-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200"
           :class="[
