@@ -283,7 +283,6 @@
               </form>
             </div>
           </div>
-        </div>
 
         <!-- Sidebar -->
         <div class="xl:col-span-1 space-y-6">
@@ -342,10 +341,10 @@
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
+  </div>
 </template>
 
 <script setup lang="ts">
