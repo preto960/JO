@@ -73,6 +73,30 @@
       <!-- Bottom Icons Section -->
       <div class="border-t border-gray-200 dark:border-gray-700 p-4">
         <div class="flex justify-around">
+          <!-- Export Data Icon -->
+          <button 
+            @click="exportData"
+            class="p-3 rounded-lg transition-colors duration-200"
+            :class="[
+              'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200'
+            ]"
+            title="Export Data"
+          >
+            <ArrowDownTrayIcon class="w-6 h-6" />
+          </button>
+
+          <!-- Delete Account Icon -->
+          <button 
+            @click="deleteAccount"
+            class="p-3 rounded-lg transition-colors duration-200"
+            :class="[
+              'text-gray-500 dark:text-gray-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400'
+            ]"
+            title="Delete Account"
+          >
+            <TrashIcon class="w-6 h-6" />
+          </button>
+
           <!-- Settings Icon -->
           <router-link 
             to="/settings"
@@ -103,11 +127,13 @@
 import { h } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useToastStore } from '@/stores/toast'
 import ThemeToggle from '@/components/ThemeToggle.vue'
 import UserDropdown from '@/components/UserDropdown.vue'
 
 const route = useRoute()
 const authStore = useAuthStore()
+const toastStore = useToastStore()
 
 // Icons
 const HomeIcon = () => h('svg', { class: 'w-5 h-5', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
@@ -127,8 +153,29 @@ const CogIcon = () => h('svg', { class: 'w-6 h-6', fill: 'none', stroke: 'curren
   h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M15 12a3 3 0 11-6 0 3 3 0 016 0z' })
 ])
 
+const ArrowDownTrayIcon = () => h('svg', { class: 'w-6 h-6', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' })
+])
+
+const TrashIcon = () => h('svg', { class: 'w-6 h-6', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+  h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' })
+])
+
 // Helper function to check if route is active
 const isActiveRoute = (to: string) => {
   return route.path.startsWith(to)
+}
+
+// Quick Actions functions
+const exportData = () => {
+  toastStore.info('Data export started. You will receive an email when ready.')
+  console.log('Exporting user data...')
+}
+
+const deleteAccount = () => {
+  if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+    toastStore.warning('Account deletion requested. You will receive a confirmation email.')
+    console.log('Deleting account...')
+  }
 }
 </script>

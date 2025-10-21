@@ -1,211 +1,190 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="p-6">
     <!-- Header -->
-    <header class="bg-white shadow-sm border-b">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-          <div class="flex items-center">
-            <h1 class="text-xl font-semibold text-gray-900">Analytics</h1>
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Analytics</h1>
+      <p class="text-gray-600 dark:text-gray-400 mt-2">Track your plugin performance and revenue</p>
+    </div>
+
+    <!-- Date Range Selector -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
+      <div class="flex flex-wrap items-center gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Date Range</label>
+          <select
+            v-model="dateRange"
+            @change="fetchAnalytics"
+            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
+          >
+            <option value="7">Last 7 days</option>
+            <option value="30">Last 30 days</option>
+            <option value="90">Last 90 days</option>
+            <option value="365">Last year</option>
+          </select>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Plugin</label>
+          <select
+            v-model="selectedPlugin"
+            @change="fetchAnalytics"
+            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
+          >
+            <option value="">All Plugins</option>
+            <option v-for="plugin in myPlugins" :key="plugin.id" :value="plugin.id">
+              {{ plugin.title }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overview Stats -->
+    <div class="grid md:grid-cols-4 gap-6 mb-8">
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center">
+          <div class="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-xl">
+            <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
           </div>
-          <div class="flex items-center space-x-4">
-            <span class="text-sm text-gray-600">Welcome, {{ user?.username }}</span>
-            <button 
-              @click="logout"
-              class="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition"
-            >
-              Logout
-            </button>
+          <div class="ml-4">
+            <div class="text-2xl font-bold text-gray-900 dark:text-white">${{ analytics.totalRevenue }}</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">Total Revenue</div>
           </div>
         </div>
       </div>
-    </header>
 
-    <!-- Navigation -->
-    <nav class="bg-white shadow-sm">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex space-x-8">
-          <router-link 
-            to="/" 
-            class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
-          >
-            Dashboard
-          </router-link>
-          <router-link 
-            to="/plugins" 
-            class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
-          >
-            My Plugins
-          </router-link>
-          <router-link 
-            to="/analytics" 
-            class="inline-flex items-center px-1 pt-1 border-b-2 border-blue-500 text-sm font-medium text-gray-900"
-          >
-            Analytics
-          </router-link>
-          <router-link 
-            to="/settings" 
-            class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
-          >
-            Settings
-          </router-link>
-        </div>
-      </div>
-    </nav>
-
-      <!-- Main Content -->
-    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-      <div class="px-4 py-6 sm:px-0">
-        <div class="mb-8">
-          <h1 class="text-3xl font-bold text-gray-900">Analytics</h1>
-          <p class="text-gray-600 mt-2">Track your plugin performance and revenue</p>
-        </div>
-
-        <!-- Date Range Selector -->
-        <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
-          <div class="flex flex-wrap items-center gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
-              <select
-                v-model="dateRange"
-                @change="fetchAnalytics"
-                class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="7">Last 7 days</option>
-                <option value="30">Last 30 days</option>
-                <option value="90">Last 90 days</option>
-                <option value="365">Last year</option>
-              </select>
-            </div>
-            
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Plugin</label>
-              <select
-                v-model="selectedPlugin"
-                @change="fetchAnalytics"
-                class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">All Plugins</option>
-                <option v-for="plugin in myPlugins" :key="plugin.id" :value="plugin.id">
-                  {{ plugin.title }}
-                </option>
-              </select>
-            </div>
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center">
+          <div class="p-3 bg-green-100 dark:bg-green-900/20 rounded-xl">
+            <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+            </svg>
           </div>
-        </div>
-
-        <!-- Overview Stats -->
-        <div class="grid md:grid-cols-4 gap-6 mb-8">
-          <div class="bg-white rounded-lg shadow-sm p-6">
-            <div class="text-2xl font-bold text-blue-600">{{ analytics.totalRevenue }}</div>
-            <div class="text-sm text-gray-600">Total Revenue</div>
-          </div>
-          <div class="bg-white rounded-lg shadow-sm p-6">
-            <div class="text-2xl font-bold text-green-600">{{ analytics.totalSales }}</div>
-            <div class="text-sm text-gray-600">Total Sales</div>
-          </div>
-          <div class="bg-white rounded-lg shadow-sm p-6">
-            <div class="text-2xl font-bold text-purple-600">{{ analytics.totalDownloads }}</div>
-            <div class="text-sm text-gray-600">Total Downloads</div>
-          </div>
-          <div class="bg-white rounded-lg shadow-sm p-6">
-            <div class="text-2xl font-bold text-orange-600">{{ analytics.avgRating }}</div>
-            <div class="text-sm text-gray-600">Average Rating</div>
-          </div>
-        </div>
-
-        <!-- Charts -->
-        <div class="grid md:grid-cols-2 gap-8 mb-8">
-          <div class="bg-white rounded-lg shadow-sm p-6">
-            <h2 class="text-lg font-semibold mb-4">Revenue Over Time</h2>
-            <div class="h-64 flex items-center justify-center text-gray-500">
-              <canvas ref="revenueChart"></canvas>
-            </div>
-          </div>
-          
-          <div class="bg-white rounded-lg shadow-sm p-6">
-            <h2 class="text-lg font-semibold mb-4">Downloads Over Time</h2>
-            <div class="h-64 flex items-center justify-center text-gray-500">
-              <canvas ref="downloadsChart"></canvas>
-            </div>
-          </div>
-        </div>
-
-        <!-- Plugin Performance Table -->
-        <div class="bg-white rounded-lg shadow-sm">
-          <div class="p-6 border-b border-gray-200">
-            <h2 class="text-lg font-semibold">Plugin Performance</h2>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Plugin
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Downloads
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Revenue
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Rating
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-                <tr v-for="plugin in pluginStats" :key="plugin.pluginId">
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm font-medium text-gray-900">{{ plugin.pluginTitle }}</div>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                      Active
-                    </span>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {{ plugin.downloads }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${{ plugin.revenue }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {{ plugin.rating.toFixed(1) }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="ml-4">
+            <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ analytics.totalSales }}</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">Total Sales</div>
           </div>
         </div>
       </div>
-    </main>
+
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center">
+          <div class="p-3 bg-purple-100 dark:bg-purple-900/20 rounded-xl">
+            <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+            </svg>
+          </div>
+          <div class="ml-4">
+            <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ analytics.totalDownloads }}</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">Total Downloads</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="flex items-center">
+          <div class="p-3 bg-yellow-100 dark:bg-yellow-900/20 rounded-xl">
+            <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+            </svg>
+          </div>
+          <div class="ml-4">
+            <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ analytics.avgRating }}</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">Average Rating</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="grid md:grid-cols-2 gap-8 mb-8">
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Revenue Over Time</h2>
+        <div class="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">
+          <canvas ref="revenueChart"></canvas>
+        </div>
+      </div>
+      
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Downloads Over Time</h2>
+        <div class="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">
+          <canvas ref="downloadsChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plugin Performance Table -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Plugin Performance</h2>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-700">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                Plugin
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                Status
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                Downloads
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                Revenue
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                Rating
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tr v-for="plugin in pluginStats" :key="plugin.pluginId" class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ plugin.pluginTitle }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
+                  Active
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                {{ plugin.downloads }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                ${{ plugin.revenue }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                  </svg>
+                  {{ plugin.rating.toFixed(1) }}
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
 import { usePluginStore } from '@/stores/plugins'
 import { useAuthStore } from '@/stores/auth'
+import { useToastStore } from '@/stores/toast'
 import type { Analytics } from '@/types'
 
-const router = useRouter()
 const pluginStore = usePluginStore()
 const authStore = useAuthStore()
+const toastStore = useToastStore()
 
 const user = computed(() => authStore.user)
-
-const logout = async () => {
-  try {
-    await authStore.logout()
-    router.push('/login')
-  } catch (error) {
-    console.error('Failed to logout')
-  }
-}
 
 const dateRange = ref('30')
 const selectedPlugin = ref('')
