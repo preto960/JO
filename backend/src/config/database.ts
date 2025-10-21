@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import { User, Plugin, Session, Purchase, Review, PluginAnalytics, Transaction } from '@/entities';
+import { User, Plugin, Session, Purchase, Review, PluginAnalytics, Transaction, Profile } from '@/entities';
 import config from './index';
 
 // Always use DATABASE_URL
@@ -16,7 +16,7 @@ console.log('🌐 Using PostgreSQL configuration (Neon)');
 const dataSourceConfig = {
   type: 'postgres' as const,
   url: databaseUrl,
-  entities: [User, Plugin, Session, Purchase, Review, PluginAnalytics, Transaction],
+  entities: [User, Plugin, Session, Purchase, Review, PluginAnalytics, Transaction, Profile],
   synchronize: config.database.synchronize,
   logging: config.database.logging,
   ssl: { rejectUnauthorized: false }, // Required for Neon
