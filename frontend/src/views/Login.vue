@@ -1,26 +1,17 @@
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center p-4">
-    <!-- Header with Theme Toggle -->
-    <header class="fixed top-0 left-0 right-0 z-40 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-      <div class="px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16 items-center">
-          <div class="flex items-center">
-            <div class="flex items-center space-x-3">
-              <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg"></div>
-              <h1 class="text-xl font-bold text-gray-900 dark:text-white">Plugin Marketplace</h1>
-            </div>
-          </div>
-          
-          <div class="flex items-center space-x-4">
-            <!-- Theme Toggle -->
-            <ThemeToggle />
-          </div>
-        </div>
-      </div>
-    </header>
+  <div class="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center p-4 relative">
+    <!-- Theme Toggle Button -->
+    <button
+      @click="toggleTheme"
+      class="absolute top-4 right-4 p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 z-10"
+      :title="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+    >
+      <Sun v-if="isDark" class="w-5 h-5 text-yellow-500" />
+      <Moon v-else class="w-5 h-5 text-indigo-600" />
+    </button>
 
     <!-- Login Card -->
-    <div class="w-full max-w-md p-8 mt-16">
+    <div class="w-full max-w-md p-8">
       <div class="bg-white dark:bg-gray-800 p-8 rounded-lg border border-gray-200 dark:border-gray-700 shadow-lg">
         <div class="text-center mb-8">
           <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mb-4">
@@ -91,11 +82,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
-import ThemeToggle from '@/components/ThemeToggle.vue'
+import { Sun, Moon } from 'lucide-vue-next'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -103,9 +94,29 @@ const toastStore = useToastStore()
 
 const email = ref('')
 const password = ref('')
+const isDark = ref(false)
 
 const loading = computed(() => authStore.loading)
 const error = computed(() => authStore.error)
+
+const toggleTheme = () => {
+  isDark.value = !isDark.value
+  if (isDark.value) {
+    document.documentElement.classList.add('dark')
+    localStorage.setItem('theme', 'dark')
+  } else {
+    document.documentElement.classList.remove('dark')
+    localStorage.setItem('theme', 'light')
+  }
+}
+
+onMounted(() => {
+  const theme = localStorage.getItem('theme')
+  if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    isDark.value = true
+    document.documentElement.classList.add('dark')
+  }
+})
 
 const handleLogin = async () => {
   try {
