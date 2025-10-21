@@ -9,7 +9,7 @@
   >
     <div
       v-if="show"
-      class="w-full bg-white shadow-xl rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden border border-gray-200"
+      class="bg-white dark:bg-gray-800 shadow-xl rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden border border-gray-200 dark:border-gray-700"
       style="min-width: 320px; max-width: 448px;"
     >
       <div class="p-4">
@@ -61,13 +61,13 @@
           <div class="ml-3 min-w-0 flex-1">
             <p
               v-if="title"
-              class="text-sm font-semibold text-gray-900 break-words"
+              class="text-sm font-semibold text-gray-900 dark:text-white break-words"
             >
               {{ title }}
             </p>
             <p
               v-if="message"
-              class="mt-1 text-sm text-gray-600 break-words"
+              class="mt-1 text-sm text-gray-600 dark:text-gray-300 break-words"
             >
               {{ message }}
             </p>
@@ -75,7 +75,7 @@
           <div class="ml-4 flex-shrink-0 flex">
             <button
               @click="close"
-              class="inline-flex text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-md p-1 transition-colors duration-200"
+              class="inline-flex text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-md p-1 transition-colors duration-200"
             >
               <span class="sr-only">Dismiss</span>
               <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
