@@ -63,7 +63,7 @@
           </button>
         </form>
 
-        <div class="text-center mt-8">
+        <div class="text-center mt-8" v-if="settingsStore.isRegistrationAllowed">
           <p class="text-sm text-gray-600 dark:text-gray-300">
             Don't have an account? 
             <router-link to="/register" class="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium transition-colors duration-200">
@@ -77,21 +77,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
+import { useSettingsStore } from '@/stores/settings'
 import ThemeToggle from '@/components/ThemeToggle.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const toastStore = useToastStore()
+const settingsStore = useSettingsStore()
 
 const login = ref('')
 const password = ref('')
 
 const loading = computed(() => authStore.loading)
 const error = computed(() => authStore.error)
+
+// Load settings on component mount
+onMounted(() => {
+  settingsStore.loadSettings()
+})
 
 const handleLogin = async () => {
   try {

@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useSettingsStore } from '@/stores/settings'
 import SidebarLayout from '@/layouts/SidebarLayout.vue'
 import Dashboard from '@/views/Dashboard.vue'
 import Plugins from '@/views/Plugins.vue'
@@ -91,8 +92,15 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
+  const settingsStore = useSettingsStore()
+  
+  // Load settings to check registration status
+  settingsStore.loadSettings()
   
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    next('/login')
+  } else if (to.name === 'Register' && !settingsStore.isRegistrationAllowed) {
+    // Redirect to login if registration is disabled
     next('/login')
   } else {
     next()

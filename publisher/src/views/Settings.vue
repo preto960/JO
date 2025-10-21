@@ -199,6 +199,90 @@
               </form>
             </div>
           </div>
+
+          <!-- Security Settings Card -->
+          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
+                  <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Security Settings</h2>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">Global security configuration</p>
+                </div>
+              </div>
+            </div>
+            <div class="p-6">
+              <form @submit.prevent="updateSecuritySettings" class="space-y-6">
+                <div class="space-y-4">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <h3 class="font-medium text-gray-900 dark:text-white">User Registration</h3>
+                      <p class="text-sm text-gray-500 dark:text-gray-400">Allow new users to register</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input
+                        v-model="securityForm.allowRegistration"
+                        type="checkbox"
+                        class="sr-only peer"
+                      />
+                      <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    </label>
+                  </div>
+
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <h3 class="font-medium text-gray-900 dark:text-white">Email Verification</h3>
+                      <p class="text-sm text-gray-500 dark:text-gray-400">Require email verification for new accounts</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input
+                        v-model="securityForm.requireEmailVerification"
+                        type="checkbox"
+                        class="sr-only peer"
+                      />
+                      <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    </label>
+                  </div>
+
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <h3 class="font-medium text-gray-900 dark:text-white">Plugin Approval</h3>
+                      <p class="text-sm text-gray-500 dark:text-gray-400">Require admin approval for new plugins</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input
+                        v-model="securityForm.requirePluginApproval"
+                        type="checkbox"
+                        class="sr-only peer"
+                      />
+                      <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    </label>
+                  </div>
+                </div>
+                
+                <div class="flex justify-end pt-4">
+                  <button
+                    type="submit"
+                    :disabled="savingSecurity"
+                    class="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105"
+                  >
+                    <span v-if="savingSecurity" class="flex items-center">
+                      <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Saving...
+                    </span>
+                    <span v-else>Save Changes</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
 
         <!-- Sidebar -->
@@ -265,17 +349,27 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { usePluginStore } from '@/stores/plugins'
 import { useToastStore } from '@/stores/toast'
+import { useSettingsStore } from '@/stores/settings'
 
 const authStore = useAuthStore()
 const pluginStore = usePluginStore()
 const toastStore = useToastStore()
+const settingsStore = useSettingsStore()
 
 const saving = ref(false)
 const savingPayment = ref(false)
+const savingSecurity = ref(false)
+
+// Security Settings Form - using reactive from settings store
+const securityForm = ref({
+  allowRegistration: settingsStore.allowRegistration,
+  requireEmailVerification: settingsStore.requireEmailVerification,
+  requirePluginApproval: settingsStore.requirePluginApproval
+})
 
 const profileForm = ref({
   username: authStore.user?.username || '',
@@ -336,6 +430,26 @@ const updatePaymentSettings = async () => {
   }
 }
 
+const updateSecuritySettings = async () => {
+  savingSecurity.value = true
+  try {
+    // Update settings store
+    settingsStore.updateSecuritySettings({
+      allowRegistration: securityForm.value.allowRegistration,
+      requireEmailVerification: securityForm.value.requireEmailVerification,
+      requirePluginApproval: securityForm.value.requirePluginApproval
+    })
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    toastStore.success('Security settings updated successfully')
+  } catch (error) {
+    toastStore.error('Failed to update security settings')
+  } finally {
+    savingSecurity.value = false
+  }
+}
+
 const exportData = () => {
   // TODO: Implement data export functionality
   toastStore.info('Data export started. You will receive an email when ready.')
@@ -349,4 +463,16 @@ const deleteAccount = () => {
     console.log('Deleting account...')
   }
 }
+
+onMounted(() => {
+  // Load settings from store
+  settingsStore.loadSettings()
+  
+  // Update security form values with loaded settings
+  securityForm.value = {
+    allowRegistration: settingsStore.allowRegistration,
+    requireEmailVerification: settingsStore.requireEmailVerification,
+    requirePluginApproval: settingsStore.requirePluginApproval
+  }
+})
 </script>
