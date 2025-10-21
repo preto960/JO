@@ -34,13 +34,13 @@
           <div class="bg-white rounded-lg shadow-sm p-6">
             <h2 class="text-xl font-semibold mb-4">Purchase History</h2>
             
-            <div v-if="!user?.purchases || user.purchases.length === 0" class="text-gray-500 text-center py-8">
+            <div v-if="!(user as any).purchases || (user as any).purchases.length === 0" class="text-gray-500 text-center py-8">
               You haven't purchased any plugins yet.
             </div>
             
             <div v-else class="space-y-4">
               <div 
-                v-for="purchase in user.purchases" 
+                v-for="purchase in (user as any).purchases || []" 
                 :key="purchase.id"
                 class="border border-gray-200 rounded-lg p-4"
               >

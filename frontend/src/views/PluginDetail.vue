@@ -86,13 +86,13 @@
             <div>
               <h2 class="text-xl font-semibold mb-4">Reviews</h2>
               
-              <div v-if="!currentPlugin.reviews || currentPlugin.reviews.length === 0" class="text-gray-500 text-center py-8">
+              <div v-if="!(currentPlugin as any).reviews || (currentPlugin as any).reviews?.length === 0" class="text-gray-500 text-center py-8">
                 No reviews yet. Be the first to review this plugin!
               </div>
               
               <div v-else class="space-y-4">
                 <div 
-                  v-for="review in currentPlugin.reviews" 
+                  v-for="review in (currentPlugin as any).reviews || []" 
                   :key="review.id"
                   class="border-b border-gray-200 pb-4"
                 >
