@@ -6,6 +6,7 @@
           <div>
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
             <p class="text-gray-600 dark:text-gray-400 mt-2">Manage your publisher and site settings</p>
+            <p class="text-sm text-gray-500 dark:text-gray-500 mt-1">Last updated: {{ new Date().toLocaleDateString() }}</p>
           </div>
         </div>
       </div>
