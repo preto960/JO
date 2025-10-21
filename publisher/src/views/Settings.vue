@@ -329,6 +329,7 @@
               </div>
             </div>
           </div>
+<<<<<<< HEAD
 
           <!-- Quick Actions Card -->
           <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -357,6 +358,8 @@
               </div>
             </div>
           </div>
+=======
+>>>>>>> e1e5a2d753b6ecde04aa69dea9993ab03e436096
         </div>
       </div>
     </div>
