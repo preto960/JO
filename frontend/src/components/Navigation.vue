@@ -26,14 +26,14 @@
           
           <template v-else>
             <router-link 
-              v-if="authStore.isUser"
+              v-if="authStore.user?.role === 'DEVELOPER'"
               to="/my-plugins" 
               class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
             >
               My Plugins
             </router-link>
             <div class="flex items-center space-x-2">
-              <span class="text-sm text-gray-600">{{ authStore.user?.name }}</span>
+              <span class="text-sm text-gray-600">{{ authStore.user?.username }}</span>
               <button 
                 @click="authStore.logout"
                 class="btn-secondary text-sm"
