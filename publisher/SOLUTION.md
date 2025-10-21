@@ -16,32 +16,27 @@ Se ha creado un servidor mock en `src/server-mock.ts` que:
 - Funciona sin base de datos (evita problemas de conexión a Neon)
 - Proporciona todas las rutas necesarias con datos simulados
 - Responde inmediatamente sin tiempos de espera largos
+- **Usa los puertos configurados en el .env**
 
-### 2. Configuración de Puertos
-- **Backend**: Puerto 3005 (en lugar de 3002 para evitar conflictos)
+### 2. Configuración de Puertos (CORREGIDA)
+- **Backend**: Puerto 3002 (según .env)
 - **Frontend**: Puerto 3003 (sin cambios)
-- **Proxy**: Configurado para redirigir `/api` a `http://localhost:3005`
+- **Proxy**: Configurado para redirigir `/api` a `http://localhost:3002`
 
-### 3. Scripts Mejorados
+### 3. Scripts Mejorados (Multiplataforma)
 - `npm run server-mock`: Inicia el servidor mock
-- `npm run dev`: Inicia ambos servicios con sincronización
-- `./start.sh`: Script completo de inicio con verificación
+- `npm run dev`: Inicia ambos servicios con wait-on (compatible Windows/Linux)
+- `npm run client-delayed`: Inicia frontend cuando backend esté listo
 
 ## 🎯 Uso Rápido
 
-### Opción 1: Script Automático (Recomendado)
-```bash
-cd /home/z/my-project/publisher
-./start.sh
-```
-
-### Opción 2: Manual
+### Opción 1: Automático (Recomendado)
 ```bash
 cd /home/z/my-project/publisher
 npm run dev
 ```
 
-### Opción 3: Por Separado
+### Opción 2: Por Separado
 ```bash
 # Terminal 1 - Backend
 npm run server-mock
@@ -53,8 +48,8 @@ npm run client
 ## 🌐 Acceso
 
 - **Frontend**: http://localhost:3003
-- **Backend API**: http://localhost:3005
-- **Health Check**: http://localhost:3005/api/health
+- **Backend API**: http://localhost:3002
+- **Health Check**: http://localhost:3002/api/health
 
 ## 🔧 Endpoints Disponibles
 
@@ -77,6 +72,7 @@ npm run client
 1. **Datos Simulados**: El servidor mock usa datos falsos para desarrollo
 2. **Sin Persistencia**: Los cambios no se guardan en base de datos
 3. **Para Producción**: Usar `npm run server` para conectar con la base de datos real
+4. **Puertos del .env**: Se respeta la configuración del archivo .env
 
 ## 🔄 Volver a Base de Datos Real
 
@@ -84,7 +80,6 @@ Cuando quieras usar la base de datos Neon real:
 
 1. Detener los servicios actuales
 2. Ejecutar: `npm run server` (en lugar de `server-mock`)
-3. Actualizar el proxy en `vite.config.ts` al puerto 3002
 
 ## 🛠️ Características Funcionales
 
@@ -94,5 +89,6 @@ Cuando quieras usar la base de datos Neon real:
 - ✅ Sistema de notificaciones Toast
 - ✅ Navegación entre vistas
 - ✅ Diseño responsivo con Tailwind CSS
+- ✅ Compatible con Windows y Linux
 
-El proyecto está completamente funcional para desarrollo y pruebas del frontend.
+El proyecto está completamente funcional para desarrollo y pruebas.
