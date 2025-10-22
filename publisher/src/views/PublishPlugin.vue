@@ -12,7 +12,7 @@
     <Card class="mb-6">
       <CardHeader>
         <CardTitle class="flex items-center gap-2">
-          <FolderOpen class="w-5 h-5 text-blue-600" />
+          <FolderOpenIcon class="w-5 h-5 text-blue-600" />
           Estado de la Carpeta de Plugins
         </CardTitle>
       </CardHeader>
@@ -52,23 +52,23 @@
       <CardHeader>
         <CardTitle class="flex items-center justify-between">
           <span class="flex items-center gap-2">
-            <Search class="w-5 h-5 text-green-600" />
+            <MagnifyingGlassIcon class="w-5 h-5 text-green-600" />
             Plugins Detectados
           </span>
           <Button @click="refreshPlugins" variant="outline" size="sm">
-            <RefreshCw class="w-4 h-4 mr-2" />
+            <ArrowPathIcon class="w-4 h-4 mr-2" />
             Actualizar
           </Button>
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div v-if="loading" class="flex items-center justify-center py-8">
-          <Loader2 class="w-8 h-8 animate-spin text-blue-600" />
+          <ArrowPathIcon class="w-8 h-8 animate-spin text-blue-600" />
           <span class="ml-2 text-gray-600 dark:text-gray-400">Detectando plugins...</span>
         </div>
 
         <div v-else-if="detectedPlugins.length === 0" class="text-center py-8">
-          <FolderX class="w-12 h-12 mx-auto text-gray-400 mb-4" />
+          <FolderIcon class="w-12 h-12 mx-auto text-gray-400 mb-4" />
           <p class="text-gray-600 dark:text-gray-400">
             No se detectaron plugins en la carpeta
           </p>
@@ -94,19 +94,19 @@
                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ plugin.description }}</p>
                 <div class="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-500">
                   <span class="flex items-center gap-1">
-                    <User class="w-3 h-3" />
+                    <UserIcon class="w-3 h-3" />
                     {{ plugin.author }}
                   </span>
                   <span class="flex items-center gap-1">
-                    <Tag class="w-3 h-3" />
+                    <TagIcon class="w-3 h-3" />
                     {{ plugin.category }}
                   </span>
                   <span class="flex items-center gap-1">
-                    <DollarSign class="w-3 h-3" />
+                    <CurrencyDollarIcon class="w-3 h-3" />
                     ${{ plugin.price }}
                   </span>
                   <span class="flex items-center gap-1">
-                    <FileText class="w-3 h-3" />
+                    <DocumentTextIcon class="w-3 h-3" />
                     v{{ plugin.version }}
                   </span>
                 </div>
@@ -118,7 +118,7 @@
                   size="sm"
                   class="bg-green-600 hover:bg-green-700"
                 >
-                  <Upload class="w-4 h-4 mr-2" />
+                  <CloudArrowUpIcon class="w-4 h-4 mr-2" />
                   Publicar
                 </Button>
                 <Button
@@ -127,7 +127,7 @@
                   size="sm"
                   class="bg-blue-600 hover:bg-blue-700"
                 >
-                  <Check class="w-4 h-4 mr-2" />
+                  <CheckCircleIcon class="w-4 h-4 mr-2" />
                   Aprobar
                 </Button>
                 <Button
@@ -135,7 +135,7 @@
                   variant="outline"
                   size="sm"
                 >
-                  <Eye class="w-4 h-4 mr-2" />
+                  <EyeIcon class="w-4 h-4 mr-2" />
                   Ver
                 </Button>
               </div>
@@ -149,7 +149,7 @@
     <Card>
       <CardHeader>
         <CardTitle class="flex items-center gap-2">
-          <PlusCircle class="w-5 h-5 text-purple-600" />
+          <PlusCircleIcon class="w-5 h-5 text-purple-600" />
           Crear Plantilla de Plugin
         </CardTitle>
       </CardHeader>
@@ -169,7 +169,7 @@
               :disabled="!newPluginName.trim()"
               class="bg-purple-600 hover:bg-purple-700"
             >
-              <PlusCircle class="w-4 h-4 mr-2" />
+              <PlusCircleIcon class="w-4 h-4 mr-2" />
               Crear Plantilla
             </Button>
           </div>
@@ -252,20 +252,20 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import {
-  FolderOpen,
-  Search,
-  RefreshCw,
-  Loader2,
-  FolderX,
-  Upload,
-  Check,
-  Eye,
-  PlusCircle,
-  User,
-  Tag,
-  DollarSign,
-  FileText
-} from 'lucide-vue-next'
+  FolderOpenIcon,
+  MagnifyingGlassIcon,
+  ArrowPathIcon,
+  CloudArrowUpIcon,
+  CheckCircleIcon,
+  EyeIcon,
+  PlusCircleIcon,
+  UserIcon,
+  TagIcon,
+  CurrencyDollarIcon,
+  DocumentTextIcon,
+  FolderIcon,
+  XCircleIcon
+} from '@heroicons/vue/24/outline'
 
 const toastStore = useToastStore()
 
