@@ -1,0 +1,13 @@
+{
+  "name": "example-plugin",
+  "version": "1.0.0",
+  "description": "Plugin de ejemplo para demostrar el sistema de gestión",
+  "author": "Developer",
+  "category": "utility",
+  "price": 0,
+  "main": "index.js",
+  "dependencies": {},
+  "permissions": ["read", "write"],
+  "screenshots": ["screenshot1.png"],
+  "tags": ["example", "demo", "utility"]
+}
