@@ -39,9 +39,8 @@
           <span>Dashboard</span>
         </router-link>
 
-        <!-- My Plugins (only for publishers and admins) -->
+        <!-- My Plugins -->
         <router-link 
-          v-if="authStore.user?.role === 'PUBLISHER' || authStore.user?.role === 'ADMIN'"
           to="/plugins"
           class="flex items-center space-x-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200"
           :class="[
@@ -54,9 +53,8 @@
           <span>My Plugins</span>
         </router-link>
 
-        <!-- Publish Plugin (only for publishers and admins) -->
+        <!-- Publish Plugin -->
         <router-link 
-          v-if="authStore.user?.role === 'PUBLISHER' || authStore.user?.role === 'ADMIN'"
           to="/publish"
           class="flex items-center space-x-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200"
           :class="[
