@@ -61,8 +61,18 @@ export const pluginsApi = {
     return response.data
   },
 
+  async updatePluginStatus(id: string, status: string) {
+    const response = await api.patch(`/plugins/${id}/status`, { status })
+    return response.data
+  },
+
   async deletePlugin(id: string) {
     const response = await api.delete(`/plugins/${id}`)
+    return response.data
+  },
+
+  async getPluginsByStatus(status: string) {
+    const response = await api.get(`/plugins/status/${status}`)
     return response.data
   },
 

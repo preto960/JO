@@ -293,38 +293,65 @@ const selectedPlugin = ref<any>(null)
 const refreshPlugins = async () => {
   loading.value = true
   try {
-    // Simular detección de plugins
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    // Load plugins from database
+    const [allPlugins, pendingPlugins, approvedPlugins] = await Promise.all([
+      pluginStore.fetchPlugins(),
+      pluginsApi.getPluginsByStatus('PENDING'),
+      pluginsApi.getPluginsByStatus('APPROVED')
+    ])
     
-    // Aquí iría la lógica real para detectar plugins
-    detectedPlugins.value = [
-      {
-        name: 'example-plugin',
-        version: '1.0.0',
-        description: 'Example plugin to demonstrate the system',
-        author: 'Developer',
-        category: 'utility',
-        price: 0,
-        status: 'DETECTED',
-        metadata: {
-          main: 'index.js',
-          dependencies: {},
-          permissions: [],
-          createdAt: new Date().toISOString()
+    // Get detected plugins from file system (simulated for now)
+    const fileSystemPlugins = await getDetectedPluginsFromFileSystem()
+    
+    // Merge file system plugins with database plugins
+    detectedPlugins.value = fileSystemPlugins.map(fsPlugin => {
+      const existingPlugin = allPlugins.find((db: any) => db.title === fsPlugin.name)
+      if (existingPlugin) {
+        return {
+          ...fsPlugin,
+          id: existingPlugin.id,
+          status: existingPlugin.status,
+          databaseRecord: existingPlugin
         }
       }
-    ]
+      return fsPlugin
+    })
     
-    // Actualizar contadores
-    publishedPlugins.value = detectedPlugins.value.filter(p => p.status === 'APPROVED')
-    pendingPlugins.value = detectedPlugins.value.filter(p => p.status === 'PENDING')
+    // Update counters
+    publishedPlugins.value = approvedPlugins || []
+    pendingPlugins.value = pendingPlugins || []
     
     toastStore.success('Plugins updated successfully')
   } catch (error) {
+    console.error('Error refreshing plugins:', error)
     toastStore.error('Error updating plugins')
   } finally {
     loading.value = false
   }
+}
+
+const getDetectedPluginsFromFileSystem = async () => {
+  // Simulate file system detection
+  // In a real implementation, this would read from the actual plugins directory
+  await new Promise(resolve => setTimeout(resolve, 500))
+  
+  return [
+    {
+      name: 'example-plugin',
+      version: '1.0.0',
+      description: 'Example plugin to demonstrate the system',
+      author: 'Developer',
+      category: 'utility',
+      price: 0,
+      status: 'DETECTED',
+      metadata: {
+        main: 'index.js',
+        dependencies: {},
+        permissions: [],
+        createdAt: new Date().toISOString()
+      }
+    }
+  ]
 }
 
 const publishPlugin = async (plugin: any) => {
@@ -345,14 +372,18 @@ const publishPlugin = async (plugin: any) => {
       documentationUrl: plugin.documentationUrl
     }
     
-    const createdPlugin = await pluginStore.createPlugin(pluginData)
+    const createdPlugin = await pluginsApi.createPlugin(pluginData)
     
     // Update local plugin status
     plugin.status = 'PENDING'
     plugin.id = createdPlugin.id
+    plugin.databaseRecord = createdPlugin
     
     // Package the plugin (create zip file)
     await packagePlugin(plugin)
+    
+    // Refresh counters
+    await refreshPlugins()
     
     toastStore.success(`Plugin ${plugin.name} submitted for approval`)
   } catch (error) {
@@ -386,10 +417,23 @@ const packagePlugin = async (plugin: any) => {
 
 const approvePlugin = async (plugin: any) => {
   try {
-    // Aquí iría la lógica real para aprobar el plugin
+    if (!plugin.id) {
+      toastStore.error('Plugin ID not found')
+      return
+    }
+    
+    // Update plugin status in database
+    await pluginsApi.updatePluginStatus(plugin.id, 'APPROVED')
+    
+    // Update local plugin status
     plugin.status = 'APPROVED'
+    
+    // Refresh counters
+    await refreshPlugins()
+    
     toastStore.success(`Plugin ${plugin.name} approved and published`)
   } catch (error) {
+    console.error('Error approving plugin:', error)
     toastStore.error('Error approving plugin')
   }
 }
@@ -418,6 +462,7 @@ const getStatusVariant = (status: string) => {
     case 'PENDING': return 'default'
     case 'APPROVED': return 'default'
     case 'REJECTED': return 'destructive'
+    case 'DRAFT': return 'secondary'
     default: return 'secondary'
   }
 }
@@ -426,8 +471,9 @@ const getStatusText = (status: string) => {
   switch (status) {
     case 'DETECTED': return 'Detected'
     case 'PENDING': return 'Pending'
-    case 'APPROVED': return 'Approved'
+    case 'APPROVED': return 'Published'
     case 'REJECTED': return 'Rejected'
+    case 'DRAFT': return 'Draft'
     default: return status
   }
 }
