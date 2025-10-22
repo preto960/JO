@@ -209,6 +209,117 @@ app.delete('/api/plugins/:id', (req, res) => {
   res.json({ message: 'Plugin eliminado correctamente' });
 });
 
+// Get plugins by status
+app.get('/api/plugins/status/:status', (req, res) => {
+  const { status } = req.params;
+  
+  let plugins = [
+    {
+      id: '1',
+      title: 'Plugin Ejemplo',
+      description: 'Este es un plugin de ejemplo para demostrar la funcionalidad del Publisher Dashboard',
+      version: '1.0.0',
+      price: 29.99,
+      category: 'productivity',
+      tags: ['productivity', 'automation', 'tools'],
+      status: 'APPROVED',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      author: {
+        id: '1',
+        username: 'developer'
+      },
+      avgRating: 4.5,
+      _count: {
+        reviews: 12,
+        purchases: 150
+      }
+    },
+    {
+      id: '2',
+      title: 'Analytics Dashboard',
+      description: 'Un plugin completo para analizar métricas y estadísticas en tiempo real',
+      version: '2.1.0',
+      price: 49.99,
+      category: 'analytics',
+      tags: ['analytics', 'dashboard', 'metrics'],
+      status: 'APPROVED',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      author: {
+        id: '1',
+        username: 'developer'
+      },
+      avgRating: 4.8,
+      _count: {
+        reviews: 25,
+        purchases: 89
+      }
+    },
+    {
+      id: '3',
+      title: 'Code Formatter',
+      description: 'Herramienta automática para formatear y organizar código fuente',
+      version: '1.5.2',
+      price: 19.99,
+      category: 'development',
+      tags: ['development', 'code', 'formatter'],
+      status: 'DRAFT',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      author: {
+        id: '1',
+        username: 'developer'
+      },
+      avgRating: 4.2,
+      _count: {
+        reviews: 8,
+        purchases: 45
+      }
+    },
+    {
+      id: '4',
+      title: 'API Tester',
+      description: 'Plugin para probar y documentar APIs REST',
+      version: '1.0.0',
+      price: 0,
+      category: 'development',
+      tags: ['development', 'api', 'testing'],
+      status: 'PENDING',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      author: {
+        id: '1',
+        username: 'developer'
+      },
+      avgRating: 0,
+      _count: {
+        reviews: 0,
+        purchases: 0
+      }
+    }
+  ];
+  
+  // Filter by status
+  const filteredPlugins = plugins.filter(plugin => plugin.status === status.toUpperCase());
+  
+  res.json(filteredPlugins);
+});
+
+// Update plugin status
+app.patch('/api/plugins/:id/status', (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  
+  // Mock response - in real implementation this would update the database
+  res.json({
+    id,
+    status: status.toUpperCase(),
+    updatedAt: new Date().toISOString(),
+    message: `Plugin status updated to ${status.toUpperCase()}`
+  });
+});
+
 // My plugins route
 app.get('/api/plugins/my/plugins', (req, res) => {
   const { status, category, page = 1, limit = 10 } = req.query;
