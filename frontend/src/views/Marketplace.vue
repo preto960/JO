@@ -42,7 +42,7 @@
           <div class="ml-4 w-0 flex-1">
             <dl>
               <dt class="text-sm font-medium text-gray-600 dark:text-gray-300">Total Plugins</dt>
-              <dd class="text-2xl font-bold text-gray-900 dark:text-white">{{ filteredPlugins.length }}</dd>
+              <dd class="text-2xl font-bold text-gray-900 dark:text-white">{{ plugins.length }}</dd>
             </dl>
           </div>
         </div>
@@ -60,7 +60,7 @@
           <div class="ml-4 w-0 flex-1">
             <dl>
               <dt class="text-sm font-medium text-gray-600 dark:text-gray-300">Installed</dt>
-              <dd class="text-2xl font-bold text-gray-900 dark:text-white">12</dd>
+              <dd class="text-2xl font-bold text-gray-900 dark:text-white">{{ installedCount }}</dd>
             </dl>
           </div>
         </div>
@@ -78,7 +78,7 @@
           <div class="ml-4 w-0 flex-1">
             <dl>
               <dt class="text-sm font-medium text-gray-600 dark:text-gray-300">Updates Available</dt>
-              <dd class="text-2xl font-bold text-gray-900 dark:text-white">3</dd>
+              <dd class="text-2xl font-bold text-gray-900 dark:text-white">{{ updatesCount }}</dd>
             </dl>
           </div>
         </div>
@@ -191,6 +191,10 @@ const selectedCategory = ref('')
 const loading = computed(() => pluginStore.loading)
 const error = computed(() => pluginStore.error)
 const plugins = computed(() => pluginStore.plugins)
+
+// Mock data for demo purposes
+const installedCount = ref(0)
+const updatesCount = ref(0)
 
 const filteredPlugins = computed(() => {
   let filtered = plugins.value

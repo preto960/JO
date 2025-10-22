@@ -246,6 +246,8 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useToastStore } from '@/stores/toast'
+import { usePluginStore } from '@/stores/plugins'
+import { useAuthStore } from '@/stores/auth'
 import Card from '@/components/ui/Card.vue'
 import CardContent from '@/components/ui/CardContent.vue'
 import CardHeader from '@/components/ui/CardHeader.vue'
@@ -276,6 +278,8 @@ import {
 } from '@heroicons/vue/24/outline'
 
 const toastStore = useToastStore()
+const pluginStore = usePluginStore()
+const authStore = useAuthStore()
 
 const loading = ref(false)
 const detectedPlugins = ref<any[]>([])
@@ -325,11 +329,58 @@ const refreshPlugins = async () => {
 
 const publishPlugin = async (plugin: any) => {
   try {
-    // Aquí iría la lógica real para publicar el plugin
+    loading.value = true
+    
+    // Create plugin in database
+    const pluginData = {
+      title: plugin.name,
+      description: plugin.description,
+      price: plugin.price,
+      category: plugin.category,
+      tags: plugin.tags || [],
+      version: plugin.version,
+      downloadUrl: plugin.downloadUrl,
+      demoUrl: plugin.demoUrl,
+      githubUrl: plugin.githubUrl,
+      documentationUrl: plugin.documentationUrl
+    }
+    
+    const createdPlugin = await pluginStore.createPlugin(pluginData)
+    
+    // Update local plugin status
     plugin.status = 'PENDING'
+    plugin.id = createdPlugin.id
+    
+    // Package the plugin (create zip file)
+    await packagePlugin(plugin)
+    
     toastStore.success(`Plugin ${plugin.name} submitted for approval`)
   } catch (error) {
+    console.error('Error publishing plugin:', error)
     toastStore.error('Error publishing plugin')
+  } finally {
+    loading.value = false
+  }
+}
+
+const packagePlugin = async (plugin: any) => {
+  try {
+    // This would create a zip package of the plugin
+    // For now, we'll simulate the packaging process
+    console.log(`Packaging plugin: ${plugin.name}`)
+    
+    // In a real implementation, this would:
+    // 1. Read all plugin files from the filesystem
+    // 2. Create a zip archive
+    // 3. Upload to a storage service
+    // 4. Update the plugin record with the download URL
+    
+    await new Promise(resolve => setTimeout(resolve, 2000)) // Simulate packaging time
+    
+    console.log(`Plugin ${plugin.name} packaged successfully`)
+  } catch (error) {
+    console.error('Error packaging plugin:', error)
+    throw error
   }
 }
 

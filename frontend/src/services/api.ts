@@ -42,4 +42,16 @@ export const authApi = {
   }
 }
 
+export const pluginsApi = {
+  async getPlugins(params?: any) {
+    const response = await api.get('/plugins', { params })
+    return response.data
+  },
+
+  async getPlugin(id: string) {
+    const response = await api.get(`/plugins/${id}`)
+    return response.data
+  }
+}
+
 export default api

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import api from '@/services/api'
+import { pluginsApi } from '@/services/api'
 import type { Plugin, PluginsResponse } from '@/types'
 
 export const usePluginStore = defineStore('plugin', () => {
@@ -27,9 +27,11 @@ export const usePluginStore = defineStore('plugin', () => {
     error.value = null
     
     try {
-      const response = await api.get<PluginsResponse>('/plugins', { params })
-      plugins.value = response.data.plugins
-      pagination.value = response.data.pagination
+      const response = await pluginsApi.getPlugins(params)
+      plugins.value = response.plugins || response
+      if (response.pagination) {
+        pagination.value = response.pagination
+      }
     } catch (err: any) {
       error.value = err.response?.data?.error || 'Failed to fetch plugins'
     } finally {
@@ -42,8 +44,8 @@ export const usePluginStore = defineStore('plugin', () => {
     error.value = null
     
     try {
-      const response = await api.get<{ plugin: Plugin }>(`/plugins/${id}`)
-      currentPlugin.value = response.data.plugin
+      const response = await pluginsApi.getPlugin(id)
+      currentPlugin.value = response.plugin || response
     } catch (err: any) {
       error.value = err.response?.data?.error || 'Failed to fetch plugin'
     } finally {

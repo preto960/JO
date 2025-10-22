@@ -12,6 +12,7 @@ import { AppDataSource } from './config/database';
 import authRoutes from './routes/auth';
 import pluginRoutes from './routes/plugins';
 import userRoutes from './routes/users';
+import analyticsRoutes from './routes/analytics';
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/plugins', pluginRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

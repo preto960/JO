@@ -278,7 +278,7 @@ const pluginForm = ref({
 
 const loading = computed(() => pluginStore.loading)
 const error = computed(() => pluginStore.error)
-const plugins = computed(() => pluginStore.plugins)
+const plugins = ref<Plugin[]>([])
 
 const myPlugins = computed(() => {
   return plugins.value.filter(plugin => plugin.author.id === authStore.user?.id)
@@ -384,6 +384,10 @@ const closeModal = () => {
 }
 
 onMounted(async () => {
-  await pluginStore.fetchPlugins()
+  try {
+    plugins.value = await pluginStore.fetchMyPlugins()
+  } catch (error) {
+    console.error('Failed to fetch plugins:', error)
+  }
 })
 </script>

@@ -64,6 +64,18 @@ export const pluginsApi = {
   async deletePlugin(id: string) {
     const response = await api.delete(`/plugins/${id}`)
     return response.data
+  },
+
+  async getMyPlugins(params?: any) {
+    const response = await api.get('/plugins/my/plugins', { params })
+    return response.data
+  }
+}
+
+export const analyticsApi = {
+  async getMyAnalytics(params?: any) {
+    const response = await api.get('/analytics/my', { params })
+    return response.data
   }
 }
 

@@ -215,6 +215,7 @@ import { ref, computed, onMounted, nextTick } from 'vue'
 import { usePluginStore } from '@/stores/plugins'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
+import { analyticsApi } from '@/services/api'
 import type { Analytics } from '@/types'
 
 const pluginStore = usePluginStore()
@@ -244,8 +245,7 @@ const myPlugins = computed(() => {
 })
 
 const recentPlugins = computed(() => {
-  return plugins.value
-    .filter(plugin => plugin.author.id === authStore.user?.id)
+  return myPlugins.value
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 })
 
@@ -272,34 +272,42 @@ const getStatusClass = (status: string) => {
 }
 
 const fetchAnalytics = async () => {
-  // TODO: Implement actual analytics API call
-  // For now, using mock data
-  
-  const mockAnalytics: Analytics = {
-    totalRevenue: '2,847.50',
-    totalSales: 156,
-    totalPlugins: myPlugins.value.length,
-    avgRating: '4.6',
-    totalDownloads: 289,
-    dailyStats: Array.from({ length: parseInt(dateRange.value) }, (_, i) => ({
-      date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      downloads: Math.floor(Math.random() * 20) + 5,
-      revenue: Math.floor(Math.random() * 200) + 50,
-      views: Math.floor(Math.random() * 100) + 20
-    })).reverse(),
-    pluginStats: myPlugins.value.map(plugin => ({
-      pluginId: plugin.id,
-      pluginTitle: plugin.title,
-      downloads: plugin._count.purchases,
-      revenue: plugin.price * plugin._count.purchases,
-      rating: plugin.avgRating
-    }))
+  try {
+    const response = await analyticsApi.getMyAnalytics({
+      days: dateRange.value,
+      pluginId: selectedPlugin.value || undefined
+    })
+    
+    analytics.value = response
+    
+    await nextTick()
+    renderCharts()
+  } catch (error) {
+    console.error('Failed to fetch analytics:', error)
+    toastStore.error('Failed to load analytics data')
+    
+    // Fallback to mock data
+    const mockAnalytics: Analytics = {
+      totalRevenue: '0.00',
+      totalSales: 0,
+      totalPlugins: myPlugins.value.length,
+      avgRating: '0.0',
+      totalDownloads: 0,
+      dailyStats: [],
+      pluginStats: myPlugins.value.map(plugin => ({
+        pluginId: plugin.id,
+        pluginTitle: plugin.title,
+        downloads: plugin.downloadCount || 0,
+        revenue: (plugin.downloadCount || 0) * plugin.price,
+        rating: 0,
+        status: plugin.status
+      }))
+    }
+    
+    analytics.value = mockAnalytics
+    await nextTick()
+    renderCharts()
   }
-  
-  analytics.value = mockAnalytics
-  
-  await nextTick()
-  renderCharts()
 }
 
 const renderCharts = () => {
@@ -310,7 +318,6 @@ const renderCharts = () => {
 onMounted(async () => {
   try {
     await pluginStore.fetchPlugins()
-    plugins.value = pluginStore.plugins
     await fetchAnalytics()
     // Only show success toast on first load, not on navigation back
     if (!sessionStorage.getItem('dashboardVisited')) {
