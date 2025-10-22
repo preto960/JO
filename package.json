@@ -26,7 +26,9 @@
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^8.5.9",
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.2.1",
+    "nodemon": "^3.1.10",
+    "vite": "^7.1.11"
   },
   "engines": {
     "node": ">=18.0.0",
