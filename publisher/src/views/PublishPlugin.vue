@@ -246,8 +246,8 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useToastStore } from '@/stores/toast'
-import { usePluginStore } from '@/stores/plugins'
 import { useAuthStore } from '@/stores/auth'
+import { pluginsApi } from '@/services/api'
 import Card from '@/components/ui/Card.vue'
 import CardContent from '@/components/ui/CardContent.vue'
 import CardHeader from '@/components/ui/CardHeader.vue'
@@ -278,7 +278,6 @@ import {
 } from '@heroicons/vue/24/outline'
 
 const toastStore = useToastStore()
-const pluginStore = usePluginStore()
 const authStore = useAuthStore()
 
 const loading = ref(false)
@@ -294,8 +293,8 @@ const refreshPlugins = async () => {
   loading.value = true
   try {
     // Load plugins from database
-    const [allPlugins, pendingPlugins, approvedPlugins] = await Promise.all([
-      pluginStore.fetchPlugins(),
+    const [allPlugins, pendingPluginsData, approvedPluginsData] = await Promise.all([
+      pluginsApi.getPlugins(),
       pluginsApi.getPluginsByStatus('PENDING'),
       pluginsApi.getPluginsByStatus('APPROVED')
     ])
