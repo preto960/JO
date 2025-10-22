@@ -7,6 +7,7 @@ import authRoutes from './routes/auth';
 import pluginRoutes from './routes/plugins';
 import analyticsRoutes from './routes/analytics';
 import { errorHandler } from './middleware/errorHandler';
+import { PluginWatcher } from './services/pluginWatcher';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -57,6 +58,18 @@ const startServer = async () => {
     await PublisherDataSource.initialize();
     console.log('✅ Publisher Database connected successfully');
     
+    // Iniciar sistema de monitoreo de plugins
+    console.log('🔍 Iniciando sistema de monitoreo de plugins...');
+    const pluginWatcher = new PluginWatcher();
+    await pluginWatcher.start();
+    
+    // Manejar cierre graceful
+    process.on('SIGINT', async () => {
+      console.log('\n🛑 Deteniendo servidor...');
+      await pluginWatcher.stop();
+      process.exit(0);
+    });
+    
       // Handle port conflicts - try different ports
     const tryPort = async (port: number): Promise<number> => {
       return new Promise((resolve, reject) => {
@@ -88,6 +101,7 @@ const startServer = async () => {
       console.log(`🔗 Health check: http://localhost:${availablePort}/api/health`);
       console.log(`🔐 Auth endpoints: http://localhost:${availablePort}/api/auth/login, /api/auth/register`);
       console.log(`💾 Database: Neon PostgreSQL connected`);
+      console.log(`🔌 Plugin monitoring: ${pluginWatcher.getPluginsDir()}`);
     });
   } catch (error) {
     console.error('❌ Failed to start publisher server:', error);

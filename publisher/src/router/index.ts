@@ -4,6 +4,7 @@ import { useSettingsStore } from '@/stores/settings'
 import SidebarLayout from '@/layouts/SidebarLayout.vue'
 import Dashboard from '@/views/Dashboard.vue'
 import Plugins from '@/views/Plugins.vue'
+import PublishPlugin from '@/views/PublishPlugin.vue'
 import Analytics from '@/views/Analytics.vue'
 import Settings from '@/views/Settings.vue'
 import Profile from '@/views/Profile.vue'
@@ -38,6 +39,18 @@ const router = createRouter({
         {
           path: '',
           component: Plugins
+        }
+      ]
+    },
+    {
+      path: '/publish',
+      name: 'PublishPlugin',
+      component: SidebarLayout,
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: '',
+          component: PublishPlugin
         }
       ]
     },
