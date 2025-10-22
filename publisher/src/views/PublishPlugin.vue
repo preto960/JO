@@ -315,9 +315,9 @@ const refreshPlugins = async () => {
     publishedPlugins.value = detectedPlugins.value.filter(p => p.status === 'APPROVED')
     pendingPlugins.value = detectedPlugins.value.filter(p => p.status === 'PENDING')
     
-    toastStore.addToast('Plugins actualizados correctamente', 'success')
+    toastStore.success('Plugins actualizados correctamente')
   } catch (error) {
-    toastStore.addToast('Error al actualizar plugins', 'error')
+    toastStore.error('Error al actualizar plugins')
   } finally {
     loading.value = false
   }
@@ -327,9 +327,9 @@ const publishPlugin = async (plugin: any) => {
   try {
     // Aquí iría la lógica real para publicar el plugin
     plugin.status = 'PENDING'
-    toastStore.addToast(`Plugin ${plugin.name} enviado para aprobación`, 'success')
+    toastStore.success(`Plugin ${plugin.name} enviado para aprobación`)
   } catch (error) {
-    toastStore.addToast('Error al publicar plugin', 'error')
+    toastStore.error('Error al publicar plugin')
   }
 }
 
@@ -337,9 +337,9 @@ const approvePlugin = async (plugin: any) => {
   try {
     // Aquí iría la lógica real para aprobar el plugin
     plugin.status = 'APPROVED'
-    toastStore.addToast(`Plugin ${plugin.name} aprobado y publicado`, 'success')
+    toastStore.success(`Plugin ${plugin.name} aprobado y publicado`)
   } catch (error) {
-    toastStore.addToast('Error al aprobar plugin', 'error')
+    toastStore.error('Error al aprobar plugin')
   }
 }
 
@@ -353,11 +353,11 @@ const createPluginTemplate = async () => {
   
   try {
     // Aquí iría la lógica real para crear la plantilla
-    toastStore.addToast(`Plantilla ${newPluginName.value} creada correctamente`, 'success')
+    toastStore.success(`Plantilla ${newPluginName.value} creada correctamente`)
     newPluginName.value = ''
     await refreshPlugins()
   } catch (error) {
-    toastStore.addToast('Error al crear plantilla', 'error')
+    toastStore.error('Error al crear plantilla')
   }
 }
 

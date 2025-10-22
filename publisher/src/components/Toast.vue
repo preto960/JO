@@ -9,12 +9,7 @@
   >
     <div
       v-if="show"
-      class="pointer-events-auto overflow-hidden scale-in rounded-lg border shadow-lg"
-      :class="[
-        type === 'success' ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800' :
-        type === 'error' ? 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800' :
-        'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800'
-      ]"
+      class="glass-card pointer-events-auto overflow-hidden scale-in"
       style="min-width: 320px; max-width: 448px;"
     >
       <div class="p-4">
@@ -82,7 +77,7 @@
           <div class="ml-4 flex-shrink-0 flex">
             <button
               @click="close"
-              class="p-1 transition-all duration-300 rounded hover:bg-black/10 dark:hover:bg-white/10"
+              class="glass-button hover:bg-white/20 p-1 transition-all duration-300"
               :class="textClass"
             >
               <span class="sr-only">Dismiss</span>
@@ -125,13 +120,7 @@ const emit = defineEmits<{
 const themeStore = useThemeStore()
 
 const textClass = computed(() => {
-  if (props.type === 'success') {
-    return themeStore.theme === 'dark' ? 'text-green-100' : 'text-green-800'
-  } else if (props.type === 'error') {
-    return themeStore.theme === 'dark' ? 'text-red-100' : 'text-red-800'
-  } else {
-    return themeStore.theme === 'dark' ? 'text-blue-100' : 'text-blue-800'
-  }
+  return themeStore.theme === 'dark' ? 'text-white' : 'text-black'
 })
 
 const textGlowClass = computed(() => {
