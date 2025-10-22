@@ -22,6 +22,11 @@ const dataSourceConfig = {
   ssl: { rejectUnauthorized: false }, // Required for Neon
   migrations: ['src/migrations/*.ts'],
   subscribers: ['src/subscribers/*.ts'],
+  extra: {
+    max: 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 2000,
+  }
 };
 
 export const AppDataSource = new DataSource(dataSourceConfig);
