@@ -10,12 +10,12 @@ import { errorHandler } from './middleware/errorHandler';
 import { PluginWatcher } from './services/pluginWatcher';
 
 const app = express();
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT_BACKEND || 3004;
 
 // Security middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3003', 'http://localhost:3004'],
+  origin: process.env.CORS_ORIGIN?.split(',') || [`http://localhost:3003`, `http://localhost:${process.env.PORT_BACKEND || 3004}`],
   credentials: true
 }));
 

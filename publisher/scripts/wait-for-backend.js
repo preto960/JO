@@ -7,7 +7,7 @@ async function waitForBackend(maxAttempts = 30, delay = 2000) {
     try {
       console.log(`🔍 Intentando conectar al backend... (intento ${i + 1}/${maxAttempts})`);
       
-      const response = await fetch('http://localhost:3002/api/health');
+      const response = await fetch(`http://localhost:${process.env.PORT_BACKEND || 3004}/api/health`);
       
       if (response.ok) {
         console.log('✅ Backend está listo!');

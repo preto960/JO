@@ -4,7 +4,7 @@ const path = require('path')
 require('dotenv').config()
 
 const app = express()
-const PORT = process.env.PORT || 3002
+const PORT = process.env.PORT_BACKEND || 3004
 
 // Middleware
 app.use(cors())

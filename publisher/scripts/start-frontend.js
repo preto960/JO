@@ -35,7 +35,7 @@ async function startFrontend() {
 }
 
 async function main() {
-  const port = process.env.PORT || 3002;
+  const port = process.env.PORT_BACKEND || 3004;
   
   console.log('🔄 Esperando que el backend esté listo...');
   await waitForServer(port);
