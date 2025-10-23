@@ -134,23 +134,55 @@ export class PluginWatcher {
       const userRepository = PublisherDataSource.getRepository(PublisherUser);
 
       // Asegurar que exista un autor por defecto
-      let author = await userRepository.findOne({ where: { email: 'admin@example.com' } });
+      let author = await userRepository.findOne({ 
+        where: { email: 'admin@example.com' } 
+      });
+      
+      // Si no encuentra por email, buscar por username
+      if (!author) {
+        author = await userRepository.findOne({ 
+          where: { username: 'admin' } 
+        });
+      }
       
       if (!author) {
-        // Crear usuario por defecto si no existe
-        const bcrypt = require('bcryptjs');
-        const hashedPassword = await bcrypt.hash('admin123', 10);
-        
-        const newAuthor = new PublisherUser();
-        newAuthor.username = 'admin';
-        newAuthor.email = 'admin@example.com';
-        newAuthor.password = hashedPassword;
-        newAuthor.role = PublisherRole.ADMIN;
-        newAuthor.isActive = true;
-        newAuthor.isVerified = true;
-        
-        author = await userRepository.save(newAuthor);
-        console.log('👤 Usuario admin creado por defecto');
+        // Crear usuario por defecto si no existe por ningún medio
+        try {
+          const bcrypt = require('bcryptjs');
+          const hashedPassword = await bcrypt.hash('admin123', 10);
+          
+          const newAuthor = new PublisherUser();
+          newAuthor.username = 'admin';
+          newAuthor.email = 'admin@example.com';
+          newAuthor.password = hashedPassword;
+          newAuthor.role = PublisherRole.ADMIN;
+          newAuthor.isActive = true;
+          newAuthor.isVerified = true;
+          
+          author = await userRepository.save(newAuthor);
+          console.log('👤 Usuario admin creado por defecto');
+        } catch (error: any) {
+          // Si hay error de duplicado, intentar buscar el usuario existente
+          if (error.code === '23505') {
+            console.log('⚠️  Usuario ya existe, buscando existente...');
+            author = await userRepository.findOne({ 
+              where: { username: 'admin' } 
+            });
+            if (!author) {
+              author = await userRepository.findOne({ 
+                where: { email: 'admin@example.com' } 
+              });
+            }
+            if (author) {
+              console.log('✅ Usuario existente encontrado y reutilizado');
+            } else {
+              console.error('❌ No se pudo encontrar ni crear el usuario admin');
+              return null;
+            }
+          } else {
+            throw error;
+          }
+        }
       } else {
         console.log('👤 Usuario admin ya existe, reutilizando...');
       }
