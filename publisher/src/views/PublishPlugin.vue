@@ -317,8 +317,8 @@ const refreshPlugins = async () => {
     })
     
     // Update counters
-    publishedPlugins.value = approvedPlugins || []
-    pendingPlugins.value = pendingPlugins || []
+    publishedPlugins.value = approvedPluginsData || []
+    pendingPlugins.value = pendingPluginsData || []
     
     toastStore.success('Plugins updated successfully')
   } catch (error) {
