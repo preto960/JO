@@ -54,4 +54,5 @@ export const pluginsApi = {
   }
 }
 
+export { api }
 export default api
