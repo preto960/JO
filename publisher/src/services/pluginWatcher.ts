@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { PublisherDataSource } from '../config/database';
 import { PublisherPlugin } from '../entities/PublisherPlugin';
+import { PublisherUser, PublisherRole } from '../entities/PublisherUser';
 import { PluginProcessor } from './pluginProcessor';
 
 export class PluginWatcher {
@@ -121,6 +122,28 @@ export class PluginWatcher {
       }
 
       const pluginRepository = PublisherDataSource.getRepository(PublisherPlugin);
+      const userRepository = PublisherDataSource.getRepository(PublisherUser);
+
+      // Asegurar que exista un autor por defecto
+      let author = await userRepository.findOne({ where: { email: 'admin@example.com' } });
+      
+      if (!author) {
+        // Crear usuario por defecto si no existe
+        author = userRepository.create({
+          username: 'admin',
+          email: 'admin@example.com',
+          password: 'admin123', // En producción esto debería estar hasheado
+          role: PublisherRole.ADMIN
+        });
+        author = await userRepository.save(author);
+        console.log('👤 Usuario admin creado por defecto');
+      }
+
+      // Asegurar que el plugin tenga un autor
+      if (!pluginData.authorId) {
+        pluginData.authorId = author.id;
+        pluginData.author_id = author.id; // Para la columna foreign key
+      }
 
       // Verificar si el plugin ya existe
       const existingPlugin = await pluginRepository.findOne({
