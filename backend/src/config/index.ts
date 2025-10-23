@@ -42,7 +42,7 @@ const config: Config = {
   },
   
   cors: {
-    origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3001', 'http://localhost:3002'],
+    origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3001', 'http://localhost:3002', 'http://localhost:3003'],
     credentials: true,
   },
   

@@ -4,6 +4,7 @@ import {
   getPluginById,
   createPlugin,
   updatePlugin,
+  updatePluginStatus,
   deletePlugin,
   getMyPlugins,
   syncPlugin
@@ -26,6 +27,7 @@ router.get('/:id', getPluginById);
 // Action routes
 router.post('/', authenticateToken, requireDeveloper, pluginValidation, validateRequest, createPlugin);
 router.put('/:id', authenticateToken, requireDeveloper, pluginValidation, validateRequest, updatePlugin);
+router.patch('/:id/status', authenticateToken, updatePluginStatus);
 router.delete('/:id', authenticateToken, requireDeveloper, deletePlugin);
 
 // Sync route (for publisher - requires API key)

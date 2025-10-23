@@ -200,6 +200,45 @@ export const updatePlugin = asyncHandler(async (req: AuthenticatedRequest, res: 
   });
 });
 
+export const updatePluginStatus = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+  const pluginRepository = AppDataSource.getRepository(Plugin);
+  
+  const { id } = req.params;
+  const { status } = req.body;
+  const userId = req.user!.id;
+
+  // Validate status
+  if (!Object.values(PluginStatus).includes(status)) {
+    return res.status(400).json({ error: 'Invalid plugin status' });
+  }
+
+  const plugin = await pluginRepository.findOne({
+    where: { id }
+  });
+
+  if (!plugin) {
+    return res.status(404).json({ error: 'Plugin not found' });
+  }
+
+  // Update plugin status
+  await pluginRepository.update(id, { 
+    status,
+    ...(status === PluginStatus.APPROVED && { approvedAt: new Date() })
+  });
+
+  // Get updated plugin with author
+  const updatedPlugin = await pluginRepository
+    .createQueryBuilder('plugin')
+    .leftJoinAndSelect('plugin.author', 'author')
+    .where('plugin.id = :id', { id })
+    .getOne();
+
+  res.json({
+    message: 'Plugin status updated successfully',
+    plugin: updatedPlugin
+  });
+});
+
 export const deletePlugin = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
   const pluginRepository = AppDataSource.getRepository(Plugin);
   
