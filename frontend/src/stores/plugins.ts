@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { pluginsApi, api } from '@/services/api'
+import { pluginsApi } from '@/services/api'
 import type { Plugin, PluginsResponse } from '@/types'
 
 export const usePluginStore = defineStore('plugin', () => {
@@ -58,7 +58,7 @@ export const usePluginStore = defineStore('plugin', () => {
     error.value = null
     
     try {
-      const response = await api.post<Plugin>('/plugins', pluginData)
+      const response = await pluginsApi.api.post<Plugin>('/plugins', pluginData)
       plugins.value.unshift(response.data)
       return response.data
     } catch (err: any) {
@@ -74,7 +74,7 @@ export const usePluginStore = defineStore('plugin', () => {
     error.value = null
     
     try {
-      const response = await api.put<Plugin>(`/plugins/${id}`, pluginData)
+      const response = await pluginsApi.api.put<Plugin>(`/plugins/${id}`, pluginData)
       const index = plugins.value.findIndex(p => p.id === id)
       if (index !== -1) {
         plugins.value[index] = response.data
@@ -96,7 +96,7 @@ export const usePluginStore = defineStore('plugin', () => {
     error.value = null
     
     try {
-      await api.delete(`/plugins/${id}`)
+      await pluginsApi.api.delete(`/plugins/${id}`)
       plugins.value = plugins.value.filter(p => p.id !== id)
       if (currentPlugin.value?.id === id) {
         currentPlugin.value = null
@@ -104,6 +104,104 @@ export const usePluginStore = defineStore('plugin', () => {
     } catch (err: any) {
       error.value = err.response?.data?.error || 'Failed to delete plugin'
       throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Nuevos métodos para consumir plugins del publisher
+  const fetchPublisherPlugins = async (params: {
+    page?: number
+    limit?: number
+    category?: string
+    search?: string
+    sortBy?: string
+    sortOrder?: string
+  } = {}) => {
+    loading.value = true
+    error.value = null
+    
+    try {
+      const response = await pluginsApi.getPublisherPlugins(params)
+      // Transformar los datos del publisher al formato del frontend si es necesario
+      const transformedPlugins = (response.plugins || response).map((plugin: any) => ({
+        ...plugin,
+        // Asegurar que los campos coincidan con el tipo Plugin
+        id: plugin.id,
+        title: plugin.title || plugin.name,
+        description: plugin.description,
+        version: plugin.version,
+        price: plugin.price || 0,
+        category: plugin.category || 'general',
+        tags: plugin.tags || [],
+        downloadUrl: plugin.downloadUrl,
+        demoUrl: plugin.demoUrl,
+        githubUrl: plugin.githubUrl,
+        documentationUrl: plugin.documentationUrl,
+        authorId: plugin.authorId,
+        status: plugin.status,
+        isActive: plugin.isActive !== false,
+        downloadCount: plugin.downloadCount || 0,
+        viewCount: plugin.viewCount || 0,
+        totalRevenue: plugin.totalRevenue || 0,
+        createdAt: plugin.createdAt,
+        updatedAt: plugin.updatedAt
+      }))
+      
+      plugins.value = transformedPlugins
+      if (response.pagination) {
+        pagination.value = response.pagination
+      }
+    } catch (err: any) {
+      error.value = err.response?.data?.error || 'Failed to fetch publisher plugins'
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const fetchApprovedPublisherPlugins = async (params: {
+    page?: number
+    limit?: number
+    category?: string
+    search?: string
+    sortBy?: string
+    sortOrder?: string
+  } = {}) => {
+    loading.value = true
+    error.value = null
+    
+    try {
+      const response = await pluginsApi.getApprovedPublisherPlugins(params)
+      // Transformar los datos del publisher al formato del frontend
+      const transformedPlugins = (response.plugins || response).map((plugin: any) => ({
+        ...plugin,
+        id: plugin.id,
+        title: plugin.title || plugin.name,
+        description: plugin.description,
+        version: plugin.version,
+        price: plugin.price || 0,
+        category: plugin.category || 'general',
+        tags: plugin.tags || [],
+        downloadUrl: plugin.downloadUrl,
+        demoUrl: plugin.demoUrl,
+        githubUrl: plugin.githubUrl,
+        documentationUrl: plugin.documentationUrl,
+        authorId: plugin.authorId,
+        status: plugin.status,
+        isActive: plugin.isActive !== false,
+        downloadCount: plugin.downloadCount || 0,
+        viewCount: plugin.viewCount || 0,
+        totalRevenue: plugin.totalRevenue || 0,
+        createdAt: plugin.createdAt,
+        updatedAt: plugin.updatedAt
+      }))
+      
+      plugins.value = transformedPlugins
+      if (response.pagination) {
+        pagination.value = response.pagination
+      }
+    } catch (err: any) {
+      error.value = err.response?.data?.error || 'Failed to fetch approved publisher plugins'
     } finally {
       loading.value = false
     }
@@ -119,6 +217,8 @@ export const usePluginStore = defineStore('plugin', () => {
     fetchPluginById,
     createPlugin,
     updatePlugin,
-    deletePlugin
+    deletePlugin,
+    fetchPublisherPlugins,
+    fetchApprovedPublisherPlugins
   }
 })

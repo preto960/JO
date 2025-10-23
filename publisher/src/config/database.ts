@@ -19,7 +19,7 @@ if (databaseUrl) {
     type: 'postgres',
     url: databaseUrl,
     entities: [PublisherUser, PublisherPlugin, PublisherSession, PublisherAnalytics],
-    synchronize: process.env.NODE_ENV === 'development', // Enable sync for development to create tables
+    synchronize: false, // Desactivar sincronización automática
     logging: process.env.NODE_ENV === 'development', // Enable logging to see what's happening
     ssl: { rejectUnauthorized: false }, // Always use SSL for external databases
     migrations: ['src/migrations/*.ts'],
@@ -36,7 +36,7 @@ if (databaseUrl) {
     password: process.env.DB_PASSWORD || 'password',
     database: process.env.DB_NAME || 'publisher_db',
     entities: [PublisherUser, PublisherPlugin, PublisherSession, PublisherAnalytics],
-    synchronize: process.env.NODE_ENV === 'development',
+    synchronize: false, // Desactivar sincronización automática
     logging: process.env.NODE_ENV === 'development',
     ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
     migrations: ['src/migrations/*.ts'],

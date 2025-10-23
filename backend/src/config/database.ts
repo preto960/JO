@@ -17,7 +17,7 @@ const dataSourceConfig = {
   type: 'postgres' as const,
   url: databaseUrl,
   entities: [User, Plugin, Session, Purchase, Review, PluginAnalytics, Transaction, Profile],
-  synchronize: config.database.synchronize,
+  synchronize: false, // Desactivar sincronización automática
   logging: config.database.logging,
   ssl: { rejectUnauthorized: false }, // Required for Neon
   migrations: ['src/migrations/*.ts'],
