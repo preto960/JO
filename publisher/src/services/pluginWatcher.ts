@@ -164,12 +164,14 @@ export class PluginWatcher {
       if (existingPlugin) {
         // Actualizar plugin existente
         Object.assign(existingPlugin, pluginData);
-        savedPlugin = await pluginRepository.save(existingPlugin) as PublisherPlugin;
+        const updated = await pluginRepository.save(existingPlugin);
+        savedPlugin = Array.isArray(updated) ? updated[0] : updated;
         console.log(`🔄 Plugin actualizado: ${pluginData.title}`);
       } else {
         // Crear nuevo plugin
         const newPlugin = pluginRepository.create(pluginData);
-        savedPlugin = await pluginRepository.save(newPlugin) as PublisherPlugin;
+        const created = await pluginRepository.save(newPlugin);
+        savedPlugin = Array.isArray(created) ? created[0] : created;
         console.log(`🆕 Plugin creado: ${pluginData.title}`);
       }
 
