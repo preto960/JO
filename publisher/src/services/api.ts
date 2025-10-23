@@ -22,7 +22,8 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.code === 'ECONNREFUSED' || error.code === 'ECONNRESET') {
-      console.error(`Error de conexión con el servidor backend. Asegúrate de que el servidor esté corriendo en el puerto ${process.env.PORT_BACKEND || 3004}.`)
+      const backendUrl = process.env.BACKEND_URL || `http://localhost:${process.env.PORT_BACKEND || 3004}`
+      console.error(`Error de conexión con el servidor backend. Asegúrate de que el servidor esté corriendo en ${backendUrl}`)
     }
     return Promise.reject(error)
   }

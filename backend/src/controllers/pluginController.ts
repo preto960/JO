@@ -71,6 +71,63 @@ export const getPlugins = async (req: Request, res: Response) => {
   }
 };
 
+export const getPluginsByStatus = asyncHandler(async (req: Request, res: Response) => {
+  const pluginRepository = AppDataSource.getRepository(Plugin);
+  
+  const { status } = req.params;
+  const {
+    page = 1,
+    limit = 10,
+    sortBy = 'createdAt',
+    sortOrder = 'DESC'
+  } = req.query;
+
+  // Validate status
+  if (!Object.values(PluginStatus).includes(status as PluginStatus)) {
+    return res.status(400).json({ error: 'Invalid plugin status' });
+  }
+
+  const skip = (Number(page) - 1) * Number(limit);
+
+  // Build query
+  const queryBuilder = pluginRepository
+    .createQueryBuilder('plugin')
+    .leftJoinAndSelect('plugin.author', 'author')
+    .where('plugin.status = :status', { status })
+    .andWhere('plugin.isActive = :isActive', { isActive: true });
+
+  // Add sorting
+  const validSortFields = ['title', 'price', 'createdAt', 'updatedAt', 'downloadCount', 'viewCount'];
+  const sortField = validSortFields.includes(sortBy as string) ? sortBy as string : 'createdAt';
+  queryBuilder.orderBy(`plugin.${sortField}`, sortOrder as 'ASC' | 'DESC');
+
+  // Get total count
+  const total = await queryBuilder.getCount();
+
+  // Get paginated results
+  const plugins = await queryBuilder
+    .skip(skip)
+    .take(Number(limit))
+    .getMany();
+
+  // Add placeholder ratings
+  const pluginsWithRatings = plugins.map(plugin => ({
+    ...plugin,
+    avgRating: 4.5, // Placeholder
+    purchaseCount: plugin.downloadCount
+  }));
+
+  res.json({
+    plugins: pluginsWithRatings,
+    pagination: {
+      page: Number(page),
+      limit: Number(limit),
+      total,
+      pages: Math.ceil(total / Number(limit))
+    }
+  });
+});
+
 export const getPluginById = asyncHandler(async (req: Request, res: Response) => {
   const pluginRepository = AppDataSource.getRepository(Plugin);
 

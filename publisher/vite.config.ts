@@ -15,7 +15,7 @@ export default defineConfig({
     port: 3003,
     proxy: {
       '/api': {
-        target: `http://localhost:${process.env.PORT_BACKEND || 3004}`,
+        target: process.env.BACKEND_URL || `http://localhost:${process.env.PORT_BACKEND || 3004}`,
         changeOrigin: true,
         secure: false,
         configure: (proxy, _options) => {

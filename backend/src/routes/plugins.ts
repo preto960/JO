@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   getPlugins,
+  getPluginsByStatus,
   getPluginById,
   createPlugin,
   updatePlugin,
@@ -22,6 +23,7 @@ router.get('/my/plugins', authenticateToken, requireDeveloper, getMyPlugins);
 
 // General routes
 router.get('/', getPlugins);
+router.get('/status/:status', getPluginsByStatus);
 router.get('/:id', getPluginById);
 
 // Action routes
