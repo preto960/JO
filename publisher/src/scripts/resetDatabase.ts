@@ -9,7 +9,14 @@ dotenv.config();
 const resetPublisherDatabase = async () => {
   try {
     console.log('🔄 Connecting to publisher database...');
-    await PublisherDataSource.initialize();
+    
+    // Create a temporary data source with synchronize enabled for reset
+    const tempDataSource = new DataSource({
+      ...PublisherDataSource.options,
+      synchronize: true
+    });
+    
+    await tempDataSource.initialize();
     
     console.log('⚠️  WARNING: This will drop all publisher tables and recreate them!');
     console.log('📋 Publisher tables to be dropped:');
@@ -20,11 +27,11 @@ const resetPublisherDatabase = async () => {
     
     // Drop all tables
     console.log('\n🗑️  Dropping all publisher tables...');
-    await PublisherDataSource.dropDatabase();
+    await tempDataSource.dropDatabase();
     
     // Synchronize schema (create all tables)
     console.log('🏗️  Creating publisher tables from entities...');
-    await PublisherDataSource.synchronize(true);
+    await tempDataSource.synchronize(true);
     
     console.log('\n✅ Publisher database reset completed successfully!');
     console.log('📊 New publisher tables created:');
@@ -37,13 +44,11 @@ const resetPublisherDatabase = async () => {
     
     console.log('\n🎯 Publisher database is ready for use!');
     
+    await tempDataSource.destroy();
+    
   } catch (error) {
     console.error('❌ Error resetting publisher database:', error);
     process.exit(1);
-  } finally {
-    if (PublisherDataSource.isInitialized) {
-      await PublisherDataSource.destroy();
-    }
   }
 };
 

@@ -13,6 +13,7 @@
     "build": "vite build",
     "start": "node dist/server.js",
     "db:reset": "npx ts-node --project tsconfig.script.json src/scripts/resetDatabase.ts",
+    "create:admin": "npx ts-node --project tsconfig.script.json src/scripts/createAdmin.ts",
     "db:sync": "npm run typeorm -- schema:sync",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
