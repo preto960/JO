@@ -1,32 +1,60 @@
-import axios from 'axios';
+import { AppDataSource } from '../data-source';
+import { PublisherUser } from '../entities/PublisherUser';
+import bcrypt from 'bcrypt';
 
 const createPublisherAdmin = async () => {
   try {
     console.log('🔧 Creating admin user for Publisher...');
     
-    const userData = {
+    // Initialize database connection
+    if (!AppDataSource.isInitialized) {
+      await AppDataSource.initialize();
+    }
+    
+    const userRepository = AppDataSource.getRepository(PublisherUser);
+    
+    // Check if admin user already exists
+    const existingAdmin = await userRepository.findOne({ 
+      where: { email: 'admin@publisher.com' } 
+    });
+    
+    if (existingAdmin) {
+      console.log('ℹ️  Publisher admin user already exists');
+      return;
+    }
+    
+    // Create admin user
+    const hashedPassword = await bcrypt.hash('admin123', 10);
+    
+    const adminUser = userRepository.create({
       email: 'admin@publisher.com',
       username: 'admin',
-      password: 'admin123',
-      role: 'ADMIN'
-    };
+      password: hashedPassword,
+      role: 'ADMIN',
+      isActive: true,
+      isEmailVerified: true
+    });
     
-    const response = await axios.post('http://localhost:3004/api/auth/register', userData);
+    const savedUser = await userRepository.save(adminUser);
     
     console.log('✅ Publisher admin user created successfully!');
     console.log('📋 User details:', {
-      id: response.data.user.id,
-      email: response.data.user.email,
-      username: response.data.user.username,
-      role: response.data.user.role
+      id: savedUser.id,
+      email: savedUser.email,
+      username: savedUser.username,
+      role: savedUser.role
     });
-    console.log('🔑 Token:', response.data.token);
+    
+    // Close database connection
+    if (AppDataSource.isInitialized) {
+      await AppDataSource.destroy();
+    }
     
   } catch (error: any) {
-    if (error.response?.status === 400 && error.response?.data?.error?.includes('already')) {
-      console.log('ℹ️  Publisher admin user already exists');
-    } else {
-      console.error('❌ Error creating publisher admin user:', error.response?.data || error.message);
+    console.error('❌ Error creating publisher admin user:', error.message);
+    // Ensure database connection is closed on error
+    if (AppDataSource.isInitialized) {
+      await AppDataSource.destroy();
     }
   }
 };

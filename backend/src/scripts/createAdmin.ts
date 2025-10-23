@@ -1,34 +1,62 @@
-import axios from 'axios';
+import { AppDataSource } from '../data-source';
+import { User } from '../entities/User';
+import bcrypt from 'bcrypt';
 
 const createAdminUser = async () => {
   try {
     console.log('🔧 Creating admin user for Backend...');
     
-    const userData = {
+    // Initialize database connection
+    if (!AppDataSource.isInitialized) {
+      await AppDataSource.initialize();
+    }
+    
+    const userRepository = AppDataSource.getRepository(User);
+    
+    // Check if admin user already exists
+    const existingAdmin = await userRepository.findOne({ 
+      where: { email: 'admin@backend.com' } 
+    });
+    
+    if (existingAdmin) {
+      console.log('ℹ️  Backend admin user already exists');
+      return;
+    }
+    
+    // Create admin user
+    const hashedPassword = await bcrypt.hash('admin123', 10);
+    
+    const adminUser = userRepository.create({
       email: 'admin@backend.com',
       username: 'admin',
-      password: 'admin123',
+      password: hashedPassword,
       firstName: 'Admin',
       lastName: 'User',
-      role: 'ADMIN'
-    };
+      role: 'ADMIN',
+      isActive: true,
+      isEmailVerified: true
+    });
     
-    const response = await axios.post('http://localhost:3000/api/auth/register', userData);
+    const savedUser = await userRepository.save(adminUser);
     
     console.log('✅ Backend admin user created successfully!');
     console.log('📋 User details:', {
-      id: response.data.user.id,
-      email: response.data.user.email,
-      username: response.data.user.username,
-      role: response.data.user.role
+      id: savedUser.id,
+      email: savedUser.email,
+      username: savedUser.username,
+      role: savedUser.role
     });
-    console.log('🔑 Token:', response.data.token);
+    
+    // Close database connection
+    if (AppDataSource.isInitialized) {
+      await AppDataSource.destroy();
+    }
     
   } catch (error: any) {
-    if (error.response?.status === 400 && error.response?.data?.error?.includes('already')) {
-      console.log('ℹ️  Backend admin user already exists');
-    } else {
-      console.error('❌ Error creating backend admin user:', error.response?.data || error.message);
+    console.error('❌ Error creating backend admin user:', error.message);
+    // Ensure database connection is closed on error
+    if (AppDataSource.isInitialized) {
+      await AppDataSource.destroy();
     }
   }
 };
