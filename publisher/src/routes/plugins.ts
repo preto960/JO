@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { PublisherDataSource } from '../config/database';
 import { PublisherPlugin, PublisherPluginStatus } from '../entities/PublisherPlugin';
-import { PublisherUser } from '../entities/PublisherUser';
+import { PublisherUser, PublisherRole } from '../entities/PublisherUser';
 
 const router = Router();
 
@@ -52,9 +52,10 @@ router.post('/', async (req, res) => {
     if (!author) {
       // Create default user if not exists
       author = userRepository.create({
-        name: 'Admin User',
+        username: 'admin',
         email: 'admin@example.com',
-        role: 'ADMIN'
+        password: 'admin123', // In production, this should be hashed
+        role: PublisherRole.ADMIN
       });
       author = await userRepository.save(author);
     }
@@ -65,7 +66,7 @@ router.post('/', async (req, res) => {
       status: PublisherPluginStatus.PENDING
     });
     
-    const savedPlugin = await pluginRepository.save(plugin);
+    const savedPlugin = await pluginRepository.save(plugin) as unknown as PublisherPlugin;
     
     // Fetch the plugin with author relation
     const result = await pluginRepository.findOne({

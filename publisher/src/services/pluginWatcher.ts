@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { AppDataSource } from '../data-source';
+import { PublisherDataSource } from '../config/database';
 import { PublisherPlugin } from '../entities/PublisherPlugin';
 import { PluginProcessor } from './pluginProcessor';
 
@@ -116,11 +116,11 @@ export class PluginWatcher {
 
   private async savePluginToDatabase(pluginData: any): Promise<void> {
     try {
-      if (!AppDataSource.isInitialized) {
-        await AppDataSource.initialize();
+      if (!PublisherDataSource.isInitialized) {
+        await PublisherDataSource.initialize();
       }
 
-      const pluginRepository = AppDataSource.getRepository(PublisherPlugin);
+      const pluginRepository = PublisherDataSource.getRepository(PublisherPlugin);
 
       // Verificar si el plugin ya existe
       const existingPlugin = await pluginRepository.findOne({
