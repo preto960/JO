@@ -85,12 +85,12 @@ export class PublisherPlugin {
   updatedAt: Date;
 
   // Foreign Keys
-  @Column({ name: 'author_id' })
-  authorId: string;
+  @Column({ name: 'author_id', nullable: true })
+  authorId?: string;
 
   // Relations
-  @ManyToOne(() => PublisherUser, user => user.plugins, { onDelete: 'CASCADE' })
-  author: PublisherUser;
+  @ManyToOne(() => PublisherUser, user => user.plugins, { onDelete: 'CASCADE', nullable: true })
+  author?: PublisherUser;
 
   @OneToMany(() => PublisherAnalytics, analytics => analytics.plugin)
   analytics: PublisherAnalytics[];

@@ -2,7 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import { PublisherDataSource } from '../config/database';
 import { PublisherPlugin, PublisherPluginStatus } from '../entities/PublisherPlugin';
-import { PublisherUser, PublisherRole } from '../entities/PublisherUser';
 import { PluginProcessor } from './pluginProcessor';
 import { SyncService } from './syncService';
 
@@ -108,7 +107,7 @@ export class PluginWatcher {
       // Procesar el plugin
       const processedPlugin = await this.pluginProcessor.processPlugin(pluginPath, manifest);
 
-      // Guardar en base de datos
+      // Guardar en base de datos SIN asignar usuario
       const savedPlugin = await this.savePluginToDatabase(processedPlugin);
 
       // Si el plugin está aprobado, sincronizar con el backend principal
@@ -131,67 +130,9 @@ export class PluginWatcher {
       }
 
       const pluginRepository = PublisherDataSource.getRepository(PublisherPlugin);
-      const userRepository = PublisherDataSource.getRepository(PublisherUser);
 
-      // Asegurar que exista un autor por defecto
-      let author = await userRepository.findOne({ 
-        where: { email: 'admin@example.com' } 
-      });
-      
-      // Si no encuentra por email, buscar por username
-      if (!author) {
-        author = await userRepository.findOne({ 
-          where: { username: 'admin' } 
-        });
-      }
-      
-      if (!author) {
-        // Crear usuario por defecto si no existe por ningún medio
-        try {
-          const bcrypt = require('bcryptjs');
-          const hashedPassword = await bcrypt.hash('admin123', 10);
-          
-          const newAuthor = new PublisherUser();
-          newAuthor.username = 'admin';
-          newAuthor.email = 'admin@example.com';
-          newAuthor.password = hashedPassword;
-          newAuthor.role = PublisherRole.ADMIN;
-          newAuthor.isActive = true;
-          newAuthor.isVerified = true;
-          
-          author = await userRepository.save(newAuthor);
-          console.log('👤 Usuario admin creado por defecto');
-        } catch (error: any) {
-          // Si hay error de duplicado, intentar buscar el usuario existente
-          if (error.code === '23505') {
-            console.log('⚠️  Usuario ya existe, buscando existente...');
-            author = await userRepository.findOne({ 
-              where: { username: 'admin' } 
-            });
-            if (!author) {
-              author = await userRepository.findOne({ 
-                where: { email: 'admin@example.com' } 
-              });
-            }
-            if (author) {
-              console.log('✅ Usuario existente encontrado y reutilizado');
-            } else {
-              console.error('❌ No se pudo encontrar ni crear el usuario admin');
-              return null;
-            }
-          } else {
-            throw error;
-          }
-        }
-      } else {
-        console.log('👤 Usuario admin ya existe, reutilizando...');
-      }
-
-      // Asegurar que el plugin tenga un autor
-      if (!pluginData.authorId) {
-        pluginData.authorId = author.id;
-        pluginData.author_id = author.id; // Para la columna foreign key
-      }
+      // NOTA: Los plugins se crean sin autor asignado
+      // El autor será asignado posteriormente por un admin a través de la interfaz
 
       // Verificar si el plugin ya existe
       const existingPlugin = await pluginRepository.findOne({
@@ -207,11 +148,11 @@ export class PluginWatcher {
         savedPlugin = Array.isArray(updated) ? updated[0] : updated;
         console.log(`🔄 Plugin actualizado: ${pluginData.title}`);
       } else {
-        // Crear nuevo plugin
+        // Crear nuevo plugin SIN autor
         const newPlugin = pluginRepository.create(pluginData);
         const created = await pluginRepository.save(newPlugin);
         savedPlugin = Array.isArray(created) ? created[0] : created;
-        console.log(`🆕 Plugin creado: ${pluginData.title}`);
+        console.log(`🆕 Plugin creado sin autor: ${pluginData.title}`);
       }
 
       return savedPlugin;
