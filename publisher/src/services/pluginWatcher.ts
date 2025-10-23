@@ -138,14 +138,21 @@ export class PluginWatcher {
       
       if (!author) {
         // Crear usuario por defecto si no existe
-        author = userRepository.create({
-          username: 'admin',
-          email: 'admin@example.com',
-          password: 'admin123', // En producción esto debería estar hasheado
-          role: PublisherRole.ADMIN
-        });
-        author = await userRepository.save(author);
+        const bcrypt = require('bcryptjs');
+        const hashedPassword = await bcrypt.hash('admin123', 10);
+        
+        const newAuthor = new PublisherUser();
+        newAuthor.username = 'admin';
+        newAuthor.email = 'admin@example.com';
+        newAuthor.password = hashedPassword;
+        newAuthor.role = PublisherRole.ADMIN;
+        newAuthor.isActive = true;
+        newAuthor.isVerified = true;
+        
+        author = await userRepository.save(newAuthor);
         console.log('👤 Usuario admin creado por defecto');
+      } else {
+        console.log('👤 Usuario admin ya existe, reutilizando...');
       }
 
       // Asegurar que el plugin tenga un autor
