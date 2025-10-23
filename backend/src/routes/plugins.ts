@@ -10,6 +10,7 @@ import {
 } from '@/controllers/pluginController';
 import { testSimple } from '@/controllers/simpleTest';
 import { authenticateToken, requireDeveloper } from '@/middleware/auth';
+import { validateApiKey } from '@/middleware/apiAuth';
 import { pluginValidation, validateRequest } from '@/middleware/validation';
 
 const router = Router();
@@ -26,6 +27,8 @@ router.get('/:id', getPluginById);
 router.post('/', authenticateToken, requireDeveloper, pluginValidation, validateRequest, createPlugin);
 router.put('/:id', authenticateToken, requireDeveloper, pluginValidation, validateRequest, updatePlugin);
 router.delete('/:id', authenticateToken, requireDeveloper, deletePlugin);
-router.post('/sync', syncPlugin);
+
+// Sync route (for publisher - requires API key)
+router.post('/sync', validateApiKey, syncPlugin);
 
 export default router;

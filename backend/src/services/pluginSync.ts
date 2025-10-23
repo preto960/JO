@@ -17,7 +17,7 @@ interface PublisherPlugin {
 }
 
 export class PluginSyncService {
-  private publisherUrl = 'http://localhost:3006';
+  private publisherUrl = 'http://localhost:3004';
   private pluginRepository = AppDataSource.getRepository(Plugin);
   private userRepository = AppDataSource.getRepository(User);
 

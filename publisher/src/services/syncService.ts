@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { PublisherPlugin } from '../entities/PublisherPlugin';
+import { PublisherPlugin, PublisherPluginStatus } from '../entities/PublisherPlugin';
 
 export class SyncService {
   private backendUrl: string;
@@ -13,7 +13,7 @@ export class SyncService {
   async syncApprovedPlugin(plugin: PublisherPlugin): Promise<boolean> {
     try {
       // Solo sincronizar plugins aprobados
-      if (plugin.status !== 'approved') {
+      if (plugin.status !== PublisherPluginStatus.APPROVED) {
         console.log(`⏭️  Plugin ${plugin.title} no está aprobado, omitiendo sincronización`);
         return false;
       }
@@ -70,7 +70,7 @@ export class SyncService {
       const pluginRepository = PublisherDataSource.getRepository(PublisherPlugin);
 
       const approvedPlugins = await pluginRepository.find({
-        where: { status: 'approved' }
+        where: { status: PublisherPluginStatus.APPROVED }
       });
 
       console.log(`🔄 Sincronizando ${approvedPlugins.length} plugins aprobados...`);

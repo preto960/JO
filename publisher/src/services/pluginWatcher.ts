@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { PublisherDataSource } from '../config/database';
-import { PublisherPlugin } from '../entities/PublisherPlugin';
+import { PublisherPlugin, PublisherPluginStatus } from '../entities/PublisherPlugin';
 import { PublisherUser, PublisherRole } from '../entities/PublisherUser';
 import { PluginProcessor } from './pluginProcessor';
 import { SyncService } from './syncService';
@@ -112,7 +112,7 @@ export class PluginWatcher {
       const savedPlugin = await this.savePluginToDatabase(processedPlugin);
 
       // Si el plugin está aprobado, sincronizar con el backend principal
-      if (savedPlugin && savedPlugin.status === 'approved') {
+      if (savedPlugin && savedPlugin.status === PublisherPluginStatus.APPROVED) {
         console.log(`🔄 Sincronizando plugin aprobado: ${pluginName}`);
         await this.syncService.syncApprovedPlugin(savedPlugin);
       }
@@ -164,12 +164,12 @@ export class PluginWatcher {
       if (existingPlugin) {
         // Actualizar plugin existente
         Object.assign(existingPlugin, pluginData);
-        savedPlugin = await pluginRepository.save(existingPlugin);
+        savedPlugin = await pluginRepository.save(existingPlugin) as PublisherPlugin;
         console.log(`🔄 Plugin actualizado: ${pluginData.title}`);
       } else {
         // Crear nuevo plugin
         const newPlugin = pluginRepository.create(pluginData);
-        savedPlugin = await pluginRepository.save(newPlugin);
+        savedPlugin = await pluginRepository.save(newPlugin) as PublisherPlugin;
         console.log(`🆕 Plugin creado: ${pluginData.title}`);
       }
 

@@ -23,6 +23,7 @@ interface Config {
     windowMs: number;
     max: number;
   };
+  apiKey?: string;
 }
 
 const config: Config = {
@@ -49,6 +50,8 @@ const config: Config = {
     windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'), // 15 minutes
     max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'), // limit each IP to 100 requests per windowMs
   },
+  
+  apiKey: process.env.API_KEY,
 };
 
 // Validation
