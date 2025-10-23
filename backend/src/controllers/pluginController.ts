@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '@/config/database';
-import { Plugin, User, PluginStatus } from '@/entities';
+import { Plugin, User, PluginStatus, UserRole } from '@/entities';
 import { asyncHandler } from '@/middleware/errorHandler';
 import { pluginValidation, validateRequest } from '@/middleware/validation';
 import { AuthenticatedRequest } from '@/middleware/auth';
@@ -19,42 +19,43 @@ export const getPlugins = asyncHandler(async (req: Request, res: Response) => {
 
   const skip = (Number(page) - 1) * Number(limit);
   
-  // Build query
-  const queryBuilder = pluginRepository
-    .createQueryBuilder('plugin')
-    .leftJoinAndSelect('plugin.author', 'author')
-    .where('plugin.status = :status', { status: PluginStatus.APPROVED })
-    .andWhere('plugin.isActive = :isActive', { isActive: true });
+  try {
+    // Build simple query first
+    const queryBuilder = pluginRepository
+      .createQueryBuilder('plugin')
+      .where('plugin.status = :status', { status: PluginStatus.APPROVED })
+      .andWhere('plugin.isActive = :isActive', { isActive: true });
 
-  // Add filters
-  if (category) {
-    queryBuilder.andWhere('plugin.category = :category', { category });
-  }
+    // Add filters
+    if (category) {
+      queryBuilder.andWhere('plugin.category = :category', { category });
+    }
 
-  if (search) {
-    queryBuilder.andWhere(
-      '(plugin.title ILIKE :search OR plugin.description ILIKE :search)',
-      { search: `%${search}%` }
-    );
-  }
+    if (search) {
+      queryBuilder.andWhere(
+        '(plugin.title ILIKE :search OR plugin.description ILIKE :search)',
+        { search: `%${search}%` }
+      );
+    }
 
-  // Add sorting
-  const validSortFields = ['title', 'price', 'createdAt', 'updatedAt', 'downloadCount', 'viewCount'];
-  const sortField = validSortFields.includes(sortBy as string) ? sortBy as string : 'createdAt';
-  queryBuilder.orderBy(`plugin.${sortField}`, sortOrder as 'ASC' | 'DESC');
+    // Add sorting
+    const validSortFields = ['title', 'price', 'createdAt', 'updatedAt', 'downloadCount', 'viewCount'];
+    const sortField = validSortFields.includes(sortBy as string) ? sortBy as string : 'createdAt';
+    queryBuilder.orderBy(`plugin.${sortField}`, sortOrder as 'ASC' | 'DESC');
 
-  // Get total count
-  const total = await queryBuilder.getCount();
+    // Get total count
+    const total = await queryBuilder.getCount();
 
-  // Get paginated results
-  const plugins = await queryBuilder
-    .skip(skip)
-    .take(Number(limit))
-    .getMany();
+    // Get paginated results
+    const plugins = await queryBuilder
+      .skip(skip)
+      .take(Number(limit))
+      .getMany();
 
-  // Calculate average rating for each plugin
-  const pluginsWithRatings = await Promise.all(
-    plugins.map(async (plugin) => {
+    console.log('🔍 Plugins found:', plugins.length);
+
+    // Calculate average rating for each plugin
+    const pluginsWithRatings = plugins.map((plugin) => {
       // Simple rating calculation (would be more complex with reviews)
       const avgRating = 4.5; // Placeholder
       
@@ -62,22 +63,29 @@ export const getPlugins = asyncHandler(async (req: Request, res: Response) => {
         ...plugin,
         avgRating,
         author: {
-          id: plugin.author.id,
-          username: plugin.author.username
+          id: plugin.authorId || 'unknown',
+          username: 'Admin'
+        },
+        _count: {
+          reviews: 0,
+          purchases: plugin.downloadCount
         }
       };
-    })
-  );
+    });
 
-  res.json({
-    plugins: pluginsWithRatings,
-    pagination: {
-      page: Number(page),
-      limit: Number(limit),
-      total,
-      pages: Math.ceil(total / Number(limit))
-    }
-  });
+    res.json({
+      plugins: pluginsWithRatings,
+      pagination: {
+        page: Number(page),
+        limit: Number(limit),
+        total,
+        pages: Math.ceil(total / Number(limit))
+      }
+    });
+  } catch (error) {
+    console.error('❌ Error in getPlugins:', error);
+    throw error;
+  }
 });
 
 export const getPluginById = asyncHandler(async (req: Request, res: Response) => {
@@ -283,5 +291,99 @@ export const getMyPlugins = asyncHandler(async (req: AuthenticatedRequest, res: 
       total,
       pages: Math.ceil(total / Number(limit))
     }
+  });
+});
+
+export const syncPlugin = asyncHandler(async (req: Request, res: Response) => {
+  const pluginRepository = AppDataSource.getRepository(Plugin);
+  const userRepository = AppDataSource.getRepository(User);
+  
+  const {
+    title,
+    description,
+    price,
+    category,
+    tags,
+    downloadUrl,
+    demoUrl,
+    githubUrl,
+    documentationUrl,
+    authorId,
+    status
+  } = req.body;
+
+  // Verificar si el autor existe o crear uno por defecto
+  let author = await userRepository.findOne({ where: { id: authorId } });
+  
+  if (!author) {
+    // Crear usuario por defecto si no existe
+    author = userRepository.create({
+      username: 'admin',
+      email: 'admin@example.com',
+      password: 'admin123', // En producción esto debería estar hasheado
+      role: UserRole.ADMIN
+    });
+    author = await userRepository.save(author);
+    console.log('👤 Usuario admin creado por defecto en backend principal');
+  }
+
+  // Verificar si el plugin ya existe
+  const existingPlugin = await pluginRepository.findOne({
+    where: { title }
+  });
+
+  let plugin: Plugin;
+
+  if (existingPlugin) {
+    // Actualizar plugin existente
+    await pluginRepository.update(existingPlugin.id, {
+      title,
+      description,
+      price,
+      category,
+      tags,
+      downloadUrl,
+      demoUrl,
+      githubUrl,
+      documentationUrl,
+      status: status || PluginStatus.APPROVED
+    });
+
+    plugin = await pluginRepository.findOne({
+      where: { id: existingPlugin.id },
+      relations: ['author']
+    })!;
+    
+    console.log(`🔄 Plugin sincronizado y actualizado: ${title}`);
+  } else {
+    // Crear nuevo plugin
+    plugin = pluginRepository.create({
+      title,
+      description,
+      price,
+      category,
+      tags,
+      downloadUrl,
+      demoUrl,
+      githubUrl,
+      documentationUrl,
+      authorId: author.id,
+      status: status || PluginStatus.APPROVED
+    });
+
+    plugin = await pluginRepository.save(plugin);
+    
+    // Cargar el plugin con autor
+    plugin = await pluginRepository.findOne({
+      where: { id: plugin.id },
+      relations: ['author']
+    })!;
+    
+    console.log(`🆕 Plugin sincronizado y creado: ${title}`);
+  }
+
+  res.status(201).json({
+    message: 'Plugin synchronized successfully',
+    plugin
   });
 });

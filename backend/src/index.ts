@@ -14,6 +14,9 @@ import pluginRoutes from './routes/plugins';
 import userRoutes from './routes/users';
 import analyticsRoutes from './routes/analytics';
 
+// Import services
+import { pluginSyncService } from './services/pluginSync';
+
 const app = express();
 
 // Rate limiting
@@ -69,6 +72,9 @@ async function initializeDatabase() {
 // Start server
 async function startServer() {
   await initializeDatabase();
+  
+  // Start plugin sync service
+  pluginSyncService.startPeriodicSync(5).catch(console.error);
   
   app.listen(config.port, () => {
     console.log(`🚀 Server is running on port ${config.port}`);

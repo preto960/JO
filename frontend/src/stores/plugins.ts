@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { pluginsApi } from '@/services/api'
+import { pluginsApi, api } from '@/services/api'
 import type { Plugin, PluginsResponse } from '@/types'
 
 export const usePluginStore = defineStore('plugin', () => {

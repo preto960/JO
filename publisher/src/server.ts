@@ -44,6 +44,25 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Sync endpoint
+app.post('/api/sync-plugins', async (req, res) => {
+  try {
+    console.log('🔄 Iniciando sincronización manual de plugins...');
+    const pluginWatcher = new PluginWatcher();
+    await pluginWatcher.syncAllApprovedPlugins();
+    res.json({ 
+      message: 'Plugins synchronization completed',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error: any) {
+    console.error('❌ Error en sincronización manual:', error);
+    res.status(500).json({ 
+      error: 'Failed to sync plugins',
+      message: error.message 
+    });
+  }
+});
+
 // Error handling
 app.use(errorHandler);
 

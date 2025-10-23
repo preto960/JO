@@ -4,15 +4,18 @@ import { PublisherDataSource } from '../config/database';
 import { PublisherPlugin } from '../entities/PublisherPlugin';
 import { PublisherUser, PublisherRole } from '../entities/PublisherUser';
 import { PluginProcessor } from './pluginProcessor';
+import { SyncService } from './syncService';
 
 export class PluginWatcher {
   private watcher: fs.FSWatcher | null = null;
   private pluginProcessor: PluginProcessor;
+  private syncService: SyncService;
   private pluginsDir: string;
 
   constructor() {
     this.pluginsDir = path.join(process.cwd(), 'plugins');
     this.pluginProcessor = new PluginProcessor();
+    this.syncService = new SyncService();
   }
 
   async start(): Promise<void> {
@@ -106,7 +109,13 @@ export class PluginWatcher {
       const processedPlugin = await this.pluginProcessor.processPlugin(pluginPath, manifest);
 
       // Guardar en base de datos
-      await this.savePluginToDatabase(processedPlugin);
+      const savedPlugin = await this.savePluginToDatabase(processedPlugin);
+
+      // Si el plugin está aprobado, sincronizar con el backend principal
+      if (savedPlugin && savedPlugin.status === 'approved') {
+        console.log(`🔄 Sincronizando plugin aprobado: ${pluginName}`);
+        await this.syncService.syncApprovedPlugin(savedPlugin);
+      }
 
       console.log(`✅ Plugin ${pluginName} procesado correctamente`);
 
@@ -115,7 +124,7 @@ export class PluginWatcher {
     }
   }
 
-  private async savePluginToDatabase(pluginData: any): Promise<void> {
+  private async savePluginToDatabase(pluginData: any): Promise<PublisherPlugin | null> {
     try {
       if (!PublisherDataSource.isInitialized) {
         await PublisherDataSource.initialize();
@@ -150,24 +159,34 @@ export class PluginWatcher {
         where: { title: pluginData.title }
       });
 
+      let savedPlugin: PublisherPlugin;
+
       if (existingPlugin) {
         // Actualizar plugin existente
         Object.assign(existingPlugin, pluginData);
-        await pluginRepository.save(existingPlugin);
+        savedPlugin = await pluginRepository.save(existingPlugin);
         console.log(`🔄 Plugin actualizado: ${pluginData.title}`);
       } else {
         // Crear nuevo plugin
         const newPlugin = pluginRepository.create(pluginData);
-        await pluginRepository.save(newPlugin);
+        savedPlugin = await pluginRepository.save(newPlugin);
         console.log(`🆕 Plugin creado: ${pluginData.title}`);
       }
 
+      return savedPlugin;
+
     } catch (error) {
       console.error('❌ Error guardando plugin en base de datos:', error);
+      return null;
     }
   }
 
   getPluginsDir(): string {
     return this.pluginsDir;
+  }
+
+  async syncAllApprovedPlugins(): Promise<void> {
+    console.log('🔄 Iniciando sincronización de todos los plugins aprobados...');
+    await this.syncService.syncAllApprovedPlugins();
   }
 }
