@@ -8,28 +8,24 @@ import {
   getMyPlugins,
   syncPlugin
 } from '@/controllers/pluginController';
-import { syncPluginsManually } from '@/controllers/syncController';
+import { testSimple } from '@/controllers/simpleTest';
 import { authenticateToken, requireDeveloper } from '@/middleware/auth';
 import { pluginValidation, validateRequest } from '@/middleware/validation';
 
 const router = Router();
 
-// Public routes
+// Specific routes first (must come before /:id)
+router.get('/test', testSimple);
+router.get('/my/plugins', authenticateToken, requireDeveloper, getMyPlugins);
+
+// General routes
 router.get('/', getPlugins);
 router.get('/:id', getPluginById);
 
-// Sync route (temporary)
-router.post('/sync-manual', syncPluginsManually);
-
-// Protected routes
+// Action routes
 router.post('/', authenticateToken, requireDeveloper, pluginValidation, validateRequest, createPlugin);
 router.put('/:id', authenticateToken, requireDeveloper, pluginValidation, validateRequest, updatePlugin);
 router.delete('/:id', authenticateToken, requireDeveloper, deletePlugin);
-
-// Developer routes
-router.get('/my/plugins', authenticateToken, requireDeveloper, getMyPlugins);
-
-// Sync route (for publisher)
 router.post('/sync', syncPlugin);
 
 export default router;
