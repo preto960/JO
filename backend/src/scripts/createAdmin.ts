@@ -1,6 +1,6 @@
-import { AppDataSource } from '../data-source';
+import { AppDataSource } from '../config/database';
 import { User } from '../entities/User';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 const createAdminUser = async () => {
   try {

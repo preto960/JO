@@ -1,17 +1,17 @@
-import { AppDataSource } from '../data-source';
+import { PublisherDataSource } from '../config/database';
 import { PublisherUser } from '../entities/PublisherUser';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 const createPublisherAdmin = async () => {
   try {
     console.log('🔧 Creating admin user for Publisher...');
     
     // Initialize database connection
-    if (!AppDataSource.isInitialized) {
-      await AppDataSource.initialize();
+    if (!PublisherDataSource.isInitialized) {
+      await PublisherDataSource.initialize();
     }
     
-    const userRepository = AppDataSource.getRepository(PublisherUser);
+    const userRepository = PublisherDataSource.getRepository(PublisherUser);
     
     // Check if admin user already exists
     const existingAdmin = await userRepository.findOne({ 
@@ -46,15 +46,15 @@ const createPublisherAdmin = async () => {
     });
     
     // Close database connection
-    if (AppDataSource.isInitialized) {
-      await AppDataSource.destroy();
+    if (PublisherDataSource.isInitialized) {
+      await PublisherDataSource.destroy();
     }
     
   } catch (error: any) {
     console.error('❌ Error creating publisher admin user:', error.message);
     // Ensure database connection is closed on error
-    if (AppDataSource.isInitialized) {
-      await AppDataSource.destroy();
+    if (PublisherDataSource.isInitialized) {
+      await PublisherDataSource.destroy();
     }
   }
 };
