@@ -67,30 +67,7 @@
           <span>Publish Plugin</span>
         </router-link>
 
-        <!-- Create New Plugin (only for publishers and admins) -->
-        <router-link 
-          v-if="authStore.user?.role === 'PUBLISHER' || authStore.user?.role === 'ADMIN'"
-          to="/plugins?action=create"
-          class="flex items-center space-x-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 shadow-md hover:shadow-lg"
-        >
-          <PlusIcon class="w-5 h-5" />
-          <span>Create New Plugin</span>
-        </router-link>
-
-        <!-- Analytics (only for publishers and admins) -->
-        <router-link 
-          v-if="authStore.user?.role === 'PUBLISHER' || authStore.user?.role === 'ADMIN'"
-          to="/analytics"
-          class="flex items-center space-x-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200"
-          :class="[
-            isActiveRoute('/analytics') 
-              ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-r-2 border-indigo-600 dark:border-indigo-400' 
-              : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
-          ]"
-        >
-          <ChartIcon class="w-5 h-5" />
-          <span>Analytics</span>
-        </router-link>
+  
       </nav>
 
       <!-- Bottom Icons Section -->

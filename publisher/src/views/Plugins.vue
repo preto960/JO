@@ -53,8 +53,20 @@
       <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
     </div>
 
-    <div v-else-if="error" class="text-center py-12 text-red-600 dark:text-red-400">
-      {{ error }}
+    <div v-else-if="error && plugins.length === 0" class="text-center py-12 text-gray-500 dark:text-gray-400">
+      <div class="mb-4">
+        <svg class="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No plugins found</h3>
+      <p class="text-gray-500 dark:text-gray-400 mb-4">You haven't created any plugins yet.</p>
+      <button
+        @click="showCreateModal = true"
+        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+      >
+        Create your first plugin
+      </button>
     </div>
 
     <div v-else-if="filteredPlugins.length === 0" class="text-center py-12 text-gray-500 dark:text-gray-400">
@@ -106,6 +118,13 @@
           </div>
           
           <div class="flex space-x-2">
+            <button
+              v-if="plugin.status === 'PENDING'"
+              @click="approvePlugin(plugin)"
+              class="flex-1 bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium text-sm"
+            >
+              Approve
+            </button>
             <button
               @click="editPlugin(plugin)"
               class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
@@ -252,6 +271,7 @@ import { ref, computed, onMounted } from 'vue'
 import { usePluginStore } from '@/stores/plugins'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
+import { pluginsApi } from '@/services/api'
 import type { Plugin } from '@/types'
 
 const pluginStore = usePluginStore()
@@ -334,9 +354,25 @@ const deletePlugin = async (pluginId: string) => {
   if (confirm('Are you sure you want to delete this plugin?')) {
     try {
       await pluginStore.deletePlugin(pluginId)
+      // Refresh the plugins list after deletion
+      const fetchedPlugins = await pluginStore.fetchMyPlugins()
+      plugins.value = fetchedPlugins || []
     } catch (error) {
       console.error('Failed to delete plugin:', error)
     }
+  }
+}
+
+const approvePlugin = async (plugin: Plugin) => {
+  try {
+    await pluginsApi.updatePluginStatus(plugin.id, 'APPROVED')
+    toastStore.success(`Plugin ${plugin.title} approved successfully!`)
+    // Refresh the plugins list after approval
+    const fetchedPlugins = await pluginStore.fetchMyPlugins()
+    plugins.value = fetchedPlugins || []
+  } catch (error) {
+    console.error('Failed to approve plugin:', error)
+    toastStore.error('Failed to approve plugin')
   }
 }
 
@@ -385,9 +421,11 @@ const closeModal = () => {
 
 onMounted(async () => {
   try {
-    plugins.value = await pluginStore.fetchMyPlugins()
+    const fetchedPlugins = await pluginStore.fetchMyPlugins()
+    plugins.value = fetchedPlugins || []
   } catch (error) {
     console.error('Failed to fetch plugins:', error)
+    plugins.value = []
   }
 })
 </script>
