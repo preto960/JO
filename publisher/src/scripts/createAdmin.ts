@@ -1,5 +1,5 @@
 import { PublisherDataSource } from '../config/database';
-import { PublisherUser } from '../entities/PublisherUser';
+import { PublisherUser, PublisherRole } from '../entities/PublisherUser';
 import bcrypt from 'bcryptjs';
 
 const createPublisherAdmin = async () => {
@@ -26,14 +26,13 @@ const createPublisherAdmin = async () => {
     // Create admin user
     const hashedPassword = await bcrypt.hash('admin123', 10);
     
-    const adminUser = userRepository.create({
-      email: 'admin@publisher.com',
-      username: 'admin',
-      password: hashedPassword,
-      role: 'ADMIN',
-      isActive: true,
-      isEmailVerified: true
-    });
+    const adminUser = new PublisherUser();
+    adminUser.email = 'admin@publisher.com';
+    adminUser.username = 'admin';
+    adminUser.password = hashedPassword;
+    adminUser.role = PublisherRole.ADMIN;
+    adminUser.isActive = true;
+    adminUser.isVerified = true;
     
     const savedUser = await userRepository.save(adminUser);
     

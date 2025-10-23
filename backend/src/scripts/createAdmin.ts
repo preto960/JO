@@ -1,5 +1,5 @@
 import { AppDataSource } from '../config/database';
-import { User } from '../entities/User';
+import { User, UserRole } from '../entities/User';
 import bcrypt from 'bcryptjs';
 
 const createAdminUser = async () => {
@@ -26,16 +26,12 @@ const createAdminUser = async () => {
     // Create admin user
     const hashedPassword = await bcrypt.hash('admin123', 10);
     
-    const adminUser = userRepository.create({
-      email: 'admin@backend.com',
-      username: 'admin',
-      password: hashedPassword,
-      firstName: 'Admin',
-      lastName: 'User',
-      role: 'ADMIN',
-      isActive: true,
-      isEmailVerified: true
-    });
+    const adminUser = new User();
+    adminUser.email = 'admin@backend.com';
+    adminUser.username = 'admin';
+    adminUser.password = hashedPassword;
+    adminUser.role = UserRole.ADMIN;
+    adminUser.isActive = true;
     
     const savedUser = await userRepository.save(adminUser);
     
