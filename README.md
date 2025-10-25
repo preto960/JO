@@ -139,15 +139,32 @@ A comprehensive AI-driven plugin marketplace platform inspired by NJO Publisher 
 - **Recommendations**: Personalized plugin suggestions
 - **Optimization**: SEO and performance improvements
 
-### AI SDK Usage
-```javascript
-import ZAI from 'z-ai-web-dev-sdk';
+### AI Integration
+The platform uses a custom AI service that supports multiple AI providers:
 
-const zai = await ZAI.create();
-const response = await zai.chat.completions.create({
-  messages: [{ role: 'user', content: 'Analyze this plugin' }]
-});
+```javascript
+import { aiService } from '../services/aiService';
+
+// Chat completions
+const response = await aiService.chatCompletions([
+  { role: 'system', content: 'You are an expert plugin analyst' },
+  { role: 'user', content: 'Analyze this plugin' }
+]);
+
+// Image generation
+const image = await aiService.generateImage('A modern plugin icon', '1024x1024');
+
+// Plugin analysis
+const analysis = await aiService.analyzePlugin(pluginData);
 ```
+
+### Supported AI Providers
+- **OpenAI**: GPT models for text generation, DALL-E for images
+- **Custom API**: Configurable base URL and model selection
+- **Environment Variables**: 
+  - `OPENAI_API_KEY`: OpenAI API key
+  - `AI_BASE_URL`: Custom API endpoint
+  - `AI_MODEL`: Model selection (default: gpt-3.5-turbo)
 
 ## 📈 Analytics & Monitoring
 

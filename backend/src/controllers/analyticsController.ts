@@ -4,12 +4,9 @@ import { Plugin } from '../models/Plugin';
 import { Download } from '../models/Download';
 import { Purchase } from '../models/Purchase';
 import { Review } from '../models/Review';
+import { User } from '../models/User';
 import { createError } from '../middleware/errorHandler';
 import { AuthRequest } from '../middleware/auth';
-
-interface AuthRequest extends Request {
-  user?: User;
-}
 
 export class AnalyticsController {
   private pluginRepository = AppDataSource.getRepository(Plugin);

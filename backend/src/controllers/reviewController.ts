@@ -2,12 +2,9 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../config/database';
 import { Review } from '../models/Review';
 import { Plugin } from '../models/Plugin';
+import { User } from '../models/User';
 import { createError } from '../middleware/errorHandler';
 import { AuthRequest } from '../middleware/auth';
-
-interface AuthRequest extends Request {
-  user?: User;
-}
 
 export class ReviewController {
   private reviewRepository = AppDataSource.getRepository(Review);

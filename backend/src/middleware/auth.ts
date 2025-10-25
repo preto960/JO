@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { AppDataSource } from '../config/database';
 import { User, UserRole } from '../models/User';
 
-interface AuthRequest extends Request {
+export interface AuthRequest extends Request {
   user?: User;
 }
 

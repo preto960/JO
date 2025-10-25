@@ -6,10 +6,6 @@ import { User, UserRole } from '../models/User';
 import { createError } from '../middleware/errorHandler';
 import { AuthRequest } from '../middleware/auth';
 
-interface AuthRequest extends Request {
-  user?: User;
-}
-
 export class AuthController {
   private userRepository = AppDataSource.getRepository(User);
 

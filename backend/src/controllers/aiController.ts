@@ -1,13 +1,10 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../config/database';
 import { Plugin } from '../models/Plugin';
+import { User } from '../models/User';
 import { createError } from '../middleware/errorHandler';
 import { AuthRequest } from '../middleware/auth';
-import ZAI from 'z-ai-web-dev-sdk';
-
-interface AuthRequest extends Request {
-  user?: User;
-}
+import { aiService } from '../services/aiService';
 
 export class AIController {
   private pluginRepository = AppDataSource.getRepository(Plugin);
@@ -30,8 +27,6 @@ export class AIController {
         throw createError('Not authorized to analyze this plugin', 403);
       }
 
-      const zai = await ZAI.create();
-
       const analysisPrompt = `
         Analyze this plugin and provide detailed feedback:
         
@@ -51,22 +46,18 @@ export class AIController {
         Format as JSON with keys: marketPotential, technicalQuality, seoOptimization, marketingRecommendations, competitiveAdvantages, improvementSuggestions
       `;
 
-      const completion = await zai.chat.completions.create({
-        messages: [
-          {
-            role: 'system',
-            content: 'You are an expert plugin analyst providing detailed feedback for plugin developers.'
-          },
-          {
-            role: 'user',
-            content: analysisPrompt
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 1500
-      });
+      const completion = await aiService.chatCompletions([
+        {
+          role: 'system',
+          content: 'You are an expert plugin analyst providing detailed feedback for plugin developers.'
+        },
+        {
+          role: 'user',
+          content: analysisPrompt
+        }
+      ]);
 
-      const analysisData = JSON.parse(completion.choices[0].message.content || '{}');
+      const analysisData = JSON.parse(completion.choices[0]?.message?.content || '{}');
 
       // Save analysis to plugin
       plugin.aiAnalysis = analysisData;
@@ -104,8 +95,6 @@ export class AIController {
       if (plugin.developer.id !== req.user!.id && req.user!.role !== 'ADMIN') {
         throw createError('Not authorized to generate content for this plugin', 403);
       }
-
-      const zai = await ZAI.create();
 
       let contentPrompt = '';
 
@@ -147,22 +136,18 @@ export class AIController {
           throw createError('Invalid content type', 400);
       }
 
-      const completion = await zai.chat.completions.create({
-        messages: [
-          {
-            role: 'system',
-            content: 'You are an expert content writer specializing in plugin marketing and documentation.'
-          },
-          {
-            role: 'user',
-            content: contentPrompt
-          }
-        ],
-        temperature: 0.8,
-        max_tokens: 2000
-      });
+      const completion = await aiService.chatCompletions([
+        {
+          role: 'system',
+          content: 'You are an expert content writer specializing in plugin marketing and documentation.'
+        },
+        {
+          role: 'user',
+          content: contentPrompt
+        }
+      ]);
 
-      const generatedContent = completion.choices[0].message.content;
+      const generatedContent = completion.choices[0]?.message?.content;
 
       res.json({
         message: 'Content generated successfully',
@@ -199,8 +184,6 @@ export class AIController {
         throw createError('Not authorized to generate images for this plugin', 403);
       }
 
-      const zai = await ZAI.create();
-
       let imagePrompt = prompt;
 
       if (!imagePrompt) {
@@ -219,12 +202,9 @@ export class AIController {
         }
       }
 
-      const response = await zai.images.generations.create({
-        prompt: imagePrompt,
-        size: size
-      });
+      const response = await aiService.generateImage(imagePrompt, size);
 
-      const imageBase64 = response.data[0].base64;
+      const imageBase64 = response.data[0]?.base64 || response.data[0]?.url;
 
       res.json({
         message: 'Image generated successfully',
@@ -248,8 +228,6 @@ export class AIController {
     try {
       const { userId, category, preferences, limit = 10 } = req.body;
 
-      const zai = await ZAI.create();
-
       const recommendationPrompt = `
         Based on the following user preferences, recommend plugins:
         
@@ -262,22 +240,18 @@ export class AIController {
         Format as JSON array with plugin IDs and reasoning.
       `;
 
-      const completion = await zai.chat.completions.create({
-        messages: [
-          {
-            role: 'system',
-            content: 'You are an expert recommendation engine for plugin discovery.'
-          },
-          {
-            role: 'user',
-            content: recommendationPrompt
-          }
-        ],
-        temperature: 0.6,
-        max_tokens: 1000
-      });
+      const completion = await aiService.chatCompletions([
+        {
+          role: 'system',
+          content: 'You are an expert recommendation engine for plugin discovery.'
+        },
+        {
+          role: 'user',
+          content: recommendationPrompt
+        }
+      ]);
 
-      const recommendations = JSON.parse(completion.choices[0].message.content || '[]');
+      const recommendations = JSON.parse(completion.choices[0]?.message?.content || '[]');
 
       res.json({
         message: 'Recommendations generated',
@@ -306,8 +280,6 @@ export class AIController {
         throw createError('Not authorized to optimize SEO for this plugin', 403);
       }
 
-      const zai = await ZAI.create();
-
       const seoPrompt = `
         Analyze and optimize SEO for this plugin:
         
@@ -326,22 +298,18 @@ export class AIController {
         Format as JSON with keys: metaTitle, metaDescription, keywords, suggestedTags, contentOptimization
       `;
 
-      const completion = await zai.chat.completions.create({
-        messages: [
-          {
-            role: 'system',
-            content: 'You are an SEO expert specializing in plugin marketplace optimization.'
-          },
-          {
-            role: 'user',
-            content: seoPrompt
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 1200
-      });
+      const completion = await aiService.chatCompletions([
+        {
+          role: 'system',
+          content: 'You are an SEO expert specializing in plugin marketplace optimization.'
+        },
+        {
+          role: 'user',
+          content: seoPrompt
+        }
+      ]);
 
-      const seoData = JSON.parse(completion.choices[0].message.content || '{}');
+      const seoData = JSON.parse(completion.choices[0]?.message?.content || '{}');
 
       // Save SEO metadata to plugin
       plugin.seoMetadata = seoData;

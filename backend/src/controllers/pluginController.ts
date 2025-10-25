@@ -1,13 +1,9 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../config/database';
 import { Plugin, PluginStatus, PluginCategory } from '../models/Plugin';
+import { User } from '../models/User';
 import { createError } from '../middleware/errorHandler';
 import { AuthRequest } from '../middleware/auth';
-import ZAI from 'z-ai-web-dev-sdk';
-
-interface AuthRequest extends Request {
-  user?: User;
-}
 
 export class PluginController {
   private pluginRepository = AppDataSource.getRepository(Plugin);
@@ -42,7 +38,7 @@ export class PluginController {
       }
 
       queryBuilder
-        .orderBy(`plugin.${sortBy}`, sortOrder)
+        .orderBy(`plugin.${sortBy}`, sortOrder as 'ASC' | 'DESC')
         .skip((Number(page) - 1) * Number(limit))
         .take(Number(limit));
 
