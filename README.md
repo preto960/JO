@@ -1,43 +1,63 @@
 # AI Plugin Marketplace Platform
 
-A comprehensive AI-driven plugin marketplace platform inspired by NJO Publisher design, featuring intelligent plugin management, AI-powered content generation, and multi-service architecture.
+A comprehensive plugin marketplace platform with dynamic plugin loading system, featuring a Publisher portal for developers and an Admin panel for plugin management and usage.
 
 ## 🏗️ Architecture Overview
 
 ### Services Structure
 - **Backend API** (Port 3001): TypeScript + Express + TypeORM + Neon PostgreSQL
+  - Main application backend
+  - Plugin installation and management
+  - Proxy to Publisher for available plugins
+  
+- **Publisher Backend** (Port 3004): TypeScript + Express + TypeORM + Neon PostgreSQL
+  - Independent backend for plugin publishing
+  - Vercel Blob storage for plugin packages
+  - Developer authentication and management
+  
 - **Publisher Frontend** (Port 3003): Vue 3 + Vite + Tailwind CSS + Pinia
-- **Marketplace Frontend** (Port 3002): Vue 3 + Vite + Tailwind CSS
+  - Developer portal for publishing plugins
+  - Plugin creation and management
+  - Analytics and revenue tracking
+  
+- **Frontend/Admin** (Port 3002): Vue 3 + Vite + Tailwind CSS + Pinia
+  - Admin panel for system management
+  - Internal marketplace to browse and install plugins
+  - Dynamic plugin loading system
+  - User management
 
 ### 🚀 Key Features
 
-#### AI-Powered Functionality
-- **Plugin Analysis**: AI-driven insights and improvement suggestions
-- **Content Generation**: Automated descriptions, documentation, and marketing materials
-- **Image Generation**: AI-created plugin assets and screenshots
-- **Smart Recommendations**: Intelligent plugin suggestions based on user behavior
-- **SEO Optimization**: AI-powered search optimization
+#### Dynamic Plugin System
+- **Plugin Installation**: Install plugins from Publisher marketplace
+- **Hot Loading**: Load and unload plugins without restart
+- **Dynamic Routes**: Plugins can register their own routes
+- **Component Injection**: Plugins can add components to the system
+- **Lifecycle Hooks**: onInstall, onActivate, onDeactivate, onUninstall
+- **Configuration Management**: Per-plugin settings and configuration
 
-#### Publisher Features
-- **Dashboard**: Comprehensive analytics and performance metrics
-- **Plugin Management**: Create, update, and manage plugin portfolio
-- **AI Tools Panel**: Integrated AI assistance for content creation
-- **Review System**: Complete rating and feedback management
-- **Revenue Tracking**: Detailed financial analytics
+#### Publisher Features (Developer Portal)
+- **Plugin Development**: Create and manage plugins
+- **Package Upload**: Upload plugin packages to Vercel Blob
+- **Version Control**: Manage plugin versions
+- **Publishing Workflow**: Draft → Published workflow
+- **Analytics**: Track downloads and usage
 
-#### Marketplace Features
-- **Plugin Discovery**: Advanced search and filtering
-- **User Reviews**: Community feedback and ratings
-- **AI Recommendations**: Personalized plugin suggestions
-- **Developer Profiles**: Showcase plugin portfolios
+#### Frontend/Admin Features
+- **Internal Marketplace**: Browse plugins from Publisher
+- **Plugin Management**: Install, activate, deactivate, uninstall
+- **User Management**: Admin user management
+- **System Settings**: Configure system-wide settings
+- **Dashboard**: System overview and statistics
 
 ## 🎨 Design System
 
-### NJO Publisher Style
-- **Primary Colors**: Purple/pink gradient theme
+### Modern Dark Theme
+- **Primary Colors**: Blue/purple gradient theme
 - **Dark Theme**: Modern dark interface with vibrant accents
 - **Responsive Design**: Mobile-first approach
 - **Component Library**: Consistent UI elements across services
+- **Tailwind CSS**: Utility-first CSS framework
 
 ## 🚀 Getting Started
 
@@ -61,25 +81,28 @@ A comprehensive AI-driven plugin marketplace platform inspired by NJO Publisher 
 
 3. **Manual setup (if script fails)**
    ```bash
-   # Install backend dependencies
+   # Install main backend dependencies
    cd backend
    npm install
-   cp .env.example .env
+   
+   # Install publisher backend dependencies
+   cd ../publisher/backend
+   npm install
    
    # Install publisher frontend dependencies
-   cd ../publisher
+   cd ../
    npm install
-   cp .env.example .env
    
-   # Install marketplace dependencies
-   cd ../marketplace
+   # Install frontend/admin dependencies
+   cd ../frontend
    npm install
-   cp .env.example .env
    
-   # Setup database
+   # Setup databases
    cd ../backend
-   npm run migration:run
    npm run seed:run
+   
+   cd ../publisher/backend
+   npm run seed
    ```
 
 4. **Environment Configuration**
@@ -92,34 +115,51 @@ A comprehensive AI-driven plugin marketplace platform inspired by NJO Publisher 
 
 5. **Start Services**
    ```bash
-   # Start backend (Port 3001)
+   # Start main backend (Port 3001)
    cd backend
+   npm run dev
+   
+   # Start publisher backend (Port 3004)
+   cd ../publisher/backend
    npm run dev
    
    # Start publisher frontend (Port 3003)
    cd ../publisher
    npm run dev
    
-   # Start marketplace frontend (Port 3002)
-   cd ../marketplace
+   # Start frontend/admin (Port 3002)
+   cd ../frontend
    npm run dev
    ```
 
 ## 📊 Service Endpoints
 
-### Backend API (Port 3001)
+### Main Backend API (Port 3001)
 - **Authentication**: `/api/auth/*`
-- **Plugins**: `/api/plugins/*`
+- **Installed Plugins**: `/api/installed-plugins/*`
+- **Market (Proxy to Publisher)**: `/api/market/*`
 - **AI Services**: `/api/ai/*`
 - **Analytics**: `/api/analytics/*`
 - **Reviews**: `/api/reviews/*`
 
-### AI Endpoints
-- `POST /api/ai/analyze-plugin` - Plugin analysis
-- `POST /api/ai/generate-content` - Content generation
-- `POST /api/ai/generate-image` - Image generation
-- `POST /api/ai/recommend-plugins` - Plugin recommendations
-- `POST /api/ai/optimize-seo` - SEO optimization
+### Publisher Backend API (Port 3004)
+- **Developer Auth**: `/api/auth/*`
+- **Plugin Management**: `/api/plugins/*`
+- **Package Upload**: `/api/plugins/:id/upload`
+- **Publish Plugin**: `/api/plugins/:id/publish`
+- **Download Plugin**: `/api/plugins/:id/download`
+
+### Plugin Installation Endpoints
+- `GET /api/installed-plugins` - List installed plugins
+- `POST /api/installed-plugins/install` - Install plugin
+- `DELETE /api/installed-plugins/:id` - Uninstall plugin
+- `PATCH /api/installed-plugins/:id/toggle` - Activate/deactivate
+- `POST /api/installed-plugins/:id/update` - Update to latest version
+- `PATCH /api/installed-plugins/:id/config` - Update plugin config
+
+### Market Endpoints (Proxy)
+- `GET /api/market/plugins` - Browse available plugins
+- `GET /api/market/plugins/:id` - Get plugin details
 
 ## 🔐 Security Features
 
@@ -130,41 +170,42 @@ A comprehensive AI-driven plugin marketplace platform inspired by NJO Publisher 
 - **Ownership Checks**: Plugin ownership verification
 - **CORS**: Cross-origin resource sharing configuration
 
-## 🤖 AI Integration
+## 🔌 Plugin System
 
-### Supported AI Features
-- **Text Generation**: Plugin descriptions, documentation
-- **Image Generation**: Plugin assets, screenshots
-- **Analysis**: Plugin performance and quality analysis
-- **Recommendations**: Personalized plugin suggestions
-- **Optimization**: SEO and performance improvements
+### Plugin Development
+See [Plugin Development Guide](frontend/docs/PLUGIN_DEVELOPMENT.md) for detailed documentation.
 
-### AI Integration
-The platform uses a custom AI service that supports multiple AI providers:
+### Plugin Lifecycle
+1. **Development**: Create plugin in Publisher portal
+2. **Upload**: Package and upload to Vercel Blob
+3. **Publish**: Set status to PUBLISHED
+4. **Discovery**: Plugin appears in Frontend marketplace
+5. **Installation**: Admin installs plugin from marketplace
+6. **Activation**: Plugin loads dynamically into system
+7. **Usage**: Plugin routes and components available
+8. **Updates**: Check and install updates
+9. **Deactivation**: Disable without uninstalling
+10. **Uninstallation**: Complete removal
 
-```javascript
-import { aiService } from '../services/aiService';
-
-// Chat completions
-const response = await aiService.chatCompletions([
-  { role: 'system', content: 'You are an expert plugin analyst' },
-  { role: 'user', content: 'Analyze this plugin' }
-]);
-
-// Image generation
-const image = await aiService.generateImage('A modern plugin icon', '1024x1024');
-
-// Plugin analysis
-const analysis = await aiService.analyzePlugin(pluginData);
+### Plugin Manifest
+```json
+{
+  "name": "My Plugin",
+  "version": "1.0.0",
+  "description": "Plugin description",
+  "routes": [...],
+  "components": {...},
+  "permissions": [...],
+  "settings": [...]
+}
 ```
 
-### Supported AI Providers
-- **OpenAI**: GPT models for text generation, DALL-E for images
-- **Custom API**: Configurable base URL and model selection
-- **Environment Variables**: 
-  - `OPENAI_API_KEY`: OpenAI API key
-  - `AI_BASE_URL`: Custom API endpoint
-  - `AI_MODEL`: Model selection (default: gpt-3.5-turbo)
+### Dynamic Loading
+- Plugins load at runtime without restart
+- Routes register dynamically
+- Components inject into system
+- Isolated plugin contexts
+- Hot reload support
 
 ## 📈 Analytics & Monitoring
 
@@ -184,11 +225,44 @@ const analysis = await aiService.analyzePlugin(pluginData);
 ### Code Organization
 ```
 /
-├── backend/          # Express.js API server
-├── publisher/        # Vue 3 publisher interface
-├── marketplace/      # Vue 3 marketplace interface
-├── shared/          # Shared utilities and types
-└── docs/            # Documentation
+├── backend/                    # Main Express.js API server
+│   ├── src/
+│   │   ├── models/            # TypeORM entities
+│   │   ├── controllers/       # Route controllers
+│   │   ├── services/          # Business logic
+│   │   ├── middleware/        # Auth, error handling
+│   │   └── routes/            # API routes
+│   └── package.json
+│
+├── publisher/
+│   ├── backend/               # Publisher Express.js API
+│   │   ├── src/
+│   │   │   ├── models/       # Developer, PublishedPlugin
+│   │   │   ├── controllers/  # Plugin management
+│   │   │   ├── services/     # Blob storage
+│   │   │   └── routes/       # API routes
+│   │   └── package.json
+│   │
+│   └── (frontend)             # Vue 3 publisher interface
+│       ├── src/
+│       │   ├── views/        # Publisher views
+│       │   ├── components/   # UI components
+│       │   ├── stores/       # Pinia stores
+│       │   └── services/     # API client
+│       └── package.json
+│
+├── frontend/                  # Vue 3 admin panel
+│   ├── src/
+│   │   ├── views/            # Admin views
+│   │   ├── components/       # UI components
+│   │   ├── stores/           # Pinia stores
+│   │   ├── composables/      # Plugin loader
+│   │   ├── router/           # Vue Router + plugin routes
+│   │   └── services/         # API client
+│   ├── docs/                 # Plugin development docs
+│   └── package.json
+│
+└── README.md
 ```
 
 ### Development Commands
@@ -263,10 +337,22 @@ For support and questions:
 
 ## 🌐 Access Points
 
-- **Backend API**: http://localhost:3001
-- **Publisher Portal**: http://localhost:3003
-- **Marketplace**: http://localhost:3002
+- **Main Backend API**: http://localhost:3001
+- **Publisher Backend API**: http://localhost:3004
+- **Publisher Portal** (Developers): http://localhost:3003
+- **Frontend/Admin Panel**: http://localhost:3002
 - **API Health Check**: http://localhost:3001/health
+
+## 🔑 Default Credentials
+
+### Frontend/Admin
+- Email: `admin@example.com`
+- Password: `admin123`
+
+### Publisher Portal
+- Email: `admin@example.com`
+- Password: `admin123`
+- Role: `ADMIN`
 
 ---
 

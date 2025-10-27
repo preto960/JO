@@ -1,10 +1,6 @@
 import { DataSource } from 'typeorm';
-import { User } from '../models/User';
-import { Plugin } from '../models/Plugin';
-import { Review } from '../models/Review';
-import { Download } from '../models/Download';
-import { Purchase } from '../models/Purchase';
-import { InstalledPlugin } from '../models/InstalledPlugin';
+import { Developer } from '../models/Developer';
+import { PublishedPlugin } from '../models/PublishedPlugin';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -12,7 +8,8 @@ export const AppDataSource = new DataSource({
   ssl: { rejectUnauthorized: false },
   synchronize: process.env.NODE_ENV === 'development',
   logging: process.env.NODE_ENV === 'development',
-  entities: [User, Plugin, Review, Download, Purchase, InstalledPlugin],
+  entities: [Developer, PublishedPlugin],
   migrations: ['src/migrations/*.ts'],
   subscribers: ['src/subscribers/*.ts'],
 });
+

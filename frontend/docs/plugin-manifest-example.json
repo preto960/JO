@@ -1,0 +1,55 @@
+{
+  "name": "Example Plugin",
+  "version": "1.0.0",
+  "description": "An example plugin demonstrating the plugin system",
+  "author": "Developer Name",
+  "main": "index.js",
+  "routes": [
+    {
+      "path": "/example",
+      "name": "PluginExample",
+      "component": "ExampleView",
+      "meta": {
+        "title": "Example Plugin",
+        "requiresAuth": true
+      }
+    }
+  ],
+  "components": {
+    "ExampleWidget": "components/ExampleWidget.vue",
+    "ExampleButton": "components/ExampleButton.vue"
+  },
+  "store": {
+    "state": {},
+    "actions": {},
+    "getters": {}
+  },
+  "permissions": [
+    "read:data",
+    "write:data"
+  ],
+  "dependencies": {
+    "vue": "^3.0.0"
+  },
+  "hooks": {
+    "onInstall": "hooks/onInstall.js",
+    "onUninstall": "hooks/onUninstall.js",
+    "onActivate": "hooks/onActivate.js",
+    "onDeactivate": "hooks/onDeactivate.js"
+  },
+  "settings": [
+    {
+      "key": "apiKey",
+      "label": "API Key",
+      "type": "text",
+      "required": true
+    },
+    {
+      "key": "enabled",
+      "label": "Enable Feature",
+      "type": "boolean",
+      "default": true
+    }
+  ]
+}
+

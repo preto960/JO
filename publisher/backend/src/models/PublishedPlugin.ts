@@ -1,14 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from 'typeorm';
-import { User } from './User';
-import { Review } from './Review';
-import { Download } from './Download';
-import { Purchase } from './Purchase';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
+import { Developer } from './Developer';
 
 export enum PluginStatus {
   DRAFT = 'DRAFT',
-  PENDING = 'PENDING',
-  APPROVED = 'APPROVED',
-  REJECTED = 'REJECTED'
+  PUBLISHED = 'PUBLISHED',
+  ARCHIVED = 'ARCHIVED'
 }
 
 export enum PluginCategory {
@@ -24,15 +20,15 @@ export enum PluginCategory {
   UTILITY = 'UTILITY'
 }
 
-@Entity('plugins')
-export class Plugin {
+@Entity('published_plugins')
+export class PublishedPlugin {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
   name: string;
 
-  @Column()
+  @Column({ unique: true })
   slug: string;
 
   @Column()
@@ -41,11 +37,11 @@ export class Plugin {
   @Column({ type: 'text', nullable: true })
   longDescription?: string;
 
-  @Column({ nullable: true })
+  @Column()
   version: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
-  price: number;
+  price?: number;
 
   @Column({ default: 0 })
   downloadCount: number;
@@ -90,8 +86,16 @@ export class Plugin {
   @Column({ type: 'simple-array', nullable: true })
   tags?: string[];
 
+  // Blob storage URL for the plugin package
+  @Column({ nullable: true })
+  packageUrl?: string;
+
+  @Column({ nullable: true })
+  packageSize?: number; // in bytes
+
+  // Plugin manifest data
   @Column({ type: 'jsonb', nullable: true })
-  aiAnalysis?: any;
+  manifest?: any;
 
   @Column({ type: 'jsonb', nullable: true })
   seoMetadata?: any;
@@ -102,6 +106,9 @@ export class Plugin {
   @Column({ nullable: true })
   featuredAt?: Date;
 
+  @Column({ nullable: true })
+  publishedAt?: Date;
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -109,15 +116,7 @@ export class Plugin {
   updatedAt: Date;
 
   // Relations
-  @ManyToOne(() => User, user => user.plugins)
-  developer: User;
-
-  @OneToMany(() => Review, review => review.plugin)
-  reviews: Review[];
-
-  @OneToMany(() => Download, download => download.plugin)
-  downloads: Download[];
-
-  @OneToMany(() => Purchase, purchase => purchase.plugin)
-  purchases: Purchase[];
+  @ManyToOne(() => Developer, developer => developer.plugins)
+  developer: Developer;
 }
+

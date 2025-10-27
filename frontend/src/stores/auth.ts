@@ -9,10 +9,6 @@ interface User {
   lastName: string
   role: string
   avatar?: string
-  bio?: string
-  website?: string
-  github?: string
-  twitter?: string
 }
 
 export const useAuthStore = defineStore('auth', () => {
@@ -22,15 +18,13 @@ export const useAuthStore = defineStore('auth', () => {
   const loading = ref(false)
 
   const isAuthenticated = computed(() => !!token.value && !!user.value)
-  const isDeveloper = computed(() => user.value?.role === 'DEVELOPER' || user.value?.role === 'ADMIN')
   const isAdmin = computed(() => user.value?.role === 'ADMIN')
 
   const login = async (email: string, password: string) => {
     loading.value = true
     try {
       const response = await api.post('/auth/login', { email, password })
-      // Publisher backend returns 'developer' instead of 'user'
-      const { developer: userData, accessToken, refreshToken } = response.data
+      const { user: userData, accessToken, refreshToken } = response.data
       
       user.value = userData
       token.value = accessToken
@@ -44,37 +38,6 @@ export const useAuthStore = defineStore('auth', () => {
       return { 
         success: false, 
         message: error.response?.data?.message || 'Login failed' 
-      }
-    } finally {
-      loading.value = false
-    }
-  }
-
-  const register = async (userData: {
-    email: string
-    password: string
-    firstName: string
-    lastName: string
-    role?: string
-  }) => {
-    loading.value = true
-    try {
-      const response = await api.post('/auth/register', userData)
-      // Publisher backend returns 'developer' instead of 'user'
-      const { developer: newUser, accessToken, refreshToken } = response.data
-      
-      user.value = newUser
-      token.value = accessToken
-      refreshTokenValue.value = refreshToken
-      
-      localStorage.setItem('accessToken', accessToken)
-      localStorage.setItem('refreshToken', refreshToken)
-      
-      return { success: true }
-    } catch (error: any) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Registration failed' 
       }
     } finally {
       loading.value = false
@@ -116,28 +79,12 @@ export const useAuthStore = defineStore('auth', () => {
   const fetchProfile = async () => {
     try {
       const response = await api.get('/auth/profile')
-      // Publisher backend returns 'developer' instead of 'user'
-      user.value = response.data.developer || response.data.user
+      user.value = response.data.user
     } catch (error) {
       logout()
     }
   }
 
-  const updateProfile = async (profileData: Partial<User>) => {
-    try {
-      const response = await api.put('/auth/profile', profileData)
-      // Publisher backend returns 'developer' instead of 'user'
-      user.value = response.data.developer || response.data.user
-      return { success: true }
-    } catch (error: any) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Profile update failed' 
-      }
-    }
-  }
-
-  // Initialize auth state
   const initializeAuth = async () => {
     if (token.value) {
       await fetchProfile()
@@ -149,14 +96,12 @@ export const useAuthStore = defineStore('auth', () => {
     token,
     loading,
     isAuthenticated,
-    isDeveloper,
     isAdmin,
     login,
-    register,
     logout,
     refreshToken,
     fetchProfile,
-    updateProfile,
     initializeAuth
   }
 })
+

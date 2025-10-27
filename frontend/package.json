@@ -1,7 +1,7 @@
 {
-  "name": "ai-plugin-marketplace-publisher",
+  "name": "admin-frontend",
   "version": "1.0.0",
-  "description": "AI-Powered Plugin Marketplace Publisher Interface",
+  "description": "Admin Frontend - Plugin Management System",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -22,9 +22,7 @@
     "postcss": "^8.4.28",
     "@headlessui/vue": "^1.7.16",
     "@heroicons/vue": "^2.0.18",
-    "vue-toastification": "^2.0.0-rc.5",
-    "chart.js": "^4.4.0",
-    "vue-chartjs": "^5.2.0"
+    "vue-toastification": "^2.0.0-rc.5"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.3.4",

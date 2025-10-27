@@ -10,38 +10,33 @@ import { AppDataSource } from './config/database';
 import { errorHandler } from './middleware/errorHandler';
 import { authRoutes } from './routes/auth';
 import { pluginRoutes } from './routes/plugins';
-import { aiRoutes } from './routes/ai';
-import { analyticsRoutes } from './routes/analytics';
-import { reviewRoutes } from './routes/reviews';
-import { installedPluginRoutes } from './routes/installedPlugins';
-import { marketRoutes } from './routes/market';
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3004;
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000,
+  max: 100,
   message: 'Too many requests from this IP, please try again later.'
 });
 
 // Middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3002',
+  origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3003', 'http://localhost:3002'],
   credentials: true
 }));
 app.use(limiter);
 app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Health check
 app.get('/health', (req, res) => {
   res.status(200).json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
-    service: 'AI Plugin Marketplace API',
+    service: 'Publisher Backend API',
     version: '1.0.0'
   });
 });
@@ -49,11 +44,6 @@ app.get('/health', (req, res) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/plugins', pluginRoutes);
-app.use('/api/ai', aiRoutes);
-app.use('/api/analytics', analyticsRoutes);
-app.use('/api/reviews', reviewRoutes);
-app.use('/api/installed-plugins', installedPluginRoutes);
-app.use('/api/market', marketRoutes);
 
 // Error handling
 app.use(errorHandler);
@@ -66,15 +56,16 @@ app.use('*', (req, res) => {
 // Initialize database and start server
 AppDataSource.initialize()
   .then(() => {
-    console.log('✅ Database connected successfully');
+    console.log('✅ Publisher Database connected successfully');
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`🚀 Publisher Backend running on port ${PORT}`);
       console.log(`📊 Health check: http://localhost:${PORT}/health`);
     });
   })
   .catch((error) => {
-    console.error('❌ Database connection failed:', error);
+    console.error('❌ Publisher Database connection failed:', error);
     process.exit(1);
   });
 
 export default app;
+
