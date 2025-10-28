@@ -27,6 +27,38 @@ export class PluginLoaderService {
   }
 
   /**
+   * Carga todos los plugins activos al iniciar el servidor
+   */
+  async loadAllActivePlugins(): Promise<void> {
+    try {
+      const installedPluginRepo = AppDataSource.getRepository(InstalledPlugin);
+      const activePlugins = await installedPluginRepo.find({
+        where: { isActive: true }
+      });
+
+      if (activePlugins.length === 0) {
+        console.log('📦 No active plugins to load');
+        return;
+      }
+
+      console.log(`📦 Loading ${activePlugins.length} active plugin(s)...`);
+
+      for (const plugin of activePlugins) {
+        try {
+          await this.loadPlugin(plugin);
+        } catch (error: any) {
+          console.error(`❌ Failed to load plugin ${plugin.name}:`, error.message);
+          // Continuar con los demás plugins aunque uno falle
+        }
+      }
+
+      console.log(`✅ Loaded ${this.loadedPlugins.size} plugin(s) successfully`);
+    } catch (error: any) {
+      console.error('❌ Failed to load active plugins:', error.message);
+    }
+  }
+
+  /**
    * Descarga y extrae un plugin desde su packageUrl
    */
   async downloadAndExtractPlugin(plugin: InstalledPlugin): Promise<string> {
@@ -41,11 +73,18 @@ export class PluginLoaderService {
 
     await fs.mkdir(pluginDir, { recursive: true });
 
-    console.log(`📦 Downloading plugin ${plugin.name} from ${plugin.packageUrl}`);
+    // Usar el endpoint de descarga del Publisher en lugar de la URL directa de Vercel Blob
+    // Nota: PUBLISHER_API_URL ya incluye /api, así que solo agregamos /download
+    const publisherBaseUrl = process.env.PUBLISHER_BASE_URL || 'http://localhost:3004';
+    const downloadUrl = `${publisherBaseUrl}/api/download/${plugin.publisherPluginId}`;
+    
+    console.log(`📦 Downloading plugin ${plugin.name} from Publisher`);
+    console.log(`   Publisher Plugin ID: ${plugin.publisherPluginId}`);
+    console.log(`   Download URL: ${downloadUrl}`);
 
     try {
-      // Descargar el ZIP
-      const response = await axios.get(plugin.packageUrl, {
+      // Descargar el ZIP desde el Publisher
+      const response = await axios.get(downloadUrl, {
         responseType: 'arraybuffer',
         timeout: 60000 // 60 segundos
       });
@@ -66,6 +105,10 @@ export class PluginLoaderService {
       return pluginDir;
     } catch (error: any) {
       console.error(`❌ Failed to download/extract plugin ${plugin.name}:`, error.message);
+      if (error.response) {
+        console.error(`   Status: ${error.response.status}`);
+        console.error(`   Data:`, error.response.data);
+      }
       throw new Error(`Failed to download plugin: ${error.message}`);
     }
   }
@@ -192,9 +235,17 @@ export class PluginLoaderService {
    * Carga un plugin completamente
    */
   async loadPlugin(plugin: InstalledPlugin): Promise<void> {
+    // Verificar si ya está cargado Y si el directorio existe
     if (this.loadedPlugins.has(plugin.id)) {
-      console.log(`Plugin ${plugin.name} already loaded`);
-      return;
+      const loadedPlugin = this.loadedPlugins.get(plugin.id);
+      try {
+        await fs.access(loadedPlugin.directory);
+        console.log(`Plugin ${plugin.name} already loaded`);
+        return;
+      } catch {
+        console.log(`Plugin ${plugin.name} was loaded but directory is missing, reloading...`);
+        this.loadedPlugins.delete(plugin.id);
+      }
     }
 
     try {
@@ -214,6 +265,7 @@ export class PluginLoaderService {
         slug: plugin.slug,
         name: plugin.name,
         directory: pluginDir,
+        manifest: plugin.manifest,
         loadedAt: new Date()
       });
 

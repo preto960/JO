@@ -18,9 +18,57 @@ interface InstalledPlugin {
   updatedAt: string
 }
 
+interface OperationStep {
+  label: string
+  status: 'pending' | 'loading' | 'completed'
+}
+
 export const usePluginsStore = defineStore('plugins', () => {
   const installedPlugins = ref<InstalledPlugin[]>([])
   const loading = ref(false)
+  
+  // Modal state
+  const operationModal = ref({
+    isOpen: false,
+    status: 'loading' as 'loading' | 'success' | 'error',
+    operation: 'install' as 'install' | 'update' | 'uninstall',
+    pluginName: '',
+    steps: [] as OperationStep[]
+  })
+
+  const showOperationModal = (operation: 'install' | 'update' | 'uninstall', pluginName: string) => {
+    operationModal.value = {
+      isOpen: true,
+      status: 'loading',
+      operation,
+      pluginName,
+      steps: [
+        { label: 'Preparing...', status: 'loading' },
+        { label: 'Processing plugin', status: 'pending' },
+        { label: 'Finalizing', status: 'pending' }
+      ]
+    }
+  }
+
+  const updateOperationStep = (stepIndex: number, status: 'loading' | 'completed') => {
+    if (operationModal.value.steps[stepIndex]) {
+      operationModal.value.steps[stepIndex].status = status
+      if (status === 'completed' && stepIndex < operationModal.value.steps.length - 1) {
+        operationModal.value.steps[stepIndex + 1].status = 'loading'
+      }
+    }
+  }
+
+  const completeOperation = (success: boolean) => {
+    operationModal.value.status = success ? 'success' : 'error'
+    operationModal.value.steps.forEach(step => {
+      if (step.status === 'loading') step.status = 'completed'
+    })
+  }
+
+  const closeOperationModal = () => {
+    operationModal.value.isOpen = false
+  }
 
   const fetchInstalledPlugins = async (filters?: { isActive?: boolean }) => {
     loading.value = true
@@ -111,12 +159,17 @@ export const usePluginsStore = defineStore('plugins', () => {
   return {
     installedPlugins,
     loading,
+    operationModal,
     fetchInstalledPlugins,
     installPlugin,
     uninstallPlugin,
     togglePlugin,
     updatePlugin,
-    updatePluginConfig
+    updatePluginConfig,
+    showOperationModal,
+    updateOperationStep,
+    completeOperation,
+    closeOperationModal
   }
 })
 

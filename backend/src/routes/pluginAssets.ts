@@ -42,14 +42,14 @@ router.get('/:pluginSlug/*', async (req: Request, res: Response) => {
     // Determinar el content-type basado en la extensión
     const ext = path.extname(filePath).toLowerCase();
     const contentTypes: Record<string, string> = {
-      '.js': 'application/javascript',
-      '.mjs': 'application/javascript',
-      '.json': 'application/json',
-      '.css': 'text/css',
-      '.html': 'text/html',
-      '.vue': 'text/plain',
-      '.ts': 'text/plain',
-      '.map': 'application/json',
+      '.js': 'application/javascript; charset=utf-8',
+      '.mjs': 'application/javascript; charset=utf-8',
+      '.json': 'application/json; charset=utf-8',
+      '.css': 'text/css; charset=utf-8',
+      '.html': 'text/html; charset=utf-8',
+      '.vue': 'application/javascript; charset=utf-8', // Vue SFCs como módulos JS
+      '.ts': 'application/javascript; charset=utf-8',  // TypeScript como módulos JS
+      '.map': 'application/json; charset=utf-8',
       '.png': 'image/png',
       '.jpg': 'image/jpeg',
       '.jpeg': 'image/jpeg',
@@ -64,6 +64,7 @@ router.get('/:pluginSlug/*', async (req: Request, res: Response) => {
 
     const contentType = contentTypes[ext] || 'application/octet-stream';
     res.setHeader('Content-Type', contentType);
+    res.setHeader('X-Content-Type-Options', 'nosniff');
 
     // Habilitar CORS para assets de plugins
     res.setHeader('Access-Control-Allow-Origin', '*');

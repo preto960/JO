@@ -10,6 +10,7 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         '@': resolve(__dirname, 'src'),
+        'vue': 'vue/dist/vue.esm-bundler.js', // Usar la versión con compilador
       },
     },
     server: {

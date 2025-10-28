@@ -85,7 +85,9 @@ AppDataSource.initialize()
     
     // Initialize plugin loader service
     await pluginLoaderService.initialize();
-    console.log('✅ Plugin loader initialized');
+    
+    // Load all active plugins
+    await pluginLoaderService.loadAllActivePlugins();
     
     httpServer.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);

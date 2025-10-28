@@ -29,116 +29,51 @@
 
     <!-- Plugin Active -->
     <div v-else>
-      <!-- Header -->
-      <div class="flex items-center justify-between">
+      <!-- Mini Header with Feature Selector -->
+      <div class="flex items-center justify-between mb-6">
         <div class="flex items-center space-x-4">
-          <div class="w-16 h-16 bg-gradient-to-r from-primary-500 to-accent-500 rounded-xl flex items-center justify-center text-3xl">
+          <div class="w-12 h-12 bg-gradient-to-r from-primary-500 to-accent-500 rounded-lg flex items-center justify-center text-2xl">
             {{ plugin.manifest?.icon || '📦' }}
           </div>
           <div>
-            <h2 class="text-2xl font-bold text-white">{{ plugin.name }}</h2>
-            <p class="text-gray-400">Version {{ plugin.version }}</p>
+            <h2 class="text-xl font-bold text-white">{{ plugin.name }}</h2>
           </div>
         </div>
+        
         <div class="flex items-center space-x-3">
-          <span class="px-3 py-1 rounded-full text-sm font-medium bg-green-500/20 text-green-400">
-            Active
-          </span>
-          <router-link to="/plugins" class="btn-secondary">
-            <Settings class="w-5 h-5 mr-2" />
-            Manage
+          <!-- Feature Selector -->
+          <div v-if="pluginRoutes.length > 1" class="flex items-center space-x-2 bg-gray-800 rounded-lg p-1">
+            <button
+              v-for="route in pluginRoutes"
+              :key="route.path"
+              @click="selectRoute(route)"
+              class="px-4 py-2 rounded-md text-sm font-medium transition-colors"
+              :class="selectedRoute?.path === route.path 
+                ? 'bg-primary-600 text-white' 
+                : 'text-gray-400 hover:text-white hover:bg-gray-700'"
+            >
+              {{ route.meta?.title || route.name }}
+            </button>
+          </div>
+          
+          <router-link to="/plugins" class="text-gray-400 hover:text-white">
+            <Settings class="w-5 h-5" />
           </router-link>
         </div>
       </div>
 
-      <!-- Description -->
-      <div v-if="plugin.description" class="card">
-        <p class="text-gray-300">{{ plugin.description }}</p>
-      </div>
-
-      <!-- Routes/Features -->
-      <div v-if="pluginRoutes.length > 0" class="card">
-        <h3 class="text-lg font-bold text-white mb-4">Available Features</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <button
-            v-for="route in pluginRoutes"
-            :key="route.path"
-            @click="selectRoute(route)"
-            class="p-4 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-left"
-            :class="{ 'ring-2 ring-primary-500': selectedRoute?.path === route.path }"
-          >
-            <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 bg-primary-500/20 rounded-lg flex items-center justify-center">
-                <component :is="getIcon(route.meta?.icon)" class="w-5 h-5 text-primary-400" />
-              </div>
-              <div>
-                <h4 class="font-semibold text-white">{{ route.meta?.title || route.name }}</h4>
-                <p class="text-sm text-gray-400">{{ route.meta?.description || 'View details' }}</p>
-              </div>
-            </div>
-          </button>
-        </div>
-      </div>
-
       <!-- Dynamic Component View -->
-      <div v-if="selectedRoute && selectedComponent" class="card">
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="text-xl font-bold text-white">{{ selectedRoute.meta?.title || selectedRoute.name }}</h3>
-          <button @click="selectedRoute = null" class="text-gray-400 hover:text-white">
-            <X class="w-5 h-5" />
-          </button>
-        </div>
+      <div v-if="selectedRoute && selectedComponent">
         <DynamicPluginView
           :plugin-slug="plugin.slug"
           :component-name="selectedComponent"
         />
       </div>
 
-      <!-- Plugin Content Placeholder -->
-      <div class="card">
-        <div class="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4 mb-6">
-          <div class="flex items-start space-x-3">
-            <AlertCircle class="w-5 h-5 text-yellow-400 mt-0.5" />
-            <div>
-              <h4 class="font-semibold text-yellow-400 mb-1">Plugin UI Loading</h4>
-              <p class="text-sm text-gray-300">
-                The plugin is installed and active. The dynamic UI loading system is currently being implemented.
-                This is a placeholder view showing the plugin's configuration.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Plugin Info -->
-        <div class="space-y-4">
-          <div>
-            <h4 class="text-sm font-semibold text-gray-400 mb-2">Plugin Information</h4>
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <p class="text-xs text-gray-500">Slug</p>
-                <p class="text-white font-mono">{{ plugin.slug }}</p>
-              </div>
-              <div>
-                <p class="text-xs text-gray-500">Status</p>
-                <p class="text-white">{{ plugin.status }}</p>
-              </div>
-              <div>
-                <p class="text-xs text-gray-500">Installed</p>
-                <p class="text-white">{{ formatDate(plugin.installedAt) }}</p>
-              </div>
-              <div>
-                <p class="text-xs text-gray-500">Last Updated</p>
-                <p class="text-white">{{ formatDate(plugin.updatedAt) }}</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Manifest Info -->
-          <div v-if="plugin.manifest">
-            <h4 class="text-sm font-semibold text-gray-400 mb-2">Manifest</h4>
-            <pre class="bg-gray-800 rounded-lg p-4 text-sm text-gray-300 overflow-x-auto">{{ JSON.stringify(plugin.manifest, null, 2) }}</pre>
-          </div>
-        </div>
+      <!-- Loading State -->
+      <div v-else class="card text-center py-12">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mb-4"></div>
+        <p class="text-gray-400">Loading plugin...</p>
       </div>
     </div>
   </div>
@@ -151,10 +86,12 @@ import { AlertCircle, Power, Settings, ArrowLeft, CheckSquare, X } from 'lucide-
 import { usePluginsStore } from '@/stores/plugins'
 import { useToast } from 'vue-toastification'
 import DynamicPluginView from '@/components/DynamicPluginView.vue'
+import { usePluginLoader } from '@/composables/usePluginLoader'
 
 const route = useRoute()
 const router = useRouter()
 const pluginsStore = usePluginsStore()
+const pluginLoader = usePluginLoader()
 const toast = useToast()
 
 const loading = ref(true)
@@ -213,13 +150,32 @@ const activatePlugin = async () => {
 onMounted(async () => {
   loading.value = true
   await pluginsStore.fetchInstalledPlugins()
-  loading.value = false
   
   // Si el plugin no existe, redirigir
   if (!plugin.value) {
+    loading.value = false
     setTimeout(() => {
       router.push('/plugins')
     }, 2000)
+    return
+  }
+
+  // Asegurarse de que el plugin esté cargado
+  if (plugin.value.isActive) {
+    try {
+      await pluginLoader.loadPlugin(plugin.value.id)
+      console.log(`✅ Plugin ${plugin.value.slug} loaded`)
+    } catch (error) {
+      console.error(`Failed to load plugin ${plugin.value.slug}:`, error)
+      toast.error('Failed to load plugin')
+    }
+  }
+  
+  loading.value = false
+
+  // Auto-seleccionar la primera ruta
+  if (pluginRoutes.value.length > 0 && !selectedRoute.value) {
+    selectedRoute.value = pluginRoutes.value[0]
   }
 })
 </script>

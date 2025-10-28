@@ -11,6 +11,12 @@ import { usePluginLoader } from './composables/usePluginLoader'
 import { registerPluginRoutes } from './router/pluginRoutes'
 import { useGlobalWebSocket } from './composables/useWebSocket'
 
+// Habilitar el compilador de templates en runtime para plugins
+if (typeof window !== 'undefined') {
+  (window as any).__VUE_OPTIONS_API__ = true;
+  (window as any).__VUE_PROD_DEVTOOLS__ = false;
+}
+
 const app = createApp(App)
 const pinia = createPinia()
 

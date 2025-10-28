@@ -43,7 +43,30 @@
             </span>
           </div>
 
+          <!-- Botón de Actualización si ya está instalado -->
           <button
+            v-if="isInstalled && hasUpdate"
+            @click="handleUpdate"
+            :disabled="updating"
+            class="btn-primary bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
+          >
+            <Download class="w-5 h-5 mr-2" />
+            {{ updating ? 'Updating...' : `Update to v${plugin.version}` }}
+          </button>
+
+          <!-- Botón de Instalado (sin acción) -->
+          <button
+            v-else-if="isInstalled && !hasUpdate"
+            disabled
+            class="btn-secondary opacity-75 cursor-not-allowed"
+          >
+            <Download class="w-5 h-5 mr-2" />
+            Installed (v{{ installedPlugin?.version }})
+          </button>
+
+          <!-- Botón de Instalación normal -->
+          <button
+            v-else
             @click="handleInstall"
             :disabled="installing"
             class="btn-primary"
@@ -78,7 +101,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ArrowLeft, Puzzle, Star, Download } from 'lucide-vue-next'
 import { useMarketStore } from '@/stores/market'
@@ -94,6 +117,22 @@ const toast = useToast()
 const plugin = ref<any>(null)
 const loading = ref(true)
 const installing = ref(false)
+const updating = ref(false)
+
+// Computed para verificar si el plugin ya está instalado
+const installedPlugin = computed(() => {
+  if (!plugin.value) return null
+  return pluginsStore.installedPlugins.find(
+    p => p.publisherPluginId === plugin.value.id
+  )
+})
+
+const isInstalled = computed(() => !!installedPlugin.value)
+
+const hasUpdate = computed(() => {
+  if (!installedPlugin.value || !plugin.value) return false
+  return installedPlugin.value.version !== plugin.value.version
+})
 
 const formatNumber = (num: number) => {
   if (num >= 1000) {
@@ -103,21 +142,44 @@ const formatNumber = (num: number) => {
 }
 
 const handleInstall = async () => {
+  // Mostrar modal de instalación
+  pluginsStore.showOperationModal('install', plugin.value.name)
+  
   installing.value = true
   const result = await pluginsStore.installPlugin(plugin.value.id)
   installing.value = false
 
-  if (result.success) {
-    toast.success('Plugin installed successfully!')
-    router.push('/plugins')
-  } else {
+  if (!result.success) {
+    pluginsStore.completeOperation(false)
     toast.error(result.message || 'Failed to install plugin')
   }
+  // El éxito se maneja en el WebSocket listener
+}
+
+const handleUpdate = async () => {
+  if (!installedPlugin.value) return
+  
+  // Mostrar modal de actualización
+  pluginsStore.showOperationModal('update', plugin.value.name)
+  
+  updating.value = true
+  const result = await pluginsStore.updatePlugin(installedPlugin.value.id)
+  updating.value = false
+
+  if (!result.success) {
+    pluginsStore.completeOperation(false)
+    toast.error(result.message || 'Failed to update plugin')
+  }
+  // El éxito se maneja en el WebSocket listener
 }
 
 onMounted(async () => {
   const id = route.params.id as string
-  plugin.value = await marketStore.fetchPluginDetail(id)
+  // Cargar plugins instalados y detalles del plugin en paralelo
+  await Promise.all([
+    pluginsStore.fetchInstalledPlugins(),
+    marketStore.fetchPluginDetail(id).then(data => plugin.value = data)
+  ])
   loading.value = false
 })
 </script>

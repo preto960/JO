@@ -140,6 +140,7 @@ export class PluginInstallationService {
 
   /**
    * Actualiza un plugin instalado
+   * Proceso: Desinstalar completamente y reinstalar con la nueva versión
    */
   async updatePlugin(pluginId: string) {
     const plugin = await this.installedPluginRepo.findOne({
@@ -151,11 +152,12 @@ export class PluginInstallationService {
     }
 
     const previousVersion = plugin.version;
+    const wasActive = plugin.isActive;
     plugin.status = InstallationStatus.UPDATING;
     await this.installedPluginRepo.save(plugin);
 
     try {
-      // Obtener la última versión desde Publisher
+      // 1. Obtener la última versión desde Publisher
       const latestVersion = await publisherService.getPluginById(plugin.publisherPluginId);
 
       if (latestVersion.version === plugin.version) {
@@ -164,18 +166,68 @@ export class PluginInstallationService {
         return { message: 'Plugin is already up to date', plugin };
       }
 
-      // Actualizar información
+      console.log(`🔄 Updating plugin ${plugin.name} from v${previousVersion} to v${latestVersion.version}`);
+
+      // 2. Desactivar el plugin si está activo
+      if (plugin.isActive) {
+        console.log('⏸️  Deactivating plugin...');
+        try {
+          await pluginLifecycleService.executeOnDeactivate(plugin);
+        } catch (error: any) {
+          console.warn(`⚠️  Failed to execute onDeactivate hook: ${error.message}`);
+          console.warn('   Continuing with update anyway...');
+          // No lanzar error, continuar con la actualización
+        }
+      }
+
+      // 3. Ejecutar hook de actualización (antes de desinstalar)
+      try {
+        await pluginLifecycleService.executeOnUpdate(plugin, previousVersion);
+      } catch (error: any) {
+        console.warn(`⚠️  Failed to execute onUpdate hook: ${error.message}`);
+        console.warn('   Continuing with update anyway...');
+        // No lanzar error, continuar con la actualización
+      }
+
+      // 4. Descargar el plugin viejo
+      console.log('🗑️  Unloading old version...');
+      await pluginLoaderService.unloadPlugin(plugin);
+
+      // 5. Actualizar información del plugin
       plugin.version = latestVersion.version;
       plugin.manifest = latestVersion.manifest;
       plugin.packageUrl = latestVersion.packageUrl;
+      plugin.description = latestVersion.description;
+      plugin.name = latestVersion.name;
+
+      // 6. Descargar y cargar la nueva versión
+      console.log('📦 Loading new version...');
+      await pluginLoaderService.loadPlugin(plugin);
+
+      // 7. Actualizar tablas de base de datos si es necesario
+      const pluginDir = pluginLoaderService.getPluginDirectory(plugin.id);
+      if (pluginDir) {
+        // Primero eliminar las tablas antiguas
+        await pluginDatabaseService.dropPluginTables(plugin);
+        // Luego crear las nuevas
+        await pluginDatabaseService.createPluginTables(plugin, pluginDir);
+      }
+
+      // 8. Reactivar el plugin si estaba activo
+      if (wasActive) {
+        console.log('▶️  Reactivating plugin...');
+        await pluginLifecycleService.executeOnActivate(plugin);
+        plugin.isActive = true;
+        plugin.lastActivatedAt = new Date();
+      }
+
       plugin.status = InstallationStatus.INSTALLED;
-
-      // Ejecutar lifecycle hook de actualización
-      await pluginLifecycleService.executeOnUpdate(plugin, previousVersion);
-
       await this.installedPluginRepo.save(plugin);
+
+      console.log(`✅ Plugin updated successfully: ${plugin.name} v${plugin.version}`);
       return { message: 'Plugin updated successfully', plugin };
     } catch (error: any) {
+      console.error('❌ Update failed:', error);
       plugin.status = InstallationStatus.FAILED;
       plugin.errorMessage = error.message;
       await this.installedPluginRepo.save(plugin);

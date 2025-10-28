@@ -11,6 +11,7 @@ import { errorHandler } from './middleware/errorHandler';
 import { authRoutes } from './routes/auth';
 import { pluginRoutes } from './routes/plugins';
 import { localPluginRoutes } from './routes/localPlugins';
+import { pluginDownloadRoutes } from './routes/pluginDownload';
 
 const app = express();
 const PORT = process.env.PORT || 3004;
@@ -25,7 +26,7 @@ const limiter = rateLimit({
 // Middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3003', 'http://localhost:3002'],
+  origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3003', 'http://localhost:3002', 'http://localhost:3001'],
   credentials: true
 }));
 app.use(limiter);
@@ -46,6 +47,7 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/plugins', pluginRoutes);
 app.use('/api/local-plugins', localPluginRoutes);
+app.use('/api/download', pluginDownloadRoutes);
 
 // Error handling
 app.use(errorHandler);

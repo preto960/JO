@@ -59,8 +59,17 @@ const router = createRouter({
   ]
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
+  
+  // Si hay token pero no hay usuario, intentar inicializar
+  if (authStore.token && !authStore.user) {
+    try {
+      await authStore.initializeAuth()
+    } catch (error) {
+      console.error('Failed to initialize auth:', error)
+    }
+  }
   
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next('/login')

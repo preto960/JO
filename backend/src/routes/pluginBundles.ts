@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { pluginInstallationService } from '../services/pluginInstallationService';
 import { pluginBundleService } from '../services/pluginBundleService';
+import { pluginLoaderService } from '../services/pluginLoaderService';
 
 const router = Router();
 
@@ -18,6 +19,12 @@ router.get('/:pluginSlug/bundle.js', async (req: Request, res: Response) => {
 
     if (!plugin) {
       return res.status(404).json({ message: 'Plugin not found or not active' });
+    }
+
+    // Asegurarse de que el plugin esté cargado
+    if (!pluginLoaderService.isPluginLoaded(plugin.id)) {
+      console.log(`⚠️  Plugin ${plugin.slug} not loaded, loading now...`);
+      await pluginLoaderService.loadPlugin(plugin);
     }
 
     // Generar el bundle

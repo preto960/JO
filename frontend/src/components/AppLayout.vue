@@ -16,6 +16,16 @@
 
     <!-- WebSocket Status Indicator -->
     <WebSocketStatus />
+    
+    <!-- Plugin Operation Modal -->
+    <PluginInstallModal
+      :is-open="pluginsStore.operationModal.isOpen"
+      :status="pluginsStore.operationModal.status"
+      :operation="pluginsStore.operationModal.operation"
+      :plugin-name="pluginsStore.operationModal.pluginName"
+      :steps="pluginsStore.operationModal.steps"
+      @close="pluginsStore.closeOperationModal"
+    />
   </div>
 </template>
 
@@ -24,9 +34,12 @@ import { onMounted } from 'vue'
 import Sidebar from '@/components/Sidebar.vue'
 import Header from '@/components/Header.vue'
 import WebSocketStatus from '@/components/WebSocketStatus.vue'
+import PluginInstallModal from '@/components/PluginInstallModal.vue'
 import { useAuthStore } from '@/stores/auth'
+import { usePluginsStore } from '@/stores/plugins'
 
 const authStore = useAuthStore()
+const pluginsStore = usePluginsStore()
 
 onMounted(() => {
   authStore.initializeAuth()

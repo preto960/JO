@@ -46,8 +46,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, defineAsyncComponent, shallowRef } from 'vue'
+import { ref, onMounted, watch, shallowRef } from 'vue'
 import { AlertCircle, RefreshCw } from 'lucide-vue-next'
+import { usePluginLoader } from '@/composables/usePluginLoader'
 
 interface Props {
   pluginSlug: string
@@ -59,6 +60,7 @@ const props = withDefaults(defineProps<Props>(), {
   componentProps: () => ({})
 })
 
+const pluginLoader = usePluginLoader()
 const loading = ref(true)
 const error = ref<string | null>(null)
 const componentInstance = shallowRef<any>(null)
@@ -71,18 +73,14 @@ const loadComponent = async () => {
   try {
     console.log(`🔧 Loading component ${props.componentName} from plugin ${props.pluginSlug}`)
 
-    // Construir la URL del componente
-    const componentUrl = `/api/plugin-assets/${props.pluginSlug}/frontend/views/${props.componentName}.vue`
+    // Obtener el componente del loader (ya está marcado como raw)
+    const component = pluginLoader.getPluginComponent(props.pluginSlug, props.componentName)
 
-    // Intentar cargar el componente dinámicamente
-    const component = defineAsyncComponent({
-      loader: () => import(/* @vite-ignore */ componentUrl),
-      loadingComponent: undefined,
-      errorComponent: undefined,
-      delay: 200,
-      timeout: 10000
-    })
+    if (!component) {
+      throw new Error(`Component ${props.componentName} not found in plugin ${props.pluginSlug}`)
+    }
 
+    // El componente ya viene marcado como raw desde usePluginLoader
     componentInstance.value = component
     console.log(`✅ Component ${props.componentName} loaded successfully`)
   } catch (err: any) {

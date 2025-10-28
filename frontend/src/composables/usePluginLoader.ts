@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { ref, computed, markRaw } from 'vue'
 import { usePluginsStore } from '@/stores/plugins'
 
 interface PluginModule {
@@ -56,16 +56,32 @@ export function usePluginLoader() {
         
         console.log(`✅ Plugin bundle loaded for ${plugin.name}`)
 
+        // Marcar componentes como raw para evitar reactividad innecesaria
+        const rawComponents: Record<string, any> = {}
+        if (pluginBundle.components) {
+          for (const [key, component] of Object.entries(pluginBundle.components)) {
+            rawComponents[key] = markRaw(component)
+          }
+        }
+
         // Crear el módulo del plugin
         const pluginModule: PluginModule = {
           name: plugin.name,
           version: plugin.version,
           routes: pluginBundle.routes || [],
-          components: pluginBundle.components || {},
+          components: rawComponents,
           store: pluginBundle.store,
           initialize: pluginBundle.initialize,
           destroy: pluginBundle.destroy
         }
+
+        // Debug: Ver qué componentes se cargaron
+        console.log('📦 Plugin bundle contents:', {
+          routes: pluginModule.routes,
+          components: Object.keys(pluginModule.components),
+          hasStore: !!pluginModule.store,
+          hasInitialize: !!pluginModule.initialize
+        })
 
         // Inicializar el plugin si tiene función de inicialización
         if (pluginModule.initialize && typeof pluginModule.initialize === 'function') {
@@ -195,6 +211,34 @@ export function usePluginLoader() {
     return loadedPlugins.value.some(p => p.id === pluginId)
   }
 
+  /**
+   * Obtiene un componente específico de un plugin por slug y nombre
+   */
+  const getPluginComponent = (pluginSlug: string, componentName: string) => {
+    const plugin = loadedPlugins.value.find(p => {
+      const installedPlugin = pluginsStore.installedPlugins.find(ip => ip.id === p.id)
+      return installedPlugin?.slug === pluginSlug
+    })
+
+    if (!plugin) {
+      console.warn(`Plugin ${pluginSlug} not loaded`)
+      return null
+    }
+
+    if (!plugin.module.components) {
+      console.warn(`Plugin ${pluginSlug} has no components`)
+      return null
+    }
+
+    const component = plugin.module.components[componentName]
+    if (!component) {
+      console.warn(`Component ${componentName} not found in plugin ${pluginSlug}`)
+      return null
+    }
+
+    return component
+  }
+
   return {
     loadedPlugins: computed(() => loadedPlugins.value),
     loadPlugin,
@@ -203,7 +247,8 @@ export function usePluginLoader() {
     reloadPlugin,
     getPluginRoutes,
     getPluginComponents,
-    isPluginLoaded
+    isPluginLoaded,
+    getPluginComponent
   }
 }
 

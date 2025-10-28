@@ -74,9 +74,11 @@ export function useWebSocket() {
 
     socket.value.on('plugin:installed', async (data) => {
       console.log('✅ Plugin installed:', data);
-      toast.success(`Plugin ${data.name} installed successfully!`, {
-        timeout: 5000
-      });
+      
+      // Actualizar pasos del modal
+      pluginsStore.updateOperationStep(0, 'completed'); // Preparing
+      pluginsStore.updateOperationStep(1, 'completed'); // Processing
+      pluginsStore.updateOperationStep(2, 'loading'); // Finalizing
       
       // Recargar la lista de plugins
       await pluginsStore.fetchInstalledPlugins();
@@ -86,6 +88,14 @@ export function useWebSocket() {
       if (plugin && plugin.isActive) {
         await pluginLoader.loadPlugin(data.pluginId);
       }
+      
+      // Completar operación
+      pluginsStore.updateOperationStep(2, 'completed');
+      pluginsStore.completeOperation(true);
+      
+      toast.success(`Plugin ${data.name} installed successfully!`, {
+        timeout: 3000
+      });
     });
 
     socket.value.on('plugin:uninstalled', async (data) => {
@@ -101,14 +111,27 @@ export function useWebSocket() {
       await pluginsStore.fetchInstalledPlugins();
     });
 
-    socket.value.on('plugin:updated', (data) => {
+    socket.value.on('plugin:updated', async (data) => {
       console.log('⬆️ Plugin updated:', data);
-      toast.success(`Plugin ${data.name} updated from ${data.oldVersion} to ${data.newVersion}`, {
-        timeout: 5000
-      });
       
-      // Recargar el plugin con la nueva versión
-      pluginLoader.reloadPlugin(data.pluginId);
+      // Actualizar pasos del modal
+      pluginsStore.updateOperationStep(0, 'completed');
+      pluginsStore.updateOperationStep(1, 'completed');
+      pluginsStore.updateOperationStep(2, 'loading');
+      
+      // Primero actualizar la lista de plugins
+      await pluginsStore.fetchInstalledPlugins();
+      
+      // Luego recargar el plugin con la nueva versión
+      await pluginLoader.reloadPlugin(data.pluginId);
+      
+      // Completar operación
+      pluginsStore.updateOperationStep(2, 'completed');
+      pluginsStore.completeOperation(true);
+      
+      toast.success(`Plugin ${data.name} updated from ${data.oldVersion} to ${data.newVersion}`, {
+        timeout: 3000
+      });
     });
 
     socket.value.on('plugin:toggled', async (data) => {
