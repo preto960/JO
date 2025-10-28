@@ -42,6 +42,23 @@
         <span>Installed Plugins</span>
       </router-link>
 
+      <!-- Plugins Activos -->
+      <div v-if="activePlugins.length > 0" class="pt-4 mt-4 border-t border-gray-700">
+        <p class="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+          Active Plugins
+        </p>
+        <router-link
+          v-for="plugin in activePlugins"
+          :key="plugin.id"
+          :to="`/plugins/${plugin.slug}`"
+          class="nav-item"
+          :class="{ 'active': $route.path.startsWith(`/plugins/${plugin.slug}`) }"
+        >
+          <Puzzle class="w-5 h-5" />
+          <span>{{ plugin.name }}</span>
+        </router-link>
+      </div>
+
       <router-link
         v-if="authStore.isAdmin"
         to="/users"
@@ -82,17 +99,29 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { LayoutDashboard, Store, Puzzle, Users, Settings } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
+import { usePluginsStore } from '@/stores/plugins'
 
 const authStore = useAuthStore()
+const pluginsStore = usePluginsStore()
 
 const userInitials = computed(() => {
   if (!authStore.user) return 'U'
   const first = authStore.user.firstName?.[0] || ''
   const last = authStore.user.lastName?.[0] || ''
   return (first + last).toUpperCase()
+})
+
+const activePlugins = computed(() => {
+  return pluginsStore.installedPlugins.filter(p => p.isActive)
+})
+
+onMounted(() => {
+  if (authStore.isAuthenticated) {
+    pluginsStore.fetchInstalledPlugins()
+  }
 })
 </script>
 

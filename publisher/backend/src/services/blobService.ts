@@ -28,6 +28,45 @@ export class BlobService {
     }
   }
 
+  async uploadPluginPackage(buffer: Buffer, blobPath: string): Promise<{ url: string; size: number }> {
+    try {
+      const blob = await put(blobPath, buffer as any, {
+        access: 'public',
+        token: this.token,
+        contentType: 'application/zip',
+      });
+
+      return {
+        url: blob.url,
+        size: buffer.length
+      };
+    } catch (error) {
+      console.error('Blob upload error:', error);
+      throw new Error('Failed to upload plugin package to storage');
+    }
+  }
+
+  async uploadToSandbox(buffer: Buffer, blobPath: string): Promise<{ url: string; size: number }> {
+    try {
+      // Usar carpeta sandbox para testing
+      const sandboxPath = `sandbox/${blobPath}`;
+      
+      const blob = await put(sandboxPath, buffer as any, {
+        access: 'public',
+        token: this.token,
+        contentType: 'application/zip',
+      });
+
+      return {
+        url: blob.url,
+        size: buffer.length
+      };
+    } catch (error) {
+      console.error('Sandbox upload error:', error);
+      throw new Error('Failed to upload to sandbox');
+    }
+  }
+
   async deletePlugin(url: string): Promise<void> {
     try {
       await del(url, { token: this.token });

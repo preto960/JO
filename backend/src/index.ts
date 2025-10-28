@@ -5,9 +5,12 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import { createServer } from 'http';
 
 import { AppDataSource } from './config/database';
 import { errorHandler } from './middleware/errorHandler';
+import { websocketService } from './services/websocketService';
+import { pluginLoaderService } from './services/pluginLoaderService';
 import { authRoutes } from './routes/auth';
 import { pluginRoutes } from './routes/plugins';
 import { aiRoutes } from './routes/ai';
@@ -15,6 +18,9 @@ import { analyticsRoutes } from './routes/analytics';
 import { reviewRoutes } from './routes/reviews';
 import { installedPluginRoutes } from './routes/installedPlugins';
 import { marketRoutes } from './routes/market';
+import { pluginAssetsRoutes } from './routes/pluginAssets';
+import { pluginBundlesRoutes } from './routes/pluginBundles';
+import { pluginApiRoutes } from './routes/pluginApi';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -54,6 +60,9 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/installed-plugins', installedPluginRoutes);
 app.use('/api/market', marketRoutes);
+app.use('/api/plugin-assets', pluginAssetsRoutes);
+app.use('/api/plugin-bundles', pluginBundlesRoutes);
+app.use('/api/plugin-api', pluginApiRoutes);
 
 // Error handling
 app.use(errorHandler);
@@ -63,13 +72,26 @@ app.use('*', (req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
+// Create HTTP server for WebSocket support
+const httpServer = createServer(app);
+
+// Initialize WebSocket
+websocketService.initialize(httpServer);
+
 // Initialize database and start server
 AppDataSource.initialize()
-  .then(() => {
+  .then(async () => {
     console.log('✅ Database connected successfully');
-    app.listen(PORT, () => {
+    
+    // Initialize plugin loader service
+    await pluginLoaderService.initialize();
+    console.log('✅ Plugin loader initialized');
+    
+    httpServer.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📊 Health check: http://localhost:${PORT}/health`);
+      console.log(`🔌 WebSocket server ready`);
+      console.log(`📦 Plugin system ready`);
     });
   })
   .catch((error) => {

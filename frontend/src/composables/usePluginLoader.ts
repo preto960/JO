@@ -24,7 +24,7 @@ export function usePluginLoader() {
   const pluginsStore = usePluginsStore()
 
   /**
-   * Carga un plugin desde su manifest
+   * Carga un plugin desde su bundle dinámico
    */
   const loadPlugin = async (pluginId: string) => {
     try {
@@ -45,34 +45,67 @@ export function usePluginLoader() {
         return existing.module
       }
 
-      // Cargar el módulo del plugin
-      // En un escenario real, esto cargaría el código del plugin desde packageUrl
-      // Por ahora, simulamos la carga con el manifest
-      const pluginModule: PluginModule = {
-        name: plugin.name,
-        version: plugin.version,
-        routes: plugin.manifest?.routes || [],
-        components: plugin.manifest?.components || {},
-        store: plugin.manifest?.store,
-        initialize: plugin.manifest?.initialize,
-        destroy: plugin.manifest?.destroy
+      console.log(`📦 Loading plugin ${plugin.name} from bundle...`)
+
+      // Cargar el bundle del plugin dinámicamente
+      const bundleUrl = `/api/plugin-bundles/${plugin.slug}/bundle.js?t=${Date.now()}`
+      
+      try {
+        // Importar el módulo dinámicamente
+        const pluginBundle = await import(/* @vite-ignore */ bundleUrl)
+        
+        console.log(`✅ Plugin bundle loaded for ${plugin.name}`)
+
+        // Crear el módulo del plugin
+        const pluginModule: PluginModule = {
+          name: plugin.name,
+          version: plugin.version,
+          routes: pluginBundle.routes || [],
+          components: pluginBundle.components || {},
+          store: pluginBundle.store,
+          initialize: pluginBundle.initialize,
+          destroy: pluginBundle.destroy
+        }
+
+        // Inicializar el plugin si tiene función de inicialización
+        if (pluginModule.initialize && typeof pluginModule.initialize === 'function') {
+          await pluginModule.initialize()
+        }
+
+        // Agregar a plugins cargados
+        loadedPlugins.value.push({
+          id: pluginId,
+          name: plugin.name,
+          module: pluginModule,
+          isActive: true
+        })
+
+        console.log(`✅ Plugin ${plugin.name} loaded and initialized successfully`)
+        return pluginModule
+      } catch (bundleError: any) {
+        console.error(`Failed to load plugin bundle for ${plugin.name}:`, bundleError)
+        
+        // Fallback: usar el manifest como antes
+        console.warn(`Falling back to manifest-only mode for ${plugin.name}`)
+        const pluginModule: PluginModule = {
+          name: plugin.name,
+          version: plugin.version,
+          routes: plugin.manifest?.frontend?.routes || [],
+          components: {},
+          store: undefined,
+          initialize: undefined,
+          destroy: undefined
+        }
+
+        loadedPlugins.value.push({
+          id: pluginId,
+          name: plugin.name,
+          module: pluginModule,
+          isActive: true
+        })
+
+        return pluginModule
       }
-
-      // Inicializar el plugin si tiene función de inicialización
-      if (pluginModule.initialize) {
-        await pluginModule.initialize()
-      }
-
-      // Agregar a plugins cargados
-      loadedPlugins.value.push({
-        id: pluginId,
-        name: plugin.name,
-        module: pluginModule,
-        isActive: true
-      })
-
-      console.log(`✅ Plugin ${plugin.name} loaded successfully`)
-      return pluginModule
     } catch (error) {
       console.error(`Failed to load plugin ${pluginId}:`, error)
       return null

@@ -1,6 +1,9 @@
 import { AppDataSource } from '../config/database';
 import { InstalledPlugin, InstallationStatus } from '../models/InstalledPlugin';
 import { publisherService } from './publisherService';
+import { pluginLifecycleService } from './pluginLifecycleService';
+import { pluginLoaderService } from './pluginLoaderService';
+import { pluginDatabaseService } from './pluginDatabaseService';
 import { put } from '@vercel/blob';
 
 export class PluginInstallationService {
@@ -38,22 +41,28 @@ export class PluginInstallationService {
 
       await this.installedPluginRepo.save(installedPlugin);
 
-      // 4. Descargar el paquete (opcional, si queremos una copia local)
+      // 4. Descargar y extraer el plugin
       try {
-        // Por ahora solo guardamos la referencia, no descargamos
-        // Si necesitas descargar y almacenar localmente:
-        // const packageBuffer = await publisherService.downloadPluginPackage(publisherPluginId);
-        // const blob = await put(`plugins/${installedPlugin.slug}-${installedPlugin.version}.zip`, packageBuffer, {
-        //   access: 'public',
-        // });
-        // installedPlugin.packageUrl = blob.url;
+        console.log(`📦 Loading plugin ${installedPlugin.name}...`);
+        await pluginLoaderService.loadPlugin(installedPlugin);
+
+        // 5. Crear tablas de base de datos si el plugin las necesita
+        const pluginDir = pluginLoaderService.getPluginDirectory(installedPlugin.id);
+        if (pluginDir) {
+          await pluginDatabaseService.createPluginTables(installedPlugin, pluginDir);
+        }
 
         installedPlugin.status = InstallationStatus.INSTALLED;
         installedPlugin.isActive = true;
         installedPlugin.lastActivatedAt = new Date();
+
+        // 6. Ejecutar lifecycle hooks
+        await pluginLifecycleService.executeOnInstall(installedPlugin);
+        await pluginLifecycleService.executeOnActivate(installedPlugin);
       } catch (error: any) {
         installedPlugin.status = InstallationStatus.FAILED;
         installedPlugin.errorMessage = error.message;
+        console.error('Installation error:', error);
       }
 
       await this.installedPluginRepo.save(installedPlugin);
@@ -79,7 +88,20 @@ export class PluginInstallationService {
     plugin.status = InstallationStatus.UNINSTALLING;
     await this.installedPluginRepo.save(plugin);
 
-    // Aquí podrías agregar lógica para limpiar recursos, archivos, etc.
+    try {
+      // Ejecutar lifecycle hooks
+      await pluginLifecycleService.executeOnDeactivate(plugin);
+      await pluginLifecycleService.executeOnUninstall(plugin);
+
+      // Eliminar tablas de la base de datos
+      await pluginDatabaseService.dropPluginTables(plugin);
+
+      // Descargar el plugin
+      await pluginLoaderService.unloadPlugin(plugin);
+    } catch (error: any) {
+      console.error('Error during uninstall:', error);
+      // Continuar con la desinstalación aunque fallen algunos pasos
+    }
     
     await this.installedPluginRepo.remove(plugin);
     return { message: 'Plugin uninstalled successfully' };
@@ -97,13 +119,23 @@ export class PluginInstallationService {
       throw new Error('Plugin not found');
     }
 
-    plugin.isActive = isActive;
-    if (isActive) {
-      plugin.lastActivatedAt = new Date();
-    }
+    try {
+      if (isActive) {
+        // Activar plugin
+        await pluginLifecycleService.executeOnActivate(plugin);
+        plugin.lastActivatedAt = new Date();
+      } else {
+        // Desactivar plugin
+        await pluginLifecycleService.executeOnDeactivate(plugin);
+      }
 
-    await this.installedPluginRepo.save(plugin);
-    return plugin;
+      plugin.isActive = isActive;
+      await this.installedPluginRepo.save(plugin);
+      
+      return plugin;
+    } catch (error: any) {
+      throw new Error(`Failed to ${isActive ? 'activate' : 'deactivate'} plugin: ${error.message}`);
+    }
   }
 
   /**
@@ -118,6 +150,7 @@ export class PluginInstallationService {
       throw new Error('Plugin not found');
     }
 
+    const previousVersion = plugin.version;
     plugin.status = InstallationStatus.UPDATING;
     await this.installedPluginRepo.save(plugin);
 
@@ -136,6 +169,9 @@ export class PluginInstallationService {
       plugin.manifest = latestVersion.manifest;
       plugin.packageUrl = latestVersion.packageUrl;
       plugin.status = InstallationStatus.INSTALLED;
+
+      // Ejecutar lifecycle hook de actualización
+      await pluginLifecycleService.executeOnUpdate(plugin, previousVersion);
 
       await this.installedPluginRepo.save(plugin);
       return { message: 'Plugin updated successfully', plugin };

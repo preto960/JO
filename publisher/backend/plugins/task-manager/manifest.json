@@ -1,0 +1,134 @@
+{
+  "name": "Task Manager",
+  "version": "1.0.0",
+  "slug": "task-manager",
+  "description": "Complete task management system with categories, priorities, and team collaboration",
+  "longDescription": "A comprehensive task management plugin that allows you to create, organize, and track tasks with support for categories, priorities, due dates, assignments, and real-time collaboration. Perfect for teams and individuals who want to stay organized.",
+  "author": "NJO Team",
+  "category": "PRODUCTIVITY",
+  
+  "frontend": {
+    "entry": "frontend/index.ts",
+    "routes": [
+      {
+        "path": "/tasks",
+        "name": "Tasks",
+        "component": "frontend/views/TaskList.vue",
+        "meta": {
+          "title": "Tasks",
+          "icon": "CheckSquare",
+          "requiresAuth": true
+        }
+      },
+      {
+        "path": "/tasks/board",
+        "name": "TaskBoard",
+        "component": "frontend/views/TaskBoard.vue",
+        "meta": {
+          "title": "Task Board",
+          "icon": "Kanban",
+          "requiresAuth": true
+        }
+      },
+      {
+        "path": "/tasks/calendar",
+        "name": "TaskCalendar",
+        "component": "frontend/views/TaskCalendar.vue",
+        "meta": {
+          "title": "Calendar",
+          "icon": "Calendar",
+          "requiresAuth": true
+        }
+      }
+    ],
+    "components": {
+      "TaskCard": "frontend/components/TaskCard.vue",
+      "TaskForm": "frontend/components/TaskForm.vue",
+      "TaskFilters": "frontend/components/TaskFilters.vue"
+    },
+    "store": "frontend/store/tasks.ts"
+  },
+  
+  "backend": {
+    "entry": "backend/index.ts",
+    "routes": "backend/routes/tasks.ts",
+    "models": ["backend/models/Task.ts", "backend/models/TaskCategory.ts"]
+  },
+  
+  "icon": "📋",
+  "screenshots": [
+    "screenshots/task-list.png",
+    "screenshots/task-board.png",
+    "screenshots/task-calendar.png"
+  ],
+  
+  "tags": ["productivity", "tasks", "project-management", "collaboration", "kanban"],
+  
+  "license": "MIT",
+  "homepage": "https://github.com/njo-team/task-manager-plugin",
+  "repository": "https://github.com/njo-team/task-manager-plugin",
+  
+  "permissions": [
+    "tasks:read",
+    "tasks:create",
+    "tasks:update",
+    "tasks:delete",
+    "tasks:assign"
+  ],
+  
+  "settings": [
+    {
+      "key": "defaultView",
+      "label": "Default View",
+      "type": "select",
+      "description": "Choose the default view when opening tasks",
+      "default": "list",
+      "required": true,
+      "options": [
+        { "label": "List View", "value": "list" },
+        { "label": "Board View", "value": "board" },
+        { "label": "Calendar View", "value": "calendar" }
+      ]
+    },
+    {
+      "key": "enableNotifications",
+      "label": "Enable Notifications",
+      "type": "boolean",
+      "description": "Receive notifications for task updates and deadlines",
+      "default": true,
+      "required": false
+    },
+    {
+      "key": "taskPrefix",
+      "label": "Task ID Prefix",
+      "type": "text",
+      "description": "Prefix for task IDs (e.g., TASK-001)",
+      "default": "TASK",
+      "required": false
+    },
+    {
+      "key": "maxTasksPerPage",
+      "label": "Tasks Per Page",
+      "type": "number",
+      "description": "Number of tasks to display per page",
+      "default": 20,
+      "required": false
+    }
+  ],
+  
+  "hooks": {
+    "onInstall": "backend/hooks/onInstall.ts",
+    "onActivate": "backend/hooks/onActivate.ts",
+    "onDeactivate": "backend/hooks/onDeactivate.ts",
+    "onUninstall": "backend/hooks/onUninstall.ts",
+    "onUpdate": "backend/hooks/onUpdate.ts"
+  },
+  
+  "dependencies": {
+    "vue": "^3.3.0",
+    "pinia": "^2.1.0"
+  },
+  
+  "minSystemVersion": "1.0.0"
+}
+

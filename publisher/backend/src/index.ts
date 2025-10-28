@@ -10,6 +10,7 @@ import { AppDataSource } from './config/database';
 import { errorHandler } from './middleware/errorHandler';
 import { authRoutes } from './routes/auth';
 import { pluginRoutes } from './routes/plugins';
+import { localPluginRoutes } from './routes/localPlugins';
 
 const app = express();
 const PORT = process.env.PORT || 3004;
@@ -44,6 +45,7 @@ app.get('/health', (req, res) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/plugins', pluginRoutes);
+app.use('/api/local-plugins', localPluginRoutes);
 
 // Error handling
 app.use(errorHandler);

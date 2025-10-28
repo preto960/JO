@@ -56,6 +56,7 @@ import {
   LayoutDashboard,
   Puzzle,
   PlusCircle,
+  FolderOpen,
   TrendingUp,
   Settings,
   LogOut
@@ -73,6 +74,11 @@ const navigation = computed(() => [
     name: 'My Plugins',
     to: '/plugins',
     icon: Puzzle
+  },
+  {
+    name: 'Local Plugins',
+    to: '/local-plugins',
+    icon: FolderOpen
   },
   {
     name: 'Create New Plugin',

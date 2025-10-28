@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import { pluginInstallationService } from '../services/pluginInstallationService';
+import { websocketService } from '../services/websocketService';
+import { pluginLifecycleService } from '../services/pluginLifecycleService';
 import { publisherService } from '../services/publisherService';
 
 export class InstalledPluginController {
@@ -51,6 +53,14 @@ export class InstalledPluginController {
       }
 
       const plugin = await pluginInstallationService.installPlugin(publisherPluginId, userId);
+      
+      // Notificar a los clientes conectados
+      websocketService.notifyPluginInstalled(
+        plugin.id,
+        plugin.slug,
+        plugin.name
+      );
+      
       res.status(201).json(plugin);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
@@ -64,7 +74,21 @@ export class InstalledPluginController {
   async uninstallPlugin(req: Request, res: Response) {
     try {
       const { id } = req.params;
+      
+      // Obtener info del plugin antes de desinstalar
+      const plugin = await pluginInstallationService.getInstalledPlugin(id);
+      
       const result = await pluginInstallationService.uninstallPlugin(id);
+      
+      // Notificar a los clientes conectados
+      if (plugin) {
+        websocketService.notifyPluginUninstalled(
+          plugin.id,
+          plugin.slug,
+          plugin.name
+        );
+      }
+      
       res.json(result);
     } catch (error: any) {
       res.status(404).json({ message: error.message });
@@ -85,6 +109,15 @@ export class InstalledPluginController {
       }
 
       const plugin = await pluginInstallationService.togglePlugin(id, isActive);
+      
+      // Notificar a los clientes conectados
+      websocketService.notifyPluginToggled(
+        plugin.id,
+        plugin.slug,
+        plugin.name,
+        plugin.isActive
+      );
+      
       res.json(plugin);
     } catch (error: any) {
       res.status(404).json({ message: error.message });
@@ -98,7 +131,24 @@ export class InstalledPluginController {
   async updatePlugin(req: Request, res: Response) {
     try {
       const { id } = req.params;
+      
+      // Obtener versión anterior
+      const oldPlugin = await pluginInstallationService.getInstalledPlugin(id);
+      const oldVersion = oldPlugin?.version || 'unknown';
+      
       const result = await pluginInstallationService.updatePlugin(id);
+      
+      // Notificar a los clientes conectados
+      if (result.plugin) {
+        websocketService.notifyPluginUpdated(
+          result.plugin.id,
+          result.plugin.slug,
+          result.plugin.name,
+          oldVersion,
+          result.plugin.version
+        );
+      }
+      
       res.json(result);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
@@ -122,6 +172,23 @@ export class InstalledPluginController {
       res.json(plugin);
     } catch (error: any) {
       res.status(404).json({ message: error.message });
+    }
+  }
+
+  /**
+   * GET /api/installed-plugins/loaded
+   * Obtiene el estado de plugins cargados en memoria
+   */
+  async getLoadedPlugins(req: Request, res: Response) {
+    try {
+      const loadedPlugins = pluginLifecycleService.getLoadedPlugins();
+      const pluginsArray = Array.from(loadedPlugins.entries()).map(([id, plugin]) => ({
+        id,
+        ...plugin
+      }));
+      res.json({ loadedPlugins: pluginsArray });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
     }
   }
 

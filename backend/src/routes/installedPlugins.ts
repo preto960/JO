@@ -6,6 +6,7 @@ const router = Router();
 
 // Rutas para plugins instalados (requieren autenticación)
 router.get('/', authenticateToken, installedPluginController.getInstalledPlugins.bind(installedPluginController));
+router.get('/loaded', authenticateToken, installedPluginController.getLoadedPlugins.bind(installedPluginController));
 router.get('/:id', authenticateToken, installedPluginController.getInstalledPlugin.bind(installedPluginController));
 router.post('/install', authenticateToken, installedPluginController.installPlugin.bind(installedPluginController));
 router.delete('/:id', authenticateToken, installedPluginController.uninstallPlugin.bind(installedPluginController));

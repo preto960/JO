@@ -13,6 +13,9 @@
         <router-view />
       </main>
     </div>
+
+    <!-- WebSocket Status Indicator -->
+    <WebSocketStatus />
   </div>
 </template>
 
@@ -20,6 +23,7 @@
 import { onMounted } from 'vue'
 import Sidebar from '@/components/Sidebar.vue'
 import Header from '@/components/Header.vue'
+import WebSocketStatus from '@/components/WebSocketStatus.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()

@@ -27,6 +27,12 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/local-plugins',
+      name: 'LocalPlugins',
+      component: () => import('@/views/LocalPlugins.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/plugins/create',
       name: 'CreatePlugin',
       component: () => import('@/views/CreatePlugin.vue'),
