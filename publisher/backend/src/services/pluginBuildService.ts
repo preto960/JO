@@ -290,6 +290,7 @@ export class PluginBuildService {
   private async compileVueFile(vueFilePath: string): Promise<void> {
     const source = await fs.readFile(vueFilePath, 'utf-8');
     const filename = path.basename(vueFilePath);
+    const componentName = filename.replace('.vue', '');
     
     console.log(`  Compiling ${filename}...`);
 
@@ -300,25 +301,70 @@ export class PluginBuildService {
       throw new Error(`Parse errors in ${filename}: ${errors.map(e => e.message).join(', ')}`);
     }
 
-    let scriptCode = '';
-    let templateCode = '';
+    let scriptContent = '';
+    let setupCode = '';
+    let templateFunction = '';
     let stylesCode = '';
+    let imports = '';
 
     // Compilar script
-    if (descriptor.script || descriptor.scriptSetup) {
-      const script = compileScript(descriptor, {
-        id: filename,
-        inlineTemplate: false
+    if (descriptor.scriptSetup) {
+      // Script setup
+      const compiled = compileScript(descriptor, {
+        id: componentName,
+        inlineTemplate: true
       });
-      scriptCode = script.content;
+      
+      // Extraer imports y código
+      const lines = compiled.content.split('\n');
+      const importLines: string[] = [];
+      const codeLines: string[] = [];
+      
+      for (const line of lines) {
+        if (line.trim().startsWith('import ') && !line.includes('import type')) {
+          // Reemplazar imports de Vue con referencias globales
+          if (line.includes('from \'vue\'') || line.includes('from "vue"')) {
+            // Extraer los nombres importados
+            const match = line.match(/import\s+\{([^}]+)\}\s+from/);
+            if (match) {
+              const vueImports = match[1].split(',').map(s => s.trim());
+              importLines.push(`const { ${vueImports.join(', ')} } = Vue;`);
+            }
+          } else {
+            importLines.push(line);
+          }
+        } else if (!line.includes('export default') && line.trim()) {
+          codeLines.push(line);
+        }
+      }
+      
+      imports = importLines.join('\n');
+      setupCode = codeLines.join('\n');
+      
+      // Obtener la función render si está inline
+      if (compiled.content.includes('return (')) {
+        templateFunction = 'render: ' + compiled.content.substring(
+          compiled.content.indexOf('return ('),
+          compiled.content.lastIndexOf('}')
+        );
+      }
+    } else if (descriptor.script) {
+      // Script normal (Options API)
+      scriptContent = descriptor.script.content;
+      
+      // Reemplazar imports de Vue
+      scriptContent = scriptContent.replace(
+        /import\s+\{([^}]+)\}\s+from\s+['"]vue['"]/g,
+        'const { $1 } = Vue'
+      );
     }
 
-    // Compilar template
-    if (descriptor.template) {
+    // Compilar template si no está inline
+    if (descriptor.template && !descriptor.scriptSetup?.attrs.inlineTemplate) {
       const template = compileTemplate({
         source: descriptor.template.content,
         filename,
-        id: filename,
+        id: componentName,
         scoped: descriptor.styles.some(s => s.scoped),
         compilerOptions: {
           mode: 'module'
@@ -329,38 +375,53 @@ export class PluginBuildService {
         throw new Error(`Template errors in ${filename}: ${template.errors.join(', ')}`);
       }
       
-      templateCode = template.code;
+      // Extraer solo la función render
+      templateFunction = template.code
+        .replace(/^import[^;]+;/gm, '')
+        .replace(/^export /gm, '')
+        .trim();
     }
 
     // Compilar styles (inline en el JS)
     if (descriptor.styles.length > 0) {
       const styles = descriptor.styles.map(s => s.content).join('\n');
       stylesCode = `
-const __injectStyle = (css) => {
-  if (typeof document !== 'undefined') {
-    const style = document.createElement('style');
-    style.textContent = css;
-    document.head.appendChild(style);
-  }
-};
-__injectStyle(\`${styles.replace(/`/g, '\\`')}\`);
+// Inject styles
+if (typeof document !== 'undefined') {
+  const style = document.createElement('style');
+  style.textContent = \`${styles.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
+  document.head.appendChild(style);
+}
 `;
     }
 
-    // Generar código final
-    let finalCode = `
-${scriptCode}
-
-${templateCode}
+    // Generar código final usando Options API (más compatible)
+    let finalCode = '';
+    
+    if (descriptor.scriptSetup) {
+      // Convertir script setup a Options API
+      finalCode = `
+${imports}
 
 ${stylesCode}
 
-// Export default component
 export default {
-  ...script,
-  render
+  name: '${componentName}',
+  setup() {
+    ${setupCode}
+    
+    return {
+      // Exportar todo lo necesario
+    };
+  }
 };
 `;
+    } else {
+      // Options API directo
+      finalCode = `
+${scriptContent.replace(/export default\s*{/, `${stylesCode}\n\nexport default {`)}
+`;
+    }
 
     // Escribir archivo .js
     const jsFilePath = vueFilePath.replace(/\.vue$/, '.js');

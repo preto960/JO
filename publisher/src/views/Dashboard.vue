@@ -122,7 +122,8 @@
             </div>
             <div class="text-center">
               <p class="text-sm text-gray-400">Rating</p>
-              <p class="font-semibold text-white">{{ plugin.rating.toFixed(1) }}</p>
+              <!-- Fixed: Handle null rating -->
+              <p class="font-semibold text-white">{{ typeof plugin.rating === 'number' ? plugin.rating.toFixed(1) : '0.0' }}</p>
             </div>
             <div class="text-center">
               <p class="text-sm text-gray-400">Status</p>
@@ -261,7 +262,7 @@ onMounted(async () => {
   stats.value[0].value = pluginStore.plugins.length.toString()
   stats.value[1].value = pluginStore.plugins.reduce((sum, p) => sum + p.downloadCount, 0).toString()
   stats.value[3].value = pluginStore.plugins.length > 0 
-    ? (pluginStore.plugins.reduce((sum, p) => sum + p.rating, 0) / pluginStore.plugins.length).toFixed(1)
+    ? (pluginStore.plugins.reduce((sum, p) => sum + (p.rating || 0), 0) / pluginStore.plugins.length).toFixed(1)
     : '0.0'
 })
 </script>

@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+import { createPinia, defineStore } from 'pinia'
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 import App from './App.vue'
@@ -19,6 +19,11 @@ if (typeof window !== 'undefined') {
 
 const app = createApp(App)
 const pinia = createPinia()
+
+// Exponer Pinia globalmente para que los plugins puedan usarlo
+if (typeof window !== 'undefined') {
+  (window as any).pinia = { defineStore };
+}
 
 app.use(pinia)
 app.use(router)

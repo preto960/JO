@@ -135,7 +135,7 @@
           </div>
           <div class="text-center p-2 bg-gray-700/50 rounded">
             <p class="text-xs text-gray-400">Rating</p>
-            <p class="font-semibold text-white">{{ plugin.rating ? plugin.rating.toFixed(1) : '0.0' }}</p>
+            <p class="font-semibold text-white">{{ typeof plugin.rating === 'number' ? plugin.rating.toFixed(1) : '0.0' }}</p>
           </div>
           <div class="text-center p-2 bg-gray-700/50 rounded">
             <p class="text-xs text-gray-400">Reviews</p>

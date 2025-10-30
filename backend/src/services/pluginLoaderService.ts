@@ -115,6 +115,9 @@ export class PluginLoaderService {
 
   /**
    * Carga las entidades (modelos) del plugin en TypeORM
+   * NOTA: No cargamos las entidades dinámicamente en TypeORM porque los decoradores
+   * se pierden en la compilación. En su lugar, usamos pluginDatabaseService para
+   * crear las tablas directamente con SQL.
    */
   async loadPluginEntities(plugin: InstalledPlugin, pluginDir: string): Promise<void> {
     if (!plugin.manifest?.backend?.models) {
@@ -122,50 +125,12 @@ export class PluginLoaderService {
       return;
     }
 
-    console.log(`📊 Loading entities for plugin ${plugin.name}`);
-
-    const models = Array.isArray(plugin.manifest.backend.models) 
-      ? plugin.manifest.backend.models 
-      : [plugin.manifest.backend.models];
-
-    for (const modelPath of models) {
-      try {
-        const fullPath = path.join(pluginDir, modelPath.replace('.ts', '.js'));
-        
-        // Verificar que el archivo existe
-        try {
-          await fs.access(fullPath);
-        } catch {
-          console.warn(`⚠️  Model file not found: ${fullPath}`);
-          continue;
-        }
-
-        // Importar el modelo
-        const modelModule = await import(fullPath);
-        const EntityClass = modelModule.default || Object.values(modelModule)[0];
-
-        if (!EntityClass) {
-          console.warn(`⚠️  No entity class found in ${modelPath}`);
-          continue;
-        }
-
-        // Verificar si la entidad ya está registrada
-        const metadata = AppDataSource.getMetadata(EntityClass);
-        if (metadata) {
-          console.log(`  ✓ Entity ${EntityClass.name} already registered`);
-          continue;
-        }
-
-        // Registrar la entidad en TypeORM
-        console.log(`  ✓ Registering entity ${EntityClass.name}`);
-        
-        // No podemos agregar entidades dinámicamente después de inicializar
-        // Necesitamos usar synchronize o crear las tablas manualmente
-        
-      } catch (error: any) {
-        console.error(`  ✗ Failed to load model ${modelPath}:`, error.message);
-      }
-    }
+    console.log(`📊 Plugin ${plugin.name} has ${plugin.manifest.backend.models.length} model(s)`);
+    console.log(`   Tables will be created by pluginDatabaseService`);
+    
+    // Las tablas se crean en pluginInstallationService usando pluginDatabaseService
+    // No intentamos cargar las entidades en TypeORM porque los decoradores no están
+    // disponibles en tiempo de ejecución después de la compilación a JavaScript
   }
 
   /**
