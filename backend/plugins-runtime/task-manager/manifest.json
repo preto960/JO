@@ -1,6 +1,6 @@
 {
   "name": "Task Manager",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "slug": "task-manager",
   "description": "Complete task management system with categories, priorities, and team collaboration",
   "longDescription": "A comprehensive task management plugin that allows you to create, organize, and track tasks with support for categories, priorities, due dates, assignments, and real-time collaboration. Perfect for teams and individuals who want to stay organized.",
@@ -69,11 +69,58 @@
   "repository": "https://github.com/njo-team/task-manager-plugin",
   
   "permissions": [
-    "tasks:read",
-    "tasks:create",
-    "tasks:update",
-    "tasks:delete",
-    "tasks:assign"
+    {
+      "resource": "tasks",
+      "label": "Tasks",
+      "description": "Access and manage tasks",
+      "actions": ["view", "create", "edit", "delete"],
+      "defaultRoles": {
+        "USER": {
+          "canView": true,
+          "canCreate": true,
+          "canEdit": true,
+          "canDelete": false
+        },
+        "DEVELOPER": {
+          "canView": true,
+          "canCreate": true,
+          "canEdit": true,
+          "canDelete": true
+        },
+        "ADMIN": {
+          "canView": true,
+          "canCreate": true,
+          "canEdit": true,
+          "canDelete": true
+        }
+      }
+    },
+    {
+      "resource": "task-categories",
+      "label": "Task Categories",
+      "description": "Manage task categories",
+      "actions": ["view", "create", "edit", "delete"],
+      "defaultRoles": {
+        "USER": {
+          "canView": true,
+          "canCreate": false,
+          "canEdit": false,
+          "canDelete": false
+        },
+        "DEVELOPER": {
+          "canView": true,
+          "canCreate": true,
+          "canEdit": true,
+          "canDelete": true
+        },
+        "ADMIN": {
+          "canView": true,
+          "canCreate": true,
+          "canEdit": true,
+          "canDelete": true
+        }
+      }
+    }
   ],
   
   "settings": [

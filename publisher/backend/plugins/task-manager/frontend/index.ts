@@ -12,7 +12,7 @@ import TaskCalendar from './views/TaskCalendar.vue';
 // Plugin metadata - será sobrescrito por el backend con datos completos
 const pluginInfo = {
   name: 'Task Manager',
-  version: '4.0.1',
+  version: '4.0.2',
   author: 'NJO Team',
   slug: 'task-manager',
   description: 'Complete task management system'

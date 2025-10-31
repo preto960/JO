@@ -4,6 +4,7 @@ import { Permission, ResourceType, PermissionAction } from '../models/Permission
 import { UserRole } from '../models/User';
 import { AuthRequest } from '../middleware/auth';
 import { createError } from '../middleware/errorHandler';
+import { pluginPermissionService } from '../services/pluginPermissionService';
 
 export class PermissionController {
   private permissionRepository = AppDataSource.getRepository(Permission);
@@ -239,35 +240,119 @@ export class PermissionController {
 
     // USER role - Limited access
     permissions.push(
-      { role: UserRole.USER, resource: ResourceType.DASHBOARD, canView: true, canCreate: false, canEdit: false, canDelete: false },
-      { role: UserRole.USER, resource: ResourceType.MARKET, canView: false, canCreate: false, canEdit: false, canDelete: false },
-      { role: UserRole.USER, resource: ResourceType.PLUGINS, canView: false, canCreate: false, canEdit: false, canDelete: false },
-      { role: UserRole.USER, resource: ResourceType.USERS, canView: false, canCreate: false, canEdit: false, canDelete: false },
-      { role: UserRole.USER, resource: ResourceType.SETTINGS, canView: false, canCreate: false, canEdit: false, canDelete: false },
-      { role: UserRole.USER, resource: ResourceType.PROFILE, canView: true, canCreate: false, canEdit: true, canDelete: false }
+      { role: UserRole.USER, resource: ResourceType.DASHBOARD as string, canView: true, canCreate: false, canEdit: false, canDelete: false, pluginId: null, isDynamic: false },
+      { role: UserRole.USER, resource: ResourceType.MARKET as string, canView: false, canCreate: false, canEdit: false, canDelete: false, pluginId: null, isDynamic: false },
+      { role: UserRole.USER, resource: ResourceType.PLUGINS as string, canView: false, canCreate: false, canEdit: false, canDelete: false, pluginId: null, isDynamic: false },
+      { role: UserRole.USER, resource: ResourceType.USERS as string, canView: false, canCreate: false, canEdit: false, canDelete: false, pluginId: null, isDynamic: false },
+      { role: UserRole.USER, resource: ResourceType.SETTINGS as string, canView: false, canCreate: false, canEdit: false, canDelete: false, pluginId: null, isDynamic: false },
+      { role: UserRole.USER, resource: ResourceType.PROFILE as string, canView: true, canCreate: false, canEdit: true, canDelete: false, pluginId: null, isDynamic: false }
     );
 
     // DEVELOPER role - More access
     permissions.push(
-      { role: UserRole.DEVELOPER, resource: ResourceType.DASHBOARD, canView: true, canCreate: false, canEdit: false, canDelete: false },
-      { role: UserRole.DEVELOPER, resource: ResourceType.MARKET, canView: true, canCreate: true, canEdit: true, canDelete: false },
-      { role: UserRole.DEVELOPER, resource: ResourceType.PLUGINS, canView: true, canCreate: true, canEdit: true, canDelete: true },
-      { role: UserRole.DEVELOPER, resource: ResourceType.USERS, canView: false, canCreate: false, canEdit: false, canDelete: false },
-      { role: UserRole.DEVELOPER, resource: ResourceType.SETTINGS, canView: false, canCreate: false, canEdit: false, canDelete: false },
-      { role: UserRole.DEVELOPER, resource: ResourceType.PROFILE, canView: true, canCreate: false, canEdit: true, canDelete: false }
+      { role: UserRole.DEVELOPER, resource: ResourceType.DASHBOARD as string, canView: true, canCreate: false, canEdit: false, canDelete: false, pluginId: null, isDynamic: false },
+      { role: UserRole.DEVELOPER, resource: ResourceType.MARKET as string, canView: true, canCreate: true, canEdit: true, canDelete: false, pluginId: null, isDynamic: false },
+      { role: UserRole.DEVELOPER, resource: ResourceType.PLUGINS as string, canView: true, canCreate: true, canEdit: true, canDelete: true, pluginId: null, isDynamic: false },
+      { role: UserRole.DEVELOPER, resource: ResourceType.USERS as string, canView: false, canCreate: false, canEdit: false, canDelete: false, pluginId: null, isDynamic: false },
+      { role: UserRole.DEVELOPER, resource: ResourceType.SETTINGS as string, canView: false, canCreate: false, canEdit: false, canDelete: false, pluginId: null, isDynamic: false },
+      { role: UserRole.DEVELOPER, resource: ResourceType.PROFILE as string, canView: true, canCreate: false, canEdit: true, canDelete: false, pluginId: null, isDynamic: false }
     );
 
     // ADMIN role - Full access
     permissions.push(
-      { role: UserRole.ADMIN, resource: ResourceType.DASHBOARD, canView: true, canCreate: true, canEdit: true, canDelete: true },
-      { role: UserRole.ADMIN, resource: ResourceType.MARKET, canView: true, canCreate: true, canEdit: true, canDelete: true },
-      { role: UserRole.ADMIN, resource: ResourceType.PLUGINS, canView: true, canCreate: true, canEdit: true, canDelete: true },
-      { role: UserRole.ADMIN, resource: ResourceType.USERS, canView: true, canCreate: true, canEdit: true, canDelete: true },
-      { role: UserRole.ADMIN, resource: ResourceType.SETTINGS, canView: true, canCreate: true, canEdit: true, canDelete: true },
-      { role: UserRole.ADMIN, resource: ResourceType.PROFILE, canView: true, canCreate: false, canEdit: true, canDelete: false }
+      { role: UserRole.ADMIN, resource: ResourceType.DASHBOARD as string, canView: true, canCreate: true, canEdit: true, canDelete: true, pluginId: null, isDynamic: false },
+      { role: UserRole.ADMIN, resource: ResourceType.MARKET as string, canView: true, canCreate: true, canEdit: true, canDelete: true, pluginId: null, isDynamic: false },
+      { role: UserRole.ADMIN, resource: ResourceType.PLUGINS as string, canView: true, canCreate: true, canEdit: true, canDelete: true, pluginId: null, isDynamic: false },
+      { role: UserRole.ADMIN, resource: ResourceType.USERS as string, canView: true, canCreate: true, canEdit: true, canDelete: true, pluginId: null, isDynamic: false },
+      { role: UserRole.ADMIN, resource: ResourceType.SETTINGS as string, canView: true, canCreate: true, canEdit: true, canDelete: true, pluginId: null, isDynamic: false },
+      { role: UserRole.ADMIN, resource: ResourceType.PROFILE as string, canView: true, canCreate: false, canEdit: true, canDelete: false, pluginId: null, isDynamic: false }
     );
 
     return permissions;
   }
+
+  // ============================================
+  // PLUGIN PERMISSIONS ENDPOINTS
+  // ============================================
+
+  // Get base system permissions only
+  getBasePermissions = async (req: AuthRequest, res: Response) => {
+    try {
+      const permissions = await pluginPermissionService.getBasePermissions();
+      res.json({ permissions });
+    } catch (error) {
+      console.error('Error fetching base permissions:', error);
+      res.status(500).json({ message: 'Failed to fetch base permissions' });
+    }
+  };
+
+  // Get all plugin permissions
+  getPluginPermissions = async (req: AuthRequest, res: Response) => {
+    try {
+      const permissions = await pluginPermissionService.getAllPluginPermissions();
+      res.json({ permissions });
+    } catch (error) {
+      console.error('Error fetching plugin permissions:', error);
+      res.status(500).json({ message: 'Failed to fetch plugin permissions' });
+    }
+  };
+
+  // Get permissions for a specific plugin
+  getPermissionsByPlugin = async (req: AuthRequest, res: Response) => {
+    try {
+      const { pluginId } = req.params;
+
+      if (!pluginId) {
+        throw createError('Plugin ID is required', 400);
+      }
+
+      const permissions = await pluginPermissionService.getPluginPermissions(pluginId);
+      res.json({ permissions });
+    } catch (error) {
+      console.error('Error fetching permissions by plugin:', error);
+      res.status(500).json({ message: 'Failed to fetch permissions' });
+    }
+  };
+
+  // Get permissions grouped by plugin
+  getPermissionsGrouped = async (req: AuthRequest, res: Response) => {
+    try {
+      const grouped = await pluginPermissionService.getPermissionsGroupedByPlugin();
+      res.json({ grouped });
+    } catch (error) {
+      console.error('Error fetching grouped permissions:', error);
+      res.status(500).json({ message: 'Failed to fetch grouped permissions' });
+    }
+  };
+
+  // Update plugin permission
+  updatePluginPermission = async (req: AuthRequest, res: Response) => {
+    try {
+      const { pluginId, role, resource, canView, canCreate, canEdit, canDelete } = req.body;
+
+      if (!pluginId || !role || !resource) {
+        throw createError('Plugin ID, role, and resource are required', 400);
+      }
+
+      const permission = await pluginPermissionService.updatePluginPermission(
+        pluginId,
+        role as UserRole,
+        resource,
+        { canView, canCreate, canEdit, canDelete }
+      );
+
+      if (!permission) {
+        throw createError('Permission not found', 404);
+      }
+
+      res.json({
+        message: 'Plugin permission updated successfully',
+        permission
+      });
+    } catch (error) {
+      console.error('Error updating plugin permission:', error);
+      res.status(500).json({ message: 'Failed to update plugin permission' });
+    }
+  };
 }
 

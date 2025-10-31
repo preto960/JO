@@ -1,38 +1,47 @@
 <template>
   <div class="space-y-6">
-    <!-- Tabs -->
+    <!-- Plugin Selector -->
     <div class="card">
-      <div class="flex border-b border-gray-200 dark:border-gray-700">
-        <button
-          @click="activeTab = 'base'"
-          class="px-4 py-3 text-sm font-medium transition-colors relative"
-          :class="activeTab === 'base' 
-            ? 'text-gray-900 dark:text-white border-b-2 border-gray-900 dark:border-white' 
-            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'"
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        Select Plugin
+      </label>
+      <select
+        v-model="selectedPluginId"
+        @change="loadPluginPermissions"
+        class="input-field"
+      >
+        <option value="">-- Select a plugin --</option>
+        <option
+          v-for="plugin in installedPlugins"
+          :key="plugin.id"
+          :value="plugin.id"
         >
-          Base System
-        </button>
-        <button
-          v-if="hasInstalledPlugins"
-          @click="activeTab = 'plugins'"
-          class="px-4 py-3 text-sm font-medium transition-colors relative"
-          :class="activeTab === 'plugins' 
-            ? 'text-gray-900 dark:text-white border-b-2 border-gray-900 dark:border-white' 
-            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'"
-        >
-          Plugin Permissions
-        </button>
-      </div>
+          {{ plugin.name }} (v{{ plugin.version }})
+        </option>
+      </select>
     </div>
 
-    <!-- Base System Permissions Tab -->
-    <div v-if="activeTab === 'base'" class="space-y-6">
+    <!-- No Plugins Message -->
+    <div v-if="installedPlugins.length === 0" class="card text-center py-12">
+      <Puzzle class="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">No Plugins Installed</h3>
+      <p class="text-gray-500 dark:text-gray-400 mb-4">
+        Install plugins from the marketplace to manage their permissions
+      </p>
+      <router-link to="/market" class="btn-primary inline-flex items-center">
+        <Store class="w-4 h-4 mr-2" />
+        Browse Market
+      </router-link>
+    </div>
+
+    <!-- Plugin Permissions Content -->
+    <div v-if="selectedPluginId">
       <!-- Header -->
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Role Permissions</h3>
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Plugin Permissions</h3>
           <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Configure access permissions for each role
+            Configure access permissions for {{ selectedPluginName }}
           </p>
         </div>
         <div class="flex items-center gap-3">
@@ -57,15 +66,15 @@
                   <div class="space-y-2 text-xs">
                     <div class="flex items-start space-x-2">
                       <span class="font-medium text-gray-900 dark:text-white min-w-[80px]">USER:</span>
-                      <span class="text-gray-600 dark:text-gray-400">Basic access to dashboard and profile</span>
+                      <span class="text-gray-600 dark:text-gray-400">Basic access to plugin features</span>
                     </div>
                     <div class="flex items-start space-x-2">
                       <span class="font-medium text-gray-900 dark:text-white min-w-[80px]">DEVELOPER:</span>
-                      <span class="text-gray-600 dark:text-gray-400">Can manage plugins and marketplace</span>
+                      <span class="text-gray-600 dark:text-gray-400">Extended access to plugin features</span>
                     </div>
                     <div class="flex items-start space-x-2">
                       <span class="font-medium text-gray-900 dark:text-white min-w-[80px]">ADMIN:</span>
-                      <span class="text-gray-600 dark:text-gray-400">Full system access and control</span>
+                      <span class="text-gray-600 dark:text-gray-400">Full access to all plugin features</span>
                     </div>
                   </div>
                 </div>
@@ -105,21 +114,12 @@
           </div>
 
           <button
-            @click="handleReset"
-            :disabled="loading"
-            class="btn-secondary text-sm inline-flex items-center justify-center min-w-[140px]"
-          >
-            <RotateCcw class="w-4 h-4 mr-2 flex-shrink-0" />
-            Reset to Default
-          </button>
-
-          <button
             @click="handleSave"
             :disabled="loading || !hasChanges"
             class="btn-primary text-sm inline-flex items-center justify-center min-w-[140px]"
           >
             <Save class="w-4 h-4 mr-2 flex-shrink-0" />
-            Save Changes
+            {{ loading ? 'Saving...' : 'Save Changes' }}
           </button>
         </div>
       </div>
@@ -131,7 +131,7 @@
       </div>
 
       <!-- Permissions Matrix -->
-      <div v-else class="card overflow-hidden">
+      <div v-else-if="localPermissions.length > 0" class="card overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full">
             <thead>
@@ -165,10 +165,12 @@
                 class="border-b border-gray-200 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
               >
                 <td class="px-4 py-4 sticky left-0 bg-white dark:bg-gray-800 z-10">
-                  <div class="flex items-center space-x-2">
-                    <component :is="getResourceIcon(resource)" class="w-5 h-5 text-gray-400" />
-                    <span class="text-sm font-medium text-gray-900 dark:text-white capitalize">
-                      {{ resource }}
+                  <div class="flex flex-col">
+                    <span class="text-sm font-medium text-gray-900 dark:text-white">
+                      {{ getResourceLabel(resource) }}
+                    </span>
+                    <span v-if="getResourceDescription(resource)" class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                      {{ getResourceDescription(resource) }}
                     </span>
                   </div>
                 </td>
@@ -236,60 +238,92 @@
         </div>
       </div>
 
+      <!-- No Permissions Message -->
+      <div v-else-if="!loading" class="card text-center py-12">
+        <AlertCircle class="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">No Permissions Defined</h3>
+        <p class="text-gray-500 dark:text-gray-400">
+          This plugin doesn't have any permissions configured
+        </p>
+      </div>
+
       <!-- Changes indicator -->
-      <div v-if="hasChanges" class="card bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+      <div v-if="hasChanges" class="card bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 mt-6">
         <div class="flex items-center space-x-2 text-blue-700 dark:text-blue-300">
           <AlertCircle class="w-5 h-5" />
           <span class="text-sm font-medium">You have unsaved changes</span>
         </div>
       </div>
     </div>
-
-    <!-- Plugin Permissions Tab -->
-    <div v-if="activeTab === 'plugins'">
-      <PluginPermissionsMatrix />
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
-import { Save, RotateCcw, AlertCircle, LayoutDashboard, Store, Puzzle, Users, Settings as SettingsIcon, User, Info } from 'lucide-vue-next'
-import { usePermissionsStore, ResourceType, type Permission } from '@/stores/permissions'
-import { usePluginsStore } from '@/stores/plugins'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { Puzzle, Store, Save, AlertCircle, Info } from 'lucide-vue-next'
 import { useToast } from 'vue-toastification'
-import PluginPermissionsMatrix from './PluginPermissionsMatrix.vue'
+import { usePluginsStore } from '@/stores/plugins'
+import { usePermissionsStore, type Permission } from '@/stores/permissions'
 
-const permissionsStore = usePermissionsStore()
-const pluginsStore = usePluginsStore()
 const toast = useToast()
+const pluginsStore = usePluginsStore()
+const permissionsStore = usePermissionsStore()
 
-const activeTab = ref<'base' | 'plugins'>('base')
-const loading = ref(false)
+const selectedPluginId = ref('')
 const localPermissions = ref<Permission[]>([])
+const loading = ref(false)
 const hasChanges = ref(false)
 const showInfo = ref(false)
 
 const roles = ['USER', 'DEVELOPER', 'ADMIN']
-const resources = Object.values(ResourceType)
 
-const hasInstalledPlugins = computed(() => pluginsStore.installedPlugins.length > 0)
+const installedPlugins = computed(() => pluginsStore.installedPlugins)
 
-// Get icon for resource
-const getResourceIcon = (resource: string) => {
-  const icons: Record<string, any> = {
-    dashboard: LayoutDashboard,
-    market: Store,
-    plugins: Puzzle,
-    users: Users,
-    settings: SettingsIcon,
-    profile: User
+const selectedPluginName = computed(() => {
+  const plugin = installedPlugins.value.find(p => p.id === selectedPluginId.value)
+  return plugin?.name || ''
+})
+
+// Get unique resources from permissions
+const resources = computed(() => {
+  const uniqueResources = new Set(localPermissions.value.map(p => p.resource))
+  return Array.from(uniqueResources).sort()
+})
+
+const loadPluginPermissions = async () => {
+  if (!selectedPluginId.value) {
+    localPermissions.value = []
+    return
   }
-  return icons[resource] || LayoutDashboard
+
+  loading.value = true
+  hasChanges.value = false
+  
+  try {
+    const permissions = await permissionsStore.fetchPermissionsByPlugin(selectedPluginId.value)
+    localPermissions.value = JSON.parse(JSON.stringify(permissions))
+  } catch (error) {
+    console.error('Error loading plugin permissions:', error)
+    toast.error('Failed to load plugin permissions')
+  } finally {
+    loading.value = false
+  }
+}
+
+// Get resource label
+const getResourceLabel = (resource: string): string => {
+  const permission = localPermissions.value.find(p => p.resource === resource)
+  return permission?.resourceLabel || resource
+}
+
+// Get resource description
+const getResourceDescription = (resource: string): string | null => {
+  const permission = localPermissions.value.find(p => p.resource === resource)
+  return permission?.resourceDescription || null
 }
 
 // Get permission action value for role and resource
-const getPermissionAction = (role: string, resource: ResourceType, action: 'canView' | 'canCreate' | 'canEdit' | 'canDelete'): boolean => {
+const getPermissionAction = (role: string, resource: string, action: 'canView' | 'canCreate' | 'canEdit' | 'canDelete'): boolean => {
   const permission = localPermissions.value.find(
     p => p.role === role && p.resource === resource
   )
@@ -297,7 +331,7 @@ const getPermissionAction = (role: string, resource: ResourceType, action: 'canV
 }
 
 // Toggle permission action
-const togglePermissionAction = (role: string, resource: ResourceType, action: 'canView' | 'canCreate' | 'canEdit' | 'canDelete', event: Event) => {
+const togglePermissionAction = (role: string, resource: string, action: 'canView' | 'canCreate' | 'canEdit' | 'canDelete', event: Event) => {
   const target = event.target as HTMLInputElement
   const value = target.checked
 
@@ -314,21 +348,6 @@ const togglePermissionAction = (role: string, resource: ResourceType, action: 'c
       localPermissions.value[permIndex].canEdit = false
       localPermissions.value[permIndex].canDelete = false
     }
-  } else {
-    // Create new permission entry
-    const newPermission: Permission = {
-      id: '',
-      role,
-      resource,
-      canView: false,
-      canCreate: false,
-      canEdit: false,
-      canDelete: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
-    newPermission[action] = value
-    localPermissions.value.push(newPermission)
   }
 
   hasChanges.value = true
@@ -338,42 +357,23 @@ const togglePermissionAction = (role: string, resource: ResourceType, action: 'c
 const handleSave = async () => {
   loading.value = true
   try {
-    const result = await permissionsStore.bulkUpdatePermissions(localPermissions.value)
-    
-    if (result.success) {
-      toast.success('Permissions updated successfully')
-      hasChanges.value = false
-    } else {
-      toast.error(result.message || 'Failed to update permissions')
+    for (const permission of localPermissions.value) {
+      await permissionsStore.updatePluginPermission({
+        pluginId: selectedPluginId.value,
+        role: permission.role,
+        resource: permission.resource,
+        canView: permission.canView,
+        canCreate: permission.canCreate,
+        canEdit: permission.canEdit,
+        canDelete: permission.canDelete
+      })
     }
-  } catch (error) {
-    toast.error('An error occurred while saving permissions')
-  } finally {
-    loading.value = false
-  }
-}
 
-// Reset to default
-const handleReset = async () => {
-  const message = `Are you sure you want to reset all permissions to default?\n\nThis will restore:\n• USER: Dashboard and Profile only\n• DEVELOPER: Dashboard, Market, Plugins, Profile\n• ADMIN: Full access to all resources\n\nThis action cannot be undone.`
-  
-  if (!confirm(message)) {
-    return
-  }
-
-  loading.value = true
-  try {
-    const result = await permissionsStore.resetPermissions()
-    
-    if (result.success) {
-      toast.success('Permissions reset to default successfully')
-      localPermissions.value = [...permissionsStore.permissions]
-      hasChanges.value = false
-    } else {
-      toast.error(result.message || 'Failed to reset permissions')
-    }
+    hasChanges.value = false
+    toast.success('Plugin permissions updated successfully')
   } catch (error) {
-    toast.error('An error occurred while resetting permissions')
+    console.error('Error saving permissions:', error)
+    toast.error('Failed to save permissions')
   } finally {
     loading.value = false
   }
@@ -392,15 +392,8 @@ const handleClickOutside = (event: MouseEvent) => {
   }
 }
 
-// Load permissions on mount
 onMounted(async () => {
-  loading.value = true
-  await Promise.all([
-    permissionsStore.fetchPermissions(),
-    pluginsStore.fetchInstalledPlugins()
-  ])
-  localPermissions.value = JSON.parse(JSON.stringify(permissionsStore.permissions))
-  loading.value = false
+  await pluginsStore.fetchInstalledPlugins()
   
   // Add click outside listener
   document.addEventListener('click', handleClickOutside)
@@ -410,13 +403,6 @@ onBeforeUnmount(() => {
   // Remove click outside listener
   document.removeEventListener('click', handleClickOutside)
 })
-
-// Watch for external changes
-watch(() => permissionsStore.permissions, (newPermissions) => {
-  if (!hasChanges.value) {
-    localPermissions.value = JSON.parse(JSON.stringify(newPermissions))
-  }
-}, { deep: true })
 </script>
 
 <style scoped>

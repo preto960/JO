@@ -19,6 +19,7 @@ export enum PermissionAction {
 
 @Entity('permissions')
 @Index(['role', 'resource'], { unique: true })
+@Index(['pluginId'])
 export class Permission {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -30,10 +31,22 @@ export class Permission {
   role: UserRole;
 
   @Column({
-    type: 'enum',
-    enum: ResourceType
+    type: 'varchar',
+    length: 255
   })
-  resource: ResourceType;
+  resource: string; // Changed from enum to string to support dynamic plugin resources
+
+  @Column({ type: 'varchar', nullable: true })
+  pluginId: string | null; // NULL = base system permission, UUID = plugin permission
+
+  @Column({ default: false })
+  isDynamic: boolean; // true = created by plugin, false = base system
+
+  @Column({ type: 'varchar', nullable: true })
+  resourceLabel: string | null; // Human-readable label for the resource
+
+  @Column({ type: 'text', nullable: true })
+  resourceDescription: string | null; // Description of what this resource controls
 
   @Column({ default: false })
   canView: boolean;

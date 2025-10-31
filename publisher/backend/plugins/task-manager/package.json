@@ -1,6 +1,6 @@
 {
   "name": "@njo/task-manager-plugin",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "Complete task management system plugin",
   "main": "backend/index.ts",
   "scripts": {

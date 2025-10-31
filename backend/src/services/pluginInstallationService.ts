@@ -4,6 +4,7 @@ import { publisherService } from './publisherService';
 import { pluginLifecycleService } from './pluginLifecycleService';
 import { pluginLoaderService } from './pluginLoaderService';
 import { pluginDatabaseService } from './pluginDatabaseService';
+import { pluginPermissionService } from './pluginPermissionService';
 import { put } from '@vercel/blob';
 
 export class PluginInstallationService {
@@ -52,11 +53,23 @@ export class PluginInstallationService {
           await pluginDatabaseService.createPluginTables(installedPlugin, pluginDir);
         }
 
+        // 6. Registrar permisos del plugin
+        try {
+          console.log(`🔐 Registering permissions for plugin ${installedPlugin.name}...`);
+          await pluginPermissionService.registerPluginPermissions(
+            installedPlugin.id,
+            installedPlugin.manifest
+          );
+        } catch (permError: any) {
+          console.error('Error registering plugin permissions:', permError);
+          // No fallar la instalación si los permisos fallan
+        }
+
         installedPlugin.status = InstallationStatus.INSTALLED;
         installedPlugin.isActive = true;
         installedPlugin.lastActivatedAt = new Date();
 
-        // 6. Ejecutar lifecycle hooks
+        // 7. Ejecutar lifecycle hooks
         await pluginLifecycleService.executeOnInstall(installedPlugin);
         await pluginLifecycleService.executeOnActivate(installedPlugin);
       } catch (error: any) {
@@ -92,6 +105,15 @@ export class PluginInstallationService {
       // Ejecutar lifecycle hooks
       await pluginLifecycleService.executeOnDeactivate(plugin);
       await pluginLifecycleService.executeOnUninstall(plugin);
+
+      // Eliminar permisos del plugin
+      try {
+        console.log(`🔐 Unregistering permissions for plugin ${plugin.name}...`);
+        await pluginPermissionService.unregisterPluginPermissions(plugin.id);
+      } catch (permError: any) {
+        console.error('Error unregistering plugin permissions:', permError);
+        // Continuar con la desinstalación
+      }
 
       // Eliminar tablas de la base de datos
       await pluginDatabaseService.dropPluginTables(plugin);

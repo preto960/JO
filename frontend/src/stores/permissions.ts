@@ -21,7 +21,11 @@ export enum PermissionAction {
 export interface Permission {
   id: string
   role: string
-  resource: ResourceType
+  resource: string // Changed to string to support dynamic plugin resources
+  pluginId?: string | null
+  isDynamic?: boolean
+  resourceLabel?: string | null
+  resourceDescription?: string | null
   canView: boolean
   canCreate: boolean
   canEdit: boolean
@@ -159,6 +163,9 @@ export const usePermissionsStore = defineStore('permissions', () => {
     }
   }
 
+  // Alias for resetPermissions (for consistency)
+  const resetToDefault = resetPermissions
+
   // Computed: Get all unique roles
   const roles = computed(() => {
     const uniqueRoles = new Set(permissions.value.map(p => p.role))
@@ -171,20 +178,121 @@ export const usePermissionsStore = defineStore('permissions', () => {
     return Array.from(uniqueResources)
   })
 
+  // ============================================
+  // PLUGIN PERMISSIONS METHODS
+  // ============================================
+
+  // Fetch base system permissions only
+  const fetchBasePermissions = async () => {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await api.get('/permissions/base')
+      permissions.value = response.data.permissions
+    } catch (err: any) {
+      error.value = err.response?.data?.message || 'Failed to fetch base permissions'
+      console.error('Error fetching base permissions:', err)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Fetch all plugin permissions
+  const fetchPluginPermissions = async () => {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await api.get('/permissions/plugins')
+      return response.data.permissions
+    } catch (err: any) {
+      error.value = err.response?.data?.message || 'Failed to fetch plugin permissions'
+      console.error('Error fetching plugin permissions:', err)
+      return []
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Fetch permissions for a specific plugin
+  const fetchPermissionsByPlugin = async (pluginId: string) => {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await api.get(`/permissions/plugin/${pluginId}`)
+      return response.data.permissions
+    } catch (err: any) {
+      error.value = err.response?.data?.message || 'Failed to fetch plugin permissions'
+      console.error('Error fetching plugin permissions:', err)
+      return []
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Fetch permissions grouped by plugin
+  const fetchPermissionsGrouped = async () => {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await api.get('/permissions/plugins/grouped')
+      return response.data.grouped
+    } catch (err: any) {
+      error.value = err.response?.data?.message || 'Failed to fetch grouped permissions'
+      console.error('Error fetching grouped permissions:', err)
+      return {}
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Update plugin permission
+  const updatePluginPermission = async (permissionData: Partial<Permission> & { pluginId: string }) => {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await api.put('/permissions/plugin', permissionData)
+      return { success: true, permission: response.data.permission }
+    } catch (err: any) {
+      error.value = err.response?.data?.message || 'Failed to update plugin permission'
+      console.error('Error updating plugin permission:', err)
+      return { success: false, message: error.value }
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Computed: Get base permissions only
+  const basePermissions = computed(() => {
+    return permissions.value.filter(p => !p.pluginId)
+  })
+
+  // Computed: Get plugin permissions only
+  const pluginPermissions = computed(() => {
+    return permissions.value.filter(p => p.pluginId)
+  })
+
   return {
     permissions,
     loading,
     error,
     roles,
     resources,
+    basePermissions,
+    pluginPermissions,
     fetchPermissions,
     fetchMyPermissions,
+    fetchBasePermissions,
+    fetchPluginPermissions,
+    fetchPermissionsByPlugin,
+    fetchPermissionsGrouped,
     getPermissionsByRole,
     getPermission,
     hasPermission,
     updatePermission,
+    updatePluginPermission,
     bulkUpdatePermissions,
-    resetPermissions
+    resetPermissions,
+    resetToDefault
   }
 })
 

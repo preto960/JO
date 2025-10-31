@@ -2076,7 +2076,7 @@ var task_manager = (function(pinia, vue, axios2) {
   const TaskCalendar = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "E:/PROGRAMAS/laragon/www/JO-Base/JO/publisher/backend/.build/task-manager/frontend/views/TaskCalendar.vue"]]);
   const pluginInfo = {
     name: "Task Manager",
-    version: "4.0.1",
+    version: "4.0.2",
     author: "NJO Team",
     slug: "task-manager",
     description: "Complete task management system"
