@@ -1,5 +1,17 @@
 <template>
   <div class="space-y-6">
+    <!-- Page Title -->
+    <div class="mb-6 flex items-center justify-between">
+      <div>
+        <h1 class="text-xl font-bold text-gray-900 dark:text-white">Plugin Market</h1>
+        <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Discover and install new plugins</p>
+      </div>
+      <router-link to="/plugins" class="btn-primary flex items-center text-sm">
+        <Package class="w-4 h-4 mr-2" />
+        Installed Plugins
+      </router-link>
+    </div>
+
     <!-- Search and Filters -->
     <div class="card">
       <div class="flex flex-col md:flex-row gap-4">
@@ -98,7 +110,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { Search, Puzzle, Star, Download, Store } from 'lucide-vue-next'
+import { Search, Puzzle, Star, Download, Store, Package } from 'lucide-vue-next'
 import { useMarketStore } from '@/stores/market'
 
 const router = useRouter()

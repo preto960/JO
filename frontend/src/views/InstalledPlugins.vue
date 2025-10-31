@@ -1,13 +1,13 @@
 <template>
   <div class="space-y-6">
-    <!-- Header -->
-    <div class="flex items-center justify-between">
+    <!-- Page Title -->
+    <div class="flex items-center justify-between mb-6">
       <div>
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Installed Plugins</h2>
-        <p class="text-gray-500 dark:text-gray-400">Manage and configure your installed plugins</p>
+        <h1 class="text-xl font-bold text-gray-900 dark:text-white">Installed Plugins</h1>
+        <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Manage your installed plugins</p>
       </div>
-      <router-link to="/market" class="btn-primary">
-        <Store class="w-5 h-5 mr-2" />
+      <router-link to="/market" class="btn-primary flex items-center text-sm">
+        <Store class="w-4 h-4 mr-2" />
         Browse Market
       </router-link>
     </div>

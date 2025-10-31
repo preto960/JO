@@ -1,5 +1,11 @@
 <template>
   <div class="space-y-6">
+    <!-- Page Title -->
+    <div class="mb-6">
+      <h1 class="text-xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+      <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Overview of your system</p>
+    </div>
+
     <!-- Stats Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="card">

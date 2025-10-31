@@ -38,14 +38,34 @@ export function useWebSocket() {
       socket.value?.emit('request:plugin-status');
     });
 
-    socket.value.on('disconnect', () => {
-      console.log('❌ WebSocket disconnected');
+    socket.value.on('disconnect', (reason) => {
+      console.log('❌ WebSocket disconnected:', reason);
       isConnected.value = false;
+      
+      // Intentar reconectar automáticamente si no fue desconexión manual
+      if (reason !== 'io client disconnect') {
+        console.log('🔄 Attempting automatic reconnection...');
+      }
     });
 
     socket.value.on('connect_error', (error) => {
       console.error('WebSocket connection error:', error);
       isConnected.value = false;
+    });
+
+    socket.value.on('reconnect_attempt', (attemptNumber) => {
+      console.log(`🔄 Reconnection attempt ${attemptNumber}...`);
+    });
+
+    socket.value.on('reconnect', (attemptNumber) => {
+      console.log(`✅ Reconnected after ${attemptNumber} attempts`);
+      isConnected.value = true;
+      toast.success('WebSocket reconnected', { timeout: 2000 });
+    });
+
+    socket.value.on('reconnect_failed', () => {
+      console.error('❌ Failed to reconnect after all attempts');
+      toast.error('Failed to connect to server. Please refresh the page.', { timeout: 5000 });
     });
 
     // Eventos de plugins

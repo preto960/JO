@@ -1,13 +1,13 @@
 <template>
   <div class="space-y-6">
-    <!-- Header -->
-    <div class="flex items-center justify-between">
+    <!-- Page Title -->
+    <div class="flex items-center justify-between mb-6">
       <div>
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">User Management</h2>
-        <p class="text-gray-500 dark:text-gray-400">Manage system users and permissions</p>
+        <h1 class="text-xl font-bold text-gray-900 dark:text-white">User Management</h1>
+        <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Manage system users and permissions</p>
       </div>
-      <button class="btn-primary">
-        <UserPlus class="w-5 h-5 mr-2" />
+      <button class="btn-primary flex items-center">
+        <UserPlus class="w-4 h-4 mr-2" />
         Add User
       </button>
     </div>
