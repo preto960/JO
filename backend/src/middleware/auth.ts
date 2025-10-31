@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { AppDataSource } from '../config/database';
 import { User, UserRole } from '../models/User';
+import { Permission, ResourceType, PermissionAction } from '../models/Permission';
 
 export interface AuthRequest extends Request {
   user?: User;
@@ -47,3 +48,51 @@ export const requireRole = (roles: UserRole[]) => {
 
 export const requireDeveloper = requireRole([UserRole.DEVELOPER, UserRole.ADMIN]);
 export const requireAdmin = requireRole([UserRole.ADMIN]);
+
+// Check if user has specific permission for a resource
+export const requirePermission = (resource: ResourceType, action: PermissionAction) => {
+  return async (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return res.status(401).json({ message: 'Authentication required' });
+    }
+
+    try {
+      const permissionRepository = AppDataSource.getRepository(Permission);
+      const permission = await permissionRepository.findOne({
+        where: {
+          role: req.user.role,
+          resource: resource
+        }
+      });
+
+      if (!permission) {
+        return res.status(403).json({ message: 'No permissions configured for this resource' });
+      }
+
+      let hasPermission = false;
+      switch (action) {
+        case PermissionAction.VIEW:
+          hasPermission = permission.canView;
+          break;
+        case PermissionAction.CREATE:
+          hasPermission = permission.canCreate;
+          break;
+        case PermissionAction.EDIT:
+          hasPermission = permission.canEdit;
+          break;
+        case PermissionAction.DELETE:
+          hasPermission = permission.canDelete;
+          break;
+      }
+
+      if (!hasPermission) {
+        return res.status(403).json({ message: 'Insufficient permissions for this action' });
+      }
+
+      next();
+    } catch (error) {
+      console.error('Error checking permission:', error);
+      return res.status(500).json({ message: 'Error checking permissions' });
+    }
+  };
+};

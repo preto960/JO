@@ -31,7 +31,7 @@
       </router-link>
 
       <router-link
-        v-if="authStore.isAdmin"
+        v-if="canViewUsers"
         to="/users"
         class="nav-item"
         :class="{ 'active': $route.path === '/users' }"
@@ -60,7 +60,7 @@
       <!-- Expanded: Show icons horizontally -->
       <div v-if="!props.isCollapsed" class="flex items-center justify-center flex-row gap-2">
         <router-link
-          v-if="authStore.isAdmin"
+          v-if="canViewMarket"
           to="/market"
           class="bottom-action-btn"
           :class="{ 'active': $route.path.startsWith('/market') }"
@@ -70,7 +70,7 @@
         </router-link>
 
         <router-link
-          v-if="authStore.isAdmin"
+          v-if="canViewSettings"
           to="/settings"
           class="bottom-action-btn"
           :class="{ 'active': $route.path === '/settings' }"
@@ -108,7 +108,7 @@
           class="bottom-menu-dropdown absolute bottom-full left-0 mb-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl py-2 z-50"
         >
           <router-link
-            v-if="authStore.isAdmin"
+            v-if="canViewMarket"
             to="/market"
             class="flex items-center space-x-3 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             @click="showBottomMenu = false"
@@ -118,7 +118,7 @@
           </router-link>
 
           <router-link
-            v-if="authStore.isAdmin"
+            v-if="canViewSettings"
             to="/settings"
             class="flex items-center space-x-3 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             @click="showBottomMenu = false"
@@ -148,6 +148,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { LayoutDashboard, Store, Puzzle, Users, Settings, Bell, MoreVertical } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 import { usePluginsStore } from '@/stores/plugins'
+import { usePermissionsStore, ResourceType, PermissionAction } from '@/stores/permissions'
 
 // Props to receive collapsed state
 const props = defineProps<{
@@ -156,6 +157,7 @@ const props = defineProps<{
 
 const authStore = useAuthStore()
 const pluginsStore = usePluginsStore()
+const permissionsStore = usePermissionsStore()
 
 const showNotifications = ref(false)
 const showBottomMenu = ref(false)
@@ -172,6 +174,27 @@ const activePlugins = computed(() => {
   return pluginsStore.installedPlugins.filter(p => p.isActive)
 })
 
+// Check if user has permission to view a resource
+const canView = (resource: ResourceType): boolean => {
+  if (!authStore.user) return false
+  
+  // Load permissions if not loaded
+  if (permissionsStore.permissions.length === 0) {
+    return authStore.isAdmin // Fallback to admin check
+  }
+  
+  return permissionsStore.hasPermission(
+    authStore.user.role,
+    resource,
+    PermissionAction.VIEW
+  )
+}
+
+// Computed properties for menu visibility
+const canViewMarket = computed(() => canView(ResourceType.MARKET))
+const canViewSettings = computed(() => canView(ResourceType.SETTINGS))
+const canViewUsers = computed(() => canView(ResourceType.USERS))
+
 // Close dropdown when clicking outside
 const handleClickOutside = (event: MouseEvent) => {
   const target = event.target as HTMLElement
@@ -185,9 +208,14 @@ const handleClickOutside = (event: MouseEvent) => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   if (authStore.isAuthenticated) {
     pluginsStore.fetchInstalledPlugins()
+    
+    // Load permissions
+    if (permissionsStore.permissions.length === 0) {
+      await permissionsStore.fetchPermissions()
+    }
   }
   
   // Add click outside listener
