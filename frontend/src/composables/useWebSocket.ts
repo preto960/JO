@@ -26,7 +26,9 @@ export function useWebSocket() {
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionDelay: 1000,
-      reconnectionAttempts: 5
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: Infinity, // Intentar reconectar indefinidamente
+      timeout: 20000
     });
 
     // Eventos de conexión
