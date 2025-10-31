@@ -10,7 +10,18 @@ const archiver = require('archiver');
 const pluginName = process.argv[2] || 'task-manager';
 const pluginDir = path.join(__dirname, '..', 'plugins', pluginName);
 const distDir = path.join(__dirname, '..', 'dist-plugins');
-const outputPath = path.join(distDir, `${pluginName}-1.0.0.zip`);
+
+// Leer la versión del manifest.json
+const manifestPath = path.join(pluginDir, 'manifest.json');
+let version = '1.0.0';
+try {
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+  version = manifest.version || '1.0.0';
+} catch (error) {
+  console.warn(`⚠️  Could not read version from manifest, using default: ${version}`);
+}
+
+const outputPath = path.join(distDir, `${pluginName}-${version}.zip`);
 
 // Crear directorio de salida si no existe
 if (!fs.existsSync(distDir)) {

@@ -1,14 +1,14 @@
 <template>
-  <aside class="w-64 bg-gray-800 border-r border-gray-700 flex flex-col">
+  <aside class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-colors">
     <!-- Logo -->
-    <div class="p-6 border-b border-gray-700">
+    <div class="p-6 border-b border-gray-200 dark:border-gray-700">
       <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 bg-gradient-to-r from-primary-500 to-accent-500 rounded-lg flex items-center justify-center">
-          <span class="text-white font-bold text-xl">A</span>
+        <div class="w-8 h-8 bg-gray-900 dark:bg-white rounded-md flex items-center justify-center">
+          <span class="text-white dark:text-gray-900 font-bold text-sm">A</span>
         </div>
         <div>
-          <h1 class="text-white font-bold text-lg">Admin Panel</h1>
-          <p class="text-gray-400 text-xs">Plugin System</p>
+          <h1 class="text-gray-900 dark:text-white font-semibold text-base">Admin Panel</h1>
+          <p class="text-gray-500 dark:text-gray-400 text-xs">Plugin System</p>
         </div>
       </div>
     </div>
@@ -80,18 +80,18 @@
     </nav>
 
     <!-- User Info -->
-    <div class="p-4 border-t border-gray-700">
+    <div class="p-4 border-t border-gray-200 dark:border-gray-700">
       <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 bg-gradient-to-r from-primary-500 to-accent-500 rounded-full flex items-center justify-center">
-          <span class="text-white font-semibold text-sm">
+        <div class="w-8 h-8 bg-gray-900 dark:bg-white rounded-full flex items-center justify-center">
+          <span class="text-white dark:text-gray-900 font-semibold text-xs">
             {{ userInitials }}
           </span>
         </div>
         <div class="flex-1 min-w-0">
-          <p class="text-white text-sm font-medium truncate">
+          <p class="text-gray-900 dark:text-white text-sm font-medium truncate">
             {{ authStore.user?.firstName }} {{ authStore.user?.lastName }}
           </p>
-          <p class="text-gray-400 text-xs truncate">{{ authStore.user?.email }}</p>
+          <p class="text-gray-500 dark:text-gray-400 text-xs truncate">{{ authStore.user?.email }}</p>
         </div>
       </div>
     </div>
@@ -127,11 +127,11 @@ onMounted(() => {
 
 <style scoped>
 .nav-item {
-  @apply flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors;
+  @apply flex items-center space-x-3 px-3 py-2 rounded-md text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors;
 }
 
 .nav-item.active {
-  @apply bg-gradient-to-r from-primary-600 to-accent-600 text-white;
+  @apply bg-gray-900 dark:bg-white text-white dark:text-gray-900;
 }
 </style>
 

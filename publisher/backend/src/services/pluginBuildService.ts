@@ -68,9 +68,8 @@ export class PluginBuildService {
         }
       }
 
-      // 5. Build TypeScript - backend (CommonJS) y frontend (ES Modules) por separado
+      // 5. Build Backend TypeScript (CommonJS)
       const hasBackendTsConfig = await this.fileExists(path.join(buildPath, 'tsconfig.backend.json'));
-      const hasFrontendTsConfig = await this.fileExists(path.join(buildPath, 'tsconfig.frontend.json'));
       
       if (hasBackendTsConfig) {
         console.log('🔧 Compiling TypeScript (Backend - CommonJS)...');
@@ -82,44 +81,16 @@ export class PluginBuildService {
         }
       }
       
-      if (hasFrontendTsConfig) {
-        console.log('🔧 Compiling TypeScript (Frontend - ES Modules)...');
+      // 5.5. Build Frontend con Vite (Vue + TypeScript)
+      const hasFrontend = await this.fileExists(path.join(buildPath, 'frontend'));
+      if (hasFrontend) {
+        console.log('⚡ Building frontend with Vite...');
         try {
-          await execAsync('npx tsc -p tsconfig.frontend.json', { cwd: buildPath });
+          await this.buildFrontendWithVite(buildPath, plugin.manifest.slug);
         } catch (error: any) {
-          errors.push(`Frontend TypeScript compilation failed: ${error.message}`);
-          console.error('Frontend TS compilation error:', error);
+          errors.push(`Frontend build failed: ${error.message}`);
+          console.error('Vite build error:', error);
         }
-      }
-      
-      // Fallback: si solo existe tsconfig.json genérico
-      if (!hasBackendTsConfig && !hasFrontendTsConfig) {
-        const hasTsConfig = await this.fileExists(path.join(buildPath, 'tsconfig.json'));
-        if (hasTsConfig) {
-          console.log('🔧 Compiling TypeScript...');
-          try {
-            await execAsync('npx tsc', { cwd: buildPath });
-          } catch (error: any) {
-            errors.push(`TypeScript compilation failed: ${error.message}`);
-          }
-        }
-      }
-
-      // 5.5. Compilar componentes Vue a JavaScript
-      console.log('🎨 Compiling Vue components...');
-      try {
-        await this.compileVueComponents(buildPath);
-      } catch (error: any) {
-        errors.push(`Vue compilation failed: ${error.message}`);
-        console.error('Vue compilation error:', error);
-      }
-
-      // 5.6. Arreglar imports en archivos JS compilados
-      console.log('🔧 Fixing imports in compiled files...');
-      try {
-        await this.fixImportsInCompiledFiles(buildPath);
-      } catch (error: any) {
-        console.warn('Warning: Failed to fix imports:', error.message);
       }
 
       // 6. Empaquetar a .zip
@@ -556,6 +527,86 @@ ${scriptContent.replace(/export default\s*{/, `${stylesCode}\n\nexport default {
     }
     
     return result;
+  }
+
+  /**
+   * Compila el frontend del plugin usando Vite CLI
+   */
+  private async buildFrontendWithVite(pluginPath: string, pluginSlug: string): Promise<void> {
+    console.log(`   Building frontend for ${pluginSlug}...`);
+    
+    const frontendPath = path.join(pluginPath, 'frontend');
+    const distPath = path.join(pluginPath, 'dist-frontend');
+    
+    // Verificar que exista el directorio frontend
+    try {
+      await fs.access(frontendPath);
+    } catch {
+      console.log(`   ⚠️  No frontend directory found, skipping Vite build`);
+      return;
+    }
+    
+    // Crear configuración temporal de Vite
+    const viteConfigContent = `
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import path from 'path'
+
+export default defineConfig({
+  plugins: [vue()],
+  build: {
+    outDir: '${distPath.replace(/\\/g, '/')}',
+    emptyOutDir: true,
+    lib: {
+      entry: path.resolve('${frontendPath.replace(/\\/g, '/')}', 'index.ts'),
+      name: '${pluginSlug.replace(/-/g, '_')}',
+      formats: ['iife'],
+      fileName: () => 'index.js'
+    },
+    rollupOptions: {
+      external: ['vue', 'pinia', 'vue-router', 'axios'],
+      output: {
+        globals: {
+          vue: 'Vue',
+          pinia: 'Pinia',
+          'vue-router': 'VueRouter',
+          axios: 'axios'
+        },
+        inlineDynamicImports: true
+      }
+    },
+    minify: false,
+    target: 'es2020'
+  },
+  resolve: {
+    alias: {
+      '@': '${frontendPath.replace(/\\/g, '/')}'
+    }
+  }
+})
+`;
+    
+    const viteConfigPath = path.join(pluginPath, 'vite.config.mjs');
+    
+    try {
+      // Escribir configuración temporal como módulo ESM
+      await fs.writeFile(viteConfigPath, viteConfigContent, 'utf-8');
+      
+      // Ejecutar Vite build
+      await execAsync('npx vite build --config vite.config.mjs', { cwd: pluginPath });
+      
+      // Limpiar configuración temporal
+      await fs.unlink(viteConfigPath);
+      
+      console.log(`   ✓ Frontend built successfully`);
+    } catch (error: any) {
+      console.error(`   ✗ Vite build failed:`, error.message);
+      // Intentar limpiar el archivo de configuración
+      try {
+        await fs.unlink(viteConfigPath);
+      } catch {}
+      throw error;
+    }
   }
 }
 

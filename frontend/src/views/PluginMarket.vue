@@ -29,44 +29,44 @@
     <!-- Loading -->
     <div v-if="marketStore.loading" class="text-center py-12">
       <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
-      <p class="text-gray-400 mt-4">Loading plugins...</p>
+      <p class="text-gray-500 dark:text-gray-400 mt-4">Loading plugins...</p>
     </div>
 
     <!-- Plugins Grid -->
-    <div v-else-if="marketStore.availablePlugins.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div v-else-if="marketStore.availablePlugins.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <div
         v-for="plugin in marketStore.availablePlugins"
         :key="plugin.id"
-        class="card hover:shadow-2xl transition-all cursor-pointer"
+        class="card hover:border-gray-300 dark:hover:border-gray-600 transition-colors cursor-pointer"
         @click="viewPlugin(plugin.id)"
       >
         <!-- Plugin Icon -->
-        <div class="w-16 h-16 bg-gradient-to-r from-primary-500 to-accent-500 rounded-xl flex items-center justify-center mb-4">
-          <Puzzle class="w-8 h-8 text-white" />
+        <div class="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-md flex items-center justify-center mb-3">
+          <Puzzle class="w-6 h-6 text-gray-600 dark:text-gray-400" />
         </div>
 
         <!-- Plugin Info -->
-        <h3 class="text-xl font-bold text-white mb-2">{{ plugin.name }}</h3>
-        <p class="text-gray-400 text-sm mb-4 line-clamp-2">{{ plugin.description }}</p>
+        <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">{{ plugin.name }}</h3>
+        <p class="text-gray-500 dark:text-gray-400 text-xs mb-3 line-clamp-2">{{ plugin.description }}</p>
 
         <!-- Meta -->
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center space-x-1">
-            <Star class="w-4 h-4 text-yellow-400 fill-yellow-400" />
-            <span class="text-white text-sm">{{ plugin.rating }}</span>
+        <div class="flex items-center justify-between mb-3 text-xs">
+          <div class="flex items-center space-x-1 text-gray-500 dark:text-gray-400">
+            <Star class="w-3 h-3" />
+            <span>{{ plugin.rating }}</span>
           </div>
-          <div class="flex items-center space-x-1 text-gray-400 text-sm">
-            <Download class="w-4 h-4" />
+          <div class="flex items-center space-x-1 text-gray-500 dark:text-gray-400">
+            <Download class="w-3 h-3" />
             <span>{{ formatNumber(plugin.downloadCount) }}</span>
           </div>
         </div>
 
         <!-- Category & Price -->
-        <div class="flex items-center justify-between">
-          <span class="px-3 py-1 bg-primary-500/20 text-primary-400 text-xs rounded-full">
+        <div class="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
+          <span class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs rounded">
             {{ plugin.category }}
           </span>
-          <span class="text-white font-bold">
+          <span class="text-gray-900 dark:text-white font-semibold text-sm">
             {{ plugin.price ? `$${plugin.price}` : 'Free' }}
           </span>
         </div>
@@ -75,9 +75,9 @@
 
     <!-- Empty State -->
     <div v-else class="card text-center py-12">
-      <Store class="w-16 h-16 text-gray-600 mx-auto mb-4" />
-      <h3 class="text-xl font-bold text-white mb-2">No plugins found</h3>
-      <p class="text-gray-400">Try adjusting your search or filters</p>
+      <Store class="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">No plugins found</h3>
+      <p class="text-gray-500 dark:text-gray-400">Try adjusting your search or filters</p>
     </div>
 
     <!-- Pagination -->
@@ -87,7 +87,7 @@
         :key="page"
         @click="changePage(page)"
         class="px-4 py-2 rounded-lg transition-colors"
-        :class="page === marketStore.pagination.page ? 'bg-primary-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'"
+        :class="page === marketStore.pagination.page ? 'bg-primary-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'"
       >
         {{ page }}
       </button>

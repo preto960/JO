@@ -3,8 +3,8 @@
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h2 class="text-2xl font-bold text-white">User Management</h2>
-        <p class="text-gray-400">Manage system users and permissions</p>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">User Management</h2>
+        <p class="text-gray-500 dark:text-gray-400">Manage system users and permissions</p>
       </div>
       <button class="btn-primary">
         <UserPlus class="w-5 h-5 mr-2" />
@@ -16,29 +16,29 @@
     <div class="card overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full">
-          <thead class="bg-gray-700/50">
+          <thead class="bg-gray-100 dark:bg-gray-700/50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">User</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Email</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Role</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">User</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Email</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Role</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Status</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-700">
-            <tr v-for="user in users" :key="user.id" class="hover:bg-gray-700/30 transition-colors">
+          <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+            <tr v-for="user in users" :key="user.id" class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
-                  <div class="w-10 h-10 bg-gradient-to-r from-primary-500 to-accent-500 rounded-full flex items-center justify-center">
-                    <span class="text-white font-semibold text-sm">{{ user.initials }}</span>
+                  <div class="w-8 h-8 bg-gray-900 dark:bg-white rounded-full flex items-center justify-center">
+                    <span class="text-white dark:text-gray-900 font-semibold text-xs">{{ user.initials }}</span>
                   </div>
-                  <div class="ml-4">
-                    <div class="text-sm font-medium text-white">{{ user.firstName }} {{ user.lastName }}</div>
+                  <div class="ml-3">
+                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ user.firstName }} {{ user.lastName }}</div>
                   </div>
                 </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-300">{{ user.email }}</div>
+                <div class="text-sm text-gray-600 dark:text-gray-300">{{ user.email }}</div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span class="px-3 py-1 text-xs font-medium rounded-full"

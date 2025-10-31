@@ -1,6 +1,6 @@
 {
   "name": "Task Manager",
-  "version": "2.0.0",
+  "version": "4.0.1",
   "slug": "task-manager",
   "description": "Complete task management system with categories, priorities, and team collaboration",
   "longDescription": "A comprehensive task management plugin that allows you to create, organize, and track tasks with support for categories, priorities, due dates, assignments, and real-time collaboration. Perfect for teams and individuals who want to stay organized.",

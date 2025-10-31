@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-screen bg-gray-900">
+  <div class="flex h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
     <!-- Sidebar -->
     <Sidebar />
     
@@ -9,7 +9,7 @@
       <Header />
       
       <!-- Main Content Area -->
-      <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-900 p-6">
+      <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-gray-900 p-6 transition-colors">
         <router-view />
       </main>
     </div>

@@ -56,13 +56,63 @@ export function usePluginLoader() {
         
         console.log(`✅ Plugin bundle loaded for ${plugin.name}`)
 
+        // Función helper para detectar si un export es un componente Vue
+        const isVueComponent = (obj: any): boolean => {
+          if (!obj || typeof obj !== 'object') return false
+          
+          // Componentes Vue compilados tienen estas propiedades
+          return (
+            obj.__vccOpts !== undefined ||  // Vue 3 SFC compilado
+            obj.render !== undefined ||      // Componente con función render
+            obj.setup !== undefined ||       // Componente con setup
+            obj.template !== undefined ||    // Componente con template
+            (obj.name && obj.props !== undefined) // Componente con name y props
+          )
+        }
+
+        // Función helper para detectar si un export es un store de Pinia
+        const isPiniaStore = (key: string, obj: any): boolean => {
+          return (
+            typeof obj === 'function' &&
+            key.startsWith('use') &&
+            key.endsWith('Store')
+          )
+        }
+
         // Marcar componentes como raw para evitar reactividad innecesaria
         const rawComponents: Record<string, any> = {}
-        if (pluginBundle.components) {
+        let detectedStore: any = undefined
+
+        // Opción 1: Si el bundle exporta explícitamente "components", usarlo
+        if (pluginBundle.components && typeof pluginBundle.components === 'object') {
           for (const [key, component] of Object.entries(pluginBundle.components)) {
             rawComponents[key] = markRaw(component)
           }
+        } 
+        // Opción 2: Auto-detectar componentes iterando sobre todos los exports
+        else {
+          // Lista de exports conocidos que NO son componentes
+          const reservedKeys = ['pluginInfo', 'routes', 'store', 'initialize', 'destroy', 'default']
+          
+          for (const [key, value] of Object.entries(pluginBundle)) {
+            // Saltar exports reservados
+            if (reservedKeys.includes(key)) continue
+            
+            // Detectar stores
+            if (isPiniaStore(key, value)) {
+              detectedStore = value
+              continue
+            }
+            
+            // Detectar componentes Vue
+            if (isVueComponent(value)) {
+              rawComponents[key] = markRaw(value)
+            }
+          }
         }
+
+        // Detectar store: primero explícito, luego auto-detectado
+        const pluginStore = pluginBundle.store || detectedStore
 
         // Crear el módulo del plugin
         const pluginModule: PluginModule = {
@@ -70,7 +120,7 @@ export function usePluginLoader() {
           version: plugin.version,
           routes: pluginBundle.routes || [],
           components: rawComponents,
-          store: pluginBundle.store,
+          store: pluginStore,
           initialize: pluginBundle.initialize,
           destroy: pluginBundle.destroy
         }

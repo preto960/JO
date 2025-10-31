@@ -3,8 +3,8 @@
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h2 class="text-2xl font-bold text-white">Installed Plugins</h2>
-        <p class="text-gray-400">Manage and configure your installed plugins</p>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Installed Plugins</h2>
+        <p class="text-gray-500 dark:text-gray-400">Manage and configure your installed plugins</p>
       </div>
       <router-link to="/market" class="btn-primary">
         <Store class="w-5 h-5 mr-2" />
@@ -25,15 +25,15 @@
         class="card"
       >
         <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
-            <div class="w-16 h-16 bg-gradient-to-r from-primary-500 to-accent-500 rounded-xl flex items-center justify-center">
-              <Puzzle class="w-8 h-8 text-white" />
+          <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-md flex items-center justify-center">
+              <Puzzle class="w-6 h-6 text-gray-600 dark:text-gray-400" />
             </div>
             
             <div>
-              <h3 class="text-xl font-bold text-white">{{ plugin.name }}</h3>
-              <p class="text-gray-400 text-sm">Version {{ plugin.version }}</p>
-              <p class="text-gray-500 text-xs">Installed {{ formatDate(plugin.installedAt) }}</p>
+              <h3 class="text-base font-semibold text-gray-900 dark:text-white">{{ plugin.name }}</h3>
+              <p class="text-gray-500 dark:text-gray-400 text-xs">Version {{ plugin.version }}</p>
+              <p class="text-gray-600 dark:text-gray-500 text-xs">Installed {{ formatDate(plugin.installedAt) }}</p>
             </div>
           </div>
 
@@ -41,7 +41,7 @@
             <!-- Status Badge -->
             <span
               class="px-3 py-1 rounded-full text-sm font-medium"
-              :class="plugin.isActive ? 'bg-green-500/20 text-green-400' : 'bg-gray-700 text-gray-400'"
+              :class="plugin.isActive ? 'bg-green-500/20 text-green-400' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'"
             >
               {{ plugin.isActive ? 'Active' : 'Inactive' }}
             </span>
@@ -56,8 +56,8 @@
             </button>
 
             <!-- Settings Button -->
-            <button class="p-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors">
-              <Settings class="w-5 h-5 text-gray-400" />
+            <button class="p-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg transition-colors">
+              <Settings class="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
 
             <!-- Delete Button -->
@@ -74,9 +74,9 @@
 
     <!-- Empty State -->
     <div v-else class="card text-center py-12">
-      <Puzzle class="w-16 h-16 text-gray-600 mx-auto mb-4" />
-      <h3 class="text-xl font-bold text-white mb-2">No plugins installed</h3>
-      <p class="text-gray-400 mb-6">Browse the market to discover and install plugins</p>
+      <Puzzle class="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">No plugins installed</h3>
+      <p class="text-gray-500 dark:text-gray-400 mb-6">Browse the market to discover and install plugins</p>
       <router-link to="/market" class="btn-primary inline-flex items-center">
         <Store class="w-5 h-5 mr-2" />
         Browse Market

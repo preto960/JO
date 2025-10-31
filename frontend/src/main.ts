@@ -1,5 +1,8 @@
 import { createApp } from 'vue'
 import { createPinia, defineStore } from 'pinia'
+import * as Vue from 'vue'
+import * as Pinia from 'pinia'
+import axios from 'axios'
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 import App from './App.vue'
@@ -20,8 +23,11 @@ if (typeof window !== 'undefined') {
 const app = createApp(App)
 const pinia = createPinia()
 
-// Exponer Pinia globalmente para que los plugins puedan usarlo
+// Exponer Vue, Pinia y axios globalmente para que los plugins puedan usarlos
 if (typeof window !== 'undefined') {
+  (window as any).Vue = Vue;
+  (window as any).Pinia = Pinia;
+  (window as any).axios = axios;
   (window as any).pinia = { defineStore };
 }
 

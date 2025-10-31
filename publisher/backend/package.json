@@ -9,7 +9,8 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "seed": "ts-node src/scripts/seed.ts",
-    "package:plugin": "node scripts/packagePlugin.js"
+    "package:plugin": "node scripts/packagePlugin.js",
+    "build:plugin": "ts-node scripts/buildPlugin.ts"
   },
   "dependencies": {
     "@types/archiver": "^6.0.4",
@@ -39,8 +40,11 @@
     "@types/multer": "^1.4.7",
     "@types/node": "^20.5.0",
     "@types/uuid": "^9.0.2",
+    "@vitejs/plugin-vue": "^6.0.1",
     "nodemon": "^3.0.1",
+    "rollup-plugin-external-globals": "^0.13.0",
     "ts-node": "^10.9.1",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "vite": "^7.1.12"
   }
 }
