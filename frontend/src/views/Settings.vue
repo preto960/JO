@@ -45,6 +45,89 @@
               />
             </div>
 
+            <div class="p-3 border-b border-gray-200 dark:border-gray-700">
+              <div class="flex items-start justify-between gap-4">
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-gray-900 dark:text-white">Site Logo</p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Upload SVG or PNG (max 512x512px, 2MB)
+                  </p>
+                </div>
+                <div class="w-80 space-y-3">
+                  <!-- File Upload -->
+                  <div class="flex gap-2">
+                    <label class="flex-1 cursor-pointer">
+                      <input 
+                        type="file" 
+                        accept=".svg,.png,image/svg+xml,image/png"
+                        @change="handleLogoUpload"
+                        class="hidden"
+                        ref="logoFileInput"
+                      />
+                      <div class="btn-secondary text-sm w-full text-center py-2">
+                        <span v-if="!uploadingLogo">Choose File</span>
+                        <span v-else>Uploading...</span>
+                      </div>
+                    </label>
+                    <button 
+                      v-if="generalSettings.siteLogo"
+                      @click="clearLogo"
+                      class="px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
+                      title="Remove logo"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  <!-- OR Divider -->
+                  <div class="flex items-center gap-2">
+                    <div class="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">OR</span>
+                    <div class="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+                  </div>
+
+                  <!-- URL Input -->
+                  <input 
+                    v-model="generalSettings.siteLogo" 
+                    type="url" 
+                    placeholder="https://example.com/logo.png"
+                    class="input-field w-full text-sm py-2"
+                  />
+
+                  <!-- Preview -->
+                  <div v-if="generalSettings.siteLogo" class="flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-700/30 rounded border border-gray-200 dark:border-gray-600">
+                    <img 
+                      :src="generalSettings.siteLogo" 
+                      alt="Logo preview" 
+                      class="max-h-16 max-w-full object-contain" 
+                      @error="handleLogoError"
+                      @load="handleLogoLoad"
+                    />
+                  </div>
+
+                  <!-- File Info -->
+                  <div v-if="logoFileInfo" class="text-xs text-gray-500 dark:text-gray-400 space-y-1">
+                    <p>📄 {{ logoFileInfo.name }}</p>
+                    <p>📐 {{ logoFileInfo.dimensions }}</p>
+                    <p>💾 {{ logoFileInfo.size }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/30 rounded-lg">
+              <div>
+                <p class="text-sm font-medium text-gray-900 dark:text-white">Show Logo Only</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Hide site name and show only the logo</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer toggle-switch">
+                <input type="checkbox" v-model="generalSettings.useLogoOnly" class="sr-only peer">
+                <div class="toggle-track">
+                  <div class="toggle-thumb"></div>
+                </div>
+              </label>
+            </div>
+
             <div class="flex items-center justify-between p-3 border-b border-gray-200 dark:border-gray-700 last:border-0">
               <div>
                 <p class="text-sm font-medium text-gray-900 dark:text-white">Language</p>
@@ -294,12 +377,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { Settings as SettingsIcon, Puzzle, Shield, Bell, Sliders, AlertTriangle, Lock } from 'lucide-vue-next'
 import { useToast } from 'vue-toastification'
+import { useSettingsStore } from '@/stores/settings'
 import PermissionsMatrix from '@/components/PermissionsMatrix.vue'
 
 const toast = useToast()
+const settingsStore = useSettingsStore()
 
 const sections = [
   { id: 'general', name: 'General', icon: SettingsIcon },
@@ -312,49 +397,82 @@ const sections = [
 
 const activeSection = ref('general')
 
-const generalSettings = ref({
-  siteName: 'Admin Panel',
-  language: 'en',
-  timezone: 'UTC'
+// Use computed properties to sync with store
+const generalSettings = computed({
+  get: () => settingsStore.settings.general,
+  set: (value) => { settingsStore.settings.general = value }
 })
 
-const pluginSettings = ref({
-  autoUpdate: true,
-  hotReload: true,
-  allowExternal: false
+const pluginSettings = computed({
+  get: () => settingsStore.settings.plugins,
+  set: (value) => { settingsStore.settings.plugins = value }
 })
 
-const securitySettings = ref({
-  twoFactor: false,
-  sessionTimeout: 30,
-  passwordExpiration: false
+const securitySettings = computed({
+  get: () => settingsStore.settings.security,
+  set: (value) => { settingsStore.settings.security = value }
 })
 
-const notificationSettings = ref({
-  email: true,
-  browser: true,
-  pluginUpdates: true
+const notificationSettings = computed({
+  get: () => ({
+    email: settingsStore.settings.notifications.emailNotifications,
+    browser: settingsStore.settings.notifications.browserNotifications,
+    pluginUpdates: settingsStore.settings.notifications.pluginUpdateNotifications
+  }),
+  set: (value) => {
+    settingsStore.settings.notifications = {
+      emailNotifications: value.email,
+      browserNotifications: value.browser,
+      pluginUpdateNotifications: value.pluginUpdates
+    }
+  }
 })
 
-const advancedSettings = ref({
-  debugMode: false,
-  cacheDuration: 3600
+const advancedSettings = computed({
+  get: () => settingsStore.settings.advanced,
+  set: (value) => { settingsStore.settings.advanced = value }
 })
 
-const saveGeneralSettings = () => {
-  toast.success('General settings saved successfully')
+// Save functions
+const saveGeneralSettings = async () => {
+  const result = await settingsStore.updateSettings('general', generalSettings.value)
+  if (result.success) {
+    toast.success('General settings saved successfully')
+  } else {
+    toast.error(result.message || 'Failed to save settings')
+  }
 }
 
-const savePluginSettings = () => {
-  toast.success('Plugin settings saved successfully')
+const savePluginSettings = async () => {
+  const result = await settingsStore.updateSettings('plugins', pluginSettings.value)
+  if (result.success) {
+    toast.success('Plugin settings saved successfully')
+  } else {
+    toast.error(result.message || 'Failed to save settings')
+  }
 }
 
-const saveSecuritySettings = () => {
-  toast.success('Security settings saved successfully')
+const saveSecuritySettings = async () => {
+  const result = await settingsStore.updateSettings('security', securitySettings.value)
+  if (result.success) {
+    toast.success('Security settings saved successfully')
+  } else {
+    toast.error(result.message || 'Failed to save settings')
+  }
 }
 
-const saveNotificationSettings = () => {
-  toast.success('Notification settings saved successfully')
+const saveNotificationSettings = async () => {
+  const notifSettings = {
+    emailNotifications: notificationSettings.value.email,
+    browserNotifications: notificationSettings.value.browser,
+    pluginUpdateNotifications: notificationSettings.value.pluginUpdates
+  }
+  const result = await settingsStore.updateSettings('notifications', notifSettings)
+  if (result.success) {
+    toast.success('Notification settings saved successfully')
+  } else {
+    toast.error(result.message || 'Failed to save settings')
+  }
 }
 
 const clearCache = () => {
@@ -363,11 +481,154 @@ const clearCache = () => {
   }
 }
 
-const resetSettings = () => {
+const resetSettings = async () => {
   if (confirm('Are you sure you want to reset all settings to default? This action cannot be undone.')) {
-    toast.success('Settings reset to default values')
+    const result = await settingsStore.resetSettings()
+    if (result.success) {
+      toast.success('Settings reset to default values')
+    } else {
+      toast.error(result.message || 'Failed to reset settings')
+    }
   }
 }
+
+// Logo upload functionality
+const uploadingLogo = ref(false)
+const logoFileInput = ref<HTMLInputElement | null>(null)
+const logoFileInfo = ref<{ name: string; dimensions: string; size: string } | null>(null)
+
+const handleLogoUpload = async (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  
+  if (!file) return
+
+  // Validate file type
+  const validTypes = ['image/svg+xml', 'image/png']
+  if (!validTypes.includes(file.type)) {
+    toast.error('Only SVG and PNG files are allowed')
+    return
+  }
+
+  // Validate file size (2MB max)
+  const maxSize = 2 * 1024 * 1024
+  if (file.size > maxSize) {
+    toast.error('File size must be less than 2MB')
+    return
+  }
+
+  // For PNG, validate dimensions
+  if (file.type === 'image/png') {
+    const img = new Image()
+    const objectUrl = URL.createObjectURL(file)
+    
+    img.onload = async () => {
+      URL.revokeObjectURL(objectUrl)
+      
+      if (img.width > 512 || img.height > 512) {
+        toast.warning(`Image will be resized from ${img.width}x${img.height} to fit 512x512`)
+      }
+
+      // Store file info
+      logoFileInfo.value = {
+        name: file.name,
+        dimensions: `${img.width}x${img.height}`,
+        size: formatFileSize(file.size)
+      }
+
+      // Upload file
+      await uploadLogoFile(file)
+    }
+
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl)
+      toast.error('Invalid image file')
+    }
+
+    img.src = objectUrl
+  } else {
+    // SVG - just upload
+    logoFileInfo.value = {
+      name: file.name,
+      dimensions: 'Vector (SVG)',
+      size: formatFileSize(file.size)
+    }
+    await uploadLogoFile(file)
+  }
+}
+
+const uploadLogoFile = async (file: File) => {
+  uploadingLogo.value = true
+
+  try {
+    const formData = new FormData()
+    formData.append('logo', file)
+
+    const response = await fetch('http://localhost:3001/api/upload/logo', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: formData
+    })
+
+    const data = await response.json()
+
+    if (response.ok) {
+      generalSettings.value.siteLogo = data.url
+      toast.success('Logo uploaded successfully')
+    } else {
+      toast.error(data.message || 'Failed to upload logo')
+    }
+  } catch (error) {
+    console.error('Error uploading logo:', error)
+    toast.error('Failed to upload logo')
+  } finally {
+    uploadingLogo.value = false
+    // Reset file input
+    if (logoFileInput.value) {
+      logoFileInput.value.value = ''
+    }
+  }
+}
+
+const clearLogo = () => {
+  generalSettings.value.siteLogo = ''
+  logoFileInfo.value = null
+  if (logoFileInput.value) {
+    logoFileInput.value.value = ''
+  }
+}
+
+// Handle logo load error
+const handleLogoError = (event: Event) => {
+  const target = event.target as HTMLImageElement
+  target.src = '' // Clear broken image
+  toast.error('Failed to load logo image')
+}
+
+const handleLogoLoad = (event: Event) => {
+  const img = event.target as HTMLImageElement
+  if (!logoFileInfo.value && generalSettings.value.siteLogo) {
+    // For URL-based logos, show dimensions after load
+    logoFileInfo.value = {
+      name: 'External URL',
+      dimensions: `${img.naturalWidth}x${img.naturalHeight}`,
+      size: 'N/A'
+    }
+  }
+}
+
+const formatFileSize = (bytes: number): string => {
+  if (bytes < 1024) return bytes + ' B'
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+}
+
+// Load settings on mount
+onMounted(async () => {
+  await settingsStore.fetchSettings()
+})
 </script>
 
 <style scoped>

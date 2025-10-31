@@ -46,6 +46,25 @@ export class PermissionController {
     }
   };
 
+  // Get current user's permissions
+  getMyPermissions = async (req: AuthRequest, res: Response) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'Authentication required' });
+      }
+
+      const permissions = await this.permissionRepository.find({
+        where: { role: req.user.role },
+        order: { resource: 'ASC' }
+      });
+
+      res.json({ permissions });
+    } catch (error) {
+      console.error('Error fetching user permissions:', error);
+      res.status(500).json({ message: 'Failed to fetch permissions' });
+    }
+  };
+
   // Check if user has permission
   checkPermission = async (req: AuthRequest, res: Response) => {
     try {

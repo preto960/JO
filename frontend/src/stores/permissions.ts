@@ -35,12 +35,27 @@ export const usePermissionsStore = defineStore('permissions', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
 
-  // Fetch all permissions
+  // Fetch all permissions (admin only)
   const fetchPermissions = async () => {
     loading.value = true
     error.value = null
     try {
       const response = await api.get('/permissions')
+      permissions.value = response.data.permissions
+    } catch (err: any) {
+      error.value = err.response?.data?.message || 'Failed to fetch permissions'
+      console.error('Error fetching permissions:', err)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Fetch current user's permissions
+  const fetchMyPermissions = async () => {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await api.get('/permissions/my-permissions')
       permissions.value = response.data.permissions
     } catch (err: any) {
       error.value = err.response?.data?.message || 'Failed to fetch permissions'
@@ -163,6 +178,7 @@ export const usePermissionsStore = defineStore('permissions', () => {
     roles,
     resources,
     fetchPermissions,
+    fetchMyPermissions,
     getPermissionsByRole,
     getPermission,
     hasPermission,

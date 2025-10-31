@@ -8,13 +8,18 @@
     <!-- Logo -->
     <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-center">
       <div class="flex items-center space-x-3 min-w-0">
-        <div class="w-8 h-8 bg-gray-900 dark:bg-white rounded-md flex items-center justify-center flex-shrink-0">
-          <span class="text-white dark:text-gray-900 font-bold text-sm">A</span>
+        <!-- Logo Image or Default Icon -->
+        <div v-if="siteLogo" class="w-8 h-8 flex items-center justify-center flex-shrink-0">
+          <img :src="siteLogo" :alt="siteName" class="max-w-full max-h-full object-contain" />
         </div>
-        <div v-if="!props.isCollapsed" class="min-w-0">
-          <h1 class="text-gray-900 dark:text-white font-semibold text-base truncate">Admin Panel</h1>
-          <p class="text-gray-500 dark:text-gray-400 text-xs truncate">Plugin System</p>
+        <div v-else class="w-8 h-8 bg-gray-900 dark:bg-white rounded-md flex items-center justify-center flex-shrink-0">
+          <span class="text-white dark:text-gray-900 font-bold text-sm">{{ siteInitial }}</span>
         </div>
+        
+              <!-- Site Name (hidden if useLogoOnly is true and logo exists) -->
+              <div v-if="!props.isCollapsed && !(useLogoOnly && siteLogo)" class="min-w-0">
+                <h1 class="text-gray-900 dark:text-white font-semibold text-base truncate">{{ siteName }}</h1>
+              </div>
       </div>
     </div>
 
@@ -149,6 +154,7 @@ import { LayoutDashboard, Store, Puzzle, Users, Settings, Bell, MoreVertical } f
 import { useAuthStore } from '@/stores/auth'
 import { usePluginsStore } from '@/stores/plugins'
 import { usePermissionsStore, ResourceType, PermissionAction } from '@/stores/permissions'
+import { useSettingsStore } from '@/stores/settings'
 
 // Props to receive collapsed state
 const props = defineProps<{
@@ -158,10 +164,17 @@ const props = defineProps<{
 const authStore = useAuthStore()
 const pluginsStore = usePluginsStore()
 const permissionsStore = usePermissionsStore()
+const settingsStore = useSettingsStore()
 
 const showNotifications = ref(false)
 const showBottomMenu = ref(false)
 const notificationCount = ref(3) // TODO: Connect to real notification system
+
+// Get site settings
+const siteName = computed(() => settingsStore.siteName || 'Admin Panel')
+const siteLogo = computed(() => settingsStore.siteLogo)
+const useLogoOnly = computed(() => settingsStore.useLogoOnly)
+const siteInitial = computed(() => siteName.value.charAt(0).toUpperCase())
 
 const handleNotificationClick = () => {
   showNotifications.value = !showNotifications.value
@@ -212,10 +225,17 @@ onMounted(async () => {
   if (authStore.isAuthenticated) {
     pluginsStore.fetchInstalledPlugins()
     
-    // Load permissions
+    // Load permissions based on user role
     if (permissionsStore.permissions.length === 0) {
-      await permissionsStore.fetchPermissions()
+      if (authStore.isAdmin) {
+        await permissionsStore.fetchPermissions()
+      } else {
+        await permissionsStore.fetchMyPermissions()
+      }
     }
+    
+    // Load settings (will use cache if recently loaded)
+    await settingsStore.fetchSettings(false, false)
   }
   
   // Add click outside listener

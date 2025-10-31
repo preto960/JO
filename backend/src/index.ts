@@ -22,6 +22,8 @@ import { pluginAssetsRoutes } from './routes/pluginAssets';
 import { pluginBundlesRoutes } from './routes/pluginBundles';
 import { pluginApiRoutes } from './routes/pluginApi';
 import permissionRoutes from './routes/permissions';
+import settingRoutes from './routes/settings';
+import uploadRoutes from './routes/upload';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -65,6 +67,8 @@ app.use('/api/plugin-assets', pluginAssetsRoutes);
 app.use('/api/plugin-bundles', pluginBundlesRoutes);
 app.use('/api/plugin-api', pluginApiRoutes);
 app.use('/api/permissions', permissionRoutes);
+app.use('/api/settings', settingRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Error handling
 app.use(errorHandler);

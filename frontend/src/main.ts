@@ -58,7 +58,7 @@ router.isReady().then(async () => {
   // Inicializar autenticación si hay token
   await authStore.initializeAuth()
   
-  // Si está autenticado, cargar plugins
+  // Si está autenticado, cargar plugins y settings
   if (authStore.isAuthenticated) {
     // Primero obtener la lista de plugins instalados
     await pluginsStore.fetchInstalledPlugins()

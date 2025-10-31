@@ -51,6 +51,7 @@ export const useAuthStore = defineStore('auth', () => {
     
     localStorage.removeItem('accessToken')
     localStorage.removeItem('refreshToken')
+    localStorage.removeItem('app_settings') // Clear settings cache
   }
 
   const refreshToken = async () => {

@@ -107,7 +107,12 @@ router.beforeEach(async (to, from, next) => {
     // Load permissions if not loaded yet
     if (permissionsStore.permissions.length === 0) {
       try {
-        await permissionsStore.fetchPermissions()
+        // Use appropriate endpoint based on user role
+        if (authStore.isAdmin) {
+          await permissionsStore.fetchPermissions()
+        } else {
+          await permissionsStore.fetchMyPermissions()
+        }
       } catch (error) {
         console.error('Failed to load permissions:', error)
         // Allow navigation if permissions can't be loaded (fail-open for better UX)

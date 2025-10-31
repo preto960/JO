@@ -3,10 +3,19 @@
     <div class="max-w-md w-full">
       <!-- Logo -->
       <div class="text-center mb-8">
-        <div class="inline-flex w-16 h-16 bg-gradient-to-r from-primary-500 to-accent-500 rounded-2xl items-center justify-center mb-4">
-          <span class="text-white font-bold text-3xl">A</span>
+        <!-- Logo Image or Default Icon -->
+        <div class="inline-flex w-16 h-16 rounded-2xl items-center justify-center mb-4">
+          <img 
+            v-if="siteLogo" 
+            :src="siteLogo" 
+            :alt="siteName" 
+            class="max-w-full max-h-full object-contain"
+          />
+          <div v-else class="w-full h-full bg-gradient-to-r from-primary-500 to-accent-500 rounded-2xl flex items-center justify-center">
+            <span class="text-white font-bold text-3xl">{{ siteInitial }}</span>
+          </div>
         </div>
-        <h1 class="text-3xl font-bold text-white mb-2">Admin Panel</h1>
+        <h1 class="text-3xl font-bold text-white mb-2">{{ siteName }}</h1>
         <p class="text-gray-400">Sign in to manage your system</p>
       </div>
 
@@ -66,30 +75,45 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useSettingsStore } from '@/stores/settings'
 import { useToast } from 'vue-toastification'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const settingsStore = useSettingsStore()
 const toast = useToast()
 
 const email = ref('')
 const password = ref('')
 const loading = ref(false)
 
+// Get site settings
+const siteName = computed(() => settingsStore.siteName || 'Admin Panel')
+const siteLogo = computed(() => settingsStore.siteLogo)
+const siteInitial = computed(() => siteName.value.charAt(0).toUpperCase())
+
 const handleLogin = async () => {
   loading.value = true
   const result = await authStore.login(email.value, password.value)
-  loading.value = false
 
   if (result.success) {
+    // Reload settings with authenticated endpoint after successful login
+    await settingsStore.fetchSettings(false)
+    loading.value = false
     toast.success('Welcome back!')
     router.push('/dashboard')
   } else {
+    loading.value = false
     toast.error(result.message || 'Login failed')
   }
 }
+
+// Load settings on mount (use public endpoint since user is not authenticated)
+onMounted(async () => {
+  await settingsStore.fetchSettings(true)
+})
 </script>
 
